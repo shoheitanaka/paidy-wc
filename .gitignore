@@ -19,8 +19,13 @@ Thumbs.db
 vendor
 package-lock.json
 
+# Optional npm cache directory
+*.npm
+
+# dotenv environment variables file
+.env
+
 paidy-wc.zip
 i18n/paidy-wc.pot
-*.env
 *.tmp
 *.zip
