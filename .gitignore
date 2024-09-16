@@ -17,6 +17,7 @@ Thumbs.db
 # node and composer
 /node_modules/
 vendor
+package-lock.json
 
 paidy-wc.zip
 i18n/paidy-wc.pot
