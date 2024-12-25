@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-require_once 'includes/class-wc-paidy.php';
+require_once 'class-wc-paidy.php';
 
 if ( ! class_exists( 'WC_Paidy' ) ) :
 	/**
