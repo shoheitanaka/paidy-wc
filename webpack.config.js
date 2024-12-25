@@ -28,12 +28,16 @@ const requestToHandle = (request) => {
 module.exports = {
 	...defaultConfig,
 	entry: {
+		'wizard/paidy': '/src/wizard/index.js',
 		'frontend/paidy': '/src/paidy/index.js',
 		'admin/paidy': '/src/admin/index.js',
 	},
 	output: {
 		path: path.resolve( __dirname, 'includes/gateways/paidy/assets/js' ),
 		filename: '[name].js',
+	},
+	resolve: {
+		extensions: [ '.json', '.js', '.jsx', '.ts', '.tsx' ],
 	},
 	plugins: [
 		...defaultConfig.plugins.filter(
