@@ -5,32 +5,17 @@
 	"license": "GPL-3.0",
 	"homepage": "https://wordpress.org/plugins/paidy-wc/",
 	"repository": {
-	  "type": "github",
-	  "url": "https://github.com/SoftStepsEC/paidy-wc.git"
-	},
-	"dependencies": {
-		"react": "^17.0.2",
-		"react-dom": "^17.0.2",
-		"react-router-dom": "~6.3.0",
-		"react-transition-group": "^4.4.5",
-		"react-visibility-sensor": "^5.1.1",
-		"clsx": "^2.1.1"
+		"type": "github",
+		"url": "https://github.com/SoftStepsEC/paidy-wc.git"
 	},
 	"devDependencies": {
-		"@types/debug": "^4.1.12",
-		"@types/jquery": "^3.5.29",
-		"@types/react": "^17.0.71",
-		"@types/react-dom": "^17.0.25",
-		"@types/wordpress__components": "^19.10.5",
-		"@types/node": "^16.18.68",
-		"@woocommerce/dependency-extraction-webpack-plugin": "^2.2.0",
-		"@wordpress/scripts": "^12.6.1",
-		"@wordpress/api-fetch": "^5.0.0",
-		"fork-ts-checker-webpack-plugin": "^8.0.0",
-		"cross-env": "7.0.3"
+		"@woocommerce/dependency-extraction-webpack-plugin": "2.2.0",
+		"@wordpress/scripts": "^30.0.2",
+		"cross-env": "7.0.3",
+		"webpack-cli": "^6.0.1"
 	},
 	"scripts": {
-		"start": "wp-scripts start",
+		"start": "wp-scripts start && wp-env logs",
 		"build": "wp-scripts build && npm run i18n:build",
 		"i18n": "npm run i18n:build",
 		"i18n:build": "npm run i18n:pot && ./bin/build_i18n.sh",

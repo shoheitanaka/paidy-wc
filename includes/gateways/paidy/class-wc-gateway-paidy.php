@@ -6,7 +6,7 @@
  * @package WooCommerce\Gateways
  */
 
-use ArtisanWorkshop\WooCommerce\PluginFramework\v2_0_13 as Framework;
+use ArtisanWorkshop\PluginFramework\v2_0_13 as Framework;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -145,7 +145,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			'refunds',
 		);
 
-		$this->jp4wc_framework = new Framework\JP4WC_Plugin();
+		$this->jp4wc_framework = new Framework\JP4WC_Framework();
 
 		// Get setting values.
 		foreach ( $this->settings as $key => $val ) {
@@ -270,7 +270,6 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				'type'        => 'image',
 				'description' => __( 'URL of a custom logo that can be displayed in the checkout application header. If no value is specified, the Paidy logo will be displayed.', 'paidy-wc' ),
 				'default'     => '',
-				'desc_tip'    => true,
 				'placeholder' => __( 'Optional', 'paidy-wc' ),
 			),
 			'debug'               => array(
@@ -337,8 +336,10 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * @return string HTML content explaining Paidy payment method.
 	 */
 	protected function paidy_explanation() {
+		$image_url    = WC_PAIDY_PLUGIN_URL . 'assets/images/paidy_checkout_2023_320x100.png';
 		$explain_html = '
         <div class="jp4wc-paidy-explanation">
+		<img src="' . esc_url( $image_url ) . '" alt="Paidy 翌月まとめてお支払い" style="max-height: none; float: none;">
         <ul>
             <li style="list-style: disc !important;">クレジットカード、事前登録不要。</li>
             <li style="list-style: disc !important;">メールアドレスと携帯番号だけで、今すぐお買い物。</li>
@@ -408,14 +409,14 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		$paidy_amount = 0;
 		foreach ( $order_items as $key => $item ) {
 			if ( $item->get_product_id() ) {
-				$item_name         = str_replace( '"', '\"', $item->get_name() );
-				$unit_price        = round( $item->get_subtotal() / $item->get_quantity(), 0 );
-				$items            .= '{
+				$item_name     = str_replace( '"', '\"', $item->get_name() );
+				$unit_price    = round( $item->get_subtotal() / $item->get_quantity(), 0 );
+				$items        .= '{
                     "id":"' . $item->get_product_id() . '",
                     "quantity":' . $item->get_quantity() . ',
                     "title":"' . $item_name . '",
                     "unit_price":' . $unit_price;
-					$paidy_amount += $item->get_quantity() * $unit_price;
+				$paidy_amount += $item->get_quantity() * $unit_price;
 			}
 			if ( end( $order_items ) === $item && ( ! isset( $fees ) ) ) {
 				$items .= '}
@@ -590,14 +591,14 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 						},
 						"order": {
 							"items": [
-								<?php echo esc_js( $items ); ?>
+							<?php echo esc_js( $items ); ?>
 
 							],
 							"order_ref": "<?php echo esc_js( $paidy_order_ref ); ?>",
-							<?php
-							if ( $not_virtual ) {
-								echo '"shipping": ' . esc_js( $order->get_shipping_total() ) . ',';}
-							?>
+						<?php
+						if ( $not_virtual ) {
+							echo '"shipping": ' . esc_js( $order->get_shipping_total() ) . ',';}
+						?>
 							"tax": <?php echo esc_js( $tax ); ?>
 						},
 						<?php if ( $not_virtual ) { ?>
@@ -615,12 +616,12 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 					paidyHandler.launch(payload);
 				}
 			</script>
-		<?php elseif ( 'yes' === $this->enabled && isset( $api_public_key ) && '' === $api_public_key ) : ?>
+			<?php elseif ( 'yes' === $this->enabled && isset( $api_public_key ) && '' === $api_public_key ) : ?>
 			<h2><?php esc_html_e( 'This order has already been settled.', 'paidy-wc' ); ?></h2>
 		<?php else : ?>
 			<h2><?php echo esc_html_e( 'API Public key is not set. Please set an API public key in the admin page.', 'paidy-wc' ); ?></h2>
 			<?php
-		endif;
+			endif;
 	}
 
 	/**
@@ -687,34 +688,8 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				WC_PAIDY_VERSION,
 				true
 			);
-			wp_enqueue_script(
-				'paidy-admin-settings',
-				WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/admin/paidy.js',
-				array( 'react', 'wp-dom-ready', 'wp-element' ),
-				WC_PAIDY_VERSION,
-				array(
-					'in_footer' => true,
-				)
-			);
-			// Paidy Payment for Admin page.
-			$asset_file = WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/admin/paidy.asset.php';
 
-			if ( ! file_exists( $asset_file ) ) {
-				return;
-			}
-			$asset = include $asset_file;
-
-			wp_enqueue_script(
-				'paidy-admin-settings',
-				WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/admin/paidy.js',
-				$asset['dependencies'],
-				$asset['version'],
-				array(
-					'in_footer' => true,
-				)
-			);
 		}
-
 		if ( is_admin() && isset( $_GET['section'] ) && isset( $_GET['tab'] ) && 'paidy' === $_GET['section'] && 'checkout' === $_GET['tab'] ) {// phpcs:ignore
 			wp_register_style(
 				'jp4wc_paidy_admin',

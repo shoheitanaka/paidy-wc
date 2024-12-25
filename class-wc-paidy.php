@@ -108,7 +108,7 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		private function includes() {
 			// load framework.
 			$version_text = 'v' . str_replace( '.', '_', JP4WC_PAIDY_FRAMEWORK_VERSION );
-			if ( ! class_exists( '\\ArtisanWorkshop\\WooCommerce\\PluginFramework\\' . $version_text . '\\JP4WC_Plugin' ) ) {
+			if ( ! class_exists( '\\ArtisanWorkshop\\PluginFramework\\' . $version_text . '\\JP4WC_Framework' ) ) {
 				require_once __DIR__ . '/includes/jp4wc-framework/class-jp4wc-framework.php';
 			}
 			require_once __DIR__ . '/includes/gateways/paidy/class-wc-gateway-paidy.php';
@@ -120,7 +120,6 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		 * Init Paidy for WooCommerce when WordPress Initialises.
 		 */
 		public static function init() {
-			add_action( 'plugins_loaded', array( __CLASS__, 'wc_paidy_plugin' ), 0 );
 			add_action( 'woocommerce_blocks_loaded', array( __CLASS__, 'wc_paidy_blocks_support' ) );
 		}
 
@@ -137,34 +136,8 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		}
 
 		/**
-		 * Display a notice when WooCommerce is not active.
-		 *
-		 * @return void
+		 * Registers WooCommerce Blocks integration.
 		 */
-		public function wc_paidy_fallback_notice() {
-			?>
-	<div class="error">
-		<ul>
-			<li><?php esc_html_e( 'Paidy for WooCommerce is enabled but not effective. It requires WooCommerce in order to work.', 'paidy-wc' ); ?></li>
-		</ul>
-	</div>
-			<?php
-		}
-
-			/**
-			 * Initialize the Paidy plugin.
-			 */
-		public function wc_paidy_plugin() {
-			if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
-				self::get_instance();
-			} else {
-				add_action( 'admin_notices', 'wc_paidy_fallback_notice' );
-			}
-		}
-
-			/**
-			 * Registers WooCommerce Blocks integration.
-			 */
 		public static function wc_paidy_blocks_support() {
 			if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
 				add_action(

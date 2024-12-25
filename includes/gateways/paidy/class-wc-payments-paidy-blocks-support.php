@@ -87,8 +87,24 @@ final class WC_Payments_Paidy_Blocks_Support extends AbstractPaymentMethodType {
 		return array(
 			'title'             => $this->get_setting( 'title' ),
 			'description'       => $this->get_setting( 'description' ),
+			'icons'             => $this->get_icons(),
 			'paidy_description' => $this->get_setting( 'paidy_description' ),
 			'supports'          => array_filter( $this->gateway->supports, array( $this->gateway, 'supports' ) ),
 		);
+	}
+
+	/**
+	 * Retrieves the icons for the payment methods.
+	 *
+	 * @return array
+	 */
+	private function get_icons() {
+		$icons_src = array(
+			'paidy' => array(
+				'src' => WC_PAIDY_PLUGIN_URL . 'assets/images/paidy_logo_100_2023.png',
+				'alt' => __( 'Paidy', 'paidy-wc' ),
+			),
+		);
+		return apply_filters( 'wc_paidy_payment_icons', $icons_src );
 	}
 }

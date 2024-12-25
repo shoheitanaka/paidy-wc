@@ -24,9 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-require_once 'class-wc-paidy.php';
 
 if ( ! class_exists( 'WC_Paidy' ) ) :
+	require_once 'class-wc-paidy.php';
 	/**
 	 * Load plugin functions.
 	 */
@@ -52,7 +52,7 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 			WC_Paidy::get_instance();
 		} else {
-			add_action( 'admin_notices', 'WC_Paidy_fallback_notice' );
+			add_action( 'admin_notices', 'wc_paidy_fallback_notice' );
 		}
 	}
 

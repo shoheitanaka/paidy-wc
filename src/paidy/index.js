@@ -16,6 +16,7 @@ const settings = getPaymentMethodData( 'paidy', {} );
 const defaultLabel = __( 'Paidy', 'paidy-wc' );
 const label = decodeEntities( settings?.title || '' ) || defaultLabel;
 const content = settings.description + settings.paidy_description;
+const icons = settings.icons || '';
 
 /**
  * Content component
@@ -25,13 +26,30 @@ const Content = () => {
 };
 
 /**
+ * Get Web Money icons
+ * 	
+ * @return {Array} Array of Web Money icons.
+ * 
+ */
+const getPaidyIcons = () => {
+    const [[id, { src, alt }]] = Object.entries(icons);
+    return [{ id, src, alt }];
+}
+
+/**
  * Label component
  *
  * @param {*} props Props from payment API.
  */
 const Label = ( props ) => {
-	const { PaymentMethodLabel } = props.components;
-	return <PaymentMethodLabel text={ label } />;
+	const { PaymentMethodLabel, PaymentMethodIcons } = props.components;
+	const paidyIcons = getPaidyIcons();
+	return (
+		<div style={{ display: 'flex', alignItems: 'center' }}>
+			<PaymentMethodLabel text={ label } />
+			<PaymentMethodIcons icons={ paidyIcons } align="left"/>
+		</div>
+	);
 };
 
 /**
@@ -50,4 +68,3 @@ const paidyTransferPaymentMethod = {
 };
 
 registerPaymentMethod( paidyTransferPaymentMethod );
-
