@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @class       WC_Gateway_Paidy
  * @extends     WC_Payment_Gateway
- * @version     1.4.1
+ * @version     1.4.5
  * @package     WooCommerce/Classes/Payment
  * @author      Artisan Workshop
  */
@@ -558,7 +558,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 						if(callbackData.status === "rejected"){
 							window.location.href = "<?php echo esc_url( wc_get_checkout_url() . '?status=' ) . '" + callbackData.status + "&order_id=' . esc_js( $order_id ); ?>";
 						}else if(callbackData.status === "authorized"){
-							window.location.href = "<?php echo esc_url( $this->get_return_url( $order ) . '&transaction_id=' ); ?>" + callbackData.id;
+							window.location.href = "<?php echo $this->get_return_url( $order ) . '&transaction_id=';//phpcs:ignore ?>" + callbackData.id;
 						}else{
 							window.location.href = "<?php echo esc_url( wc_get_checkout_url() ) . '?status='; ?>" + callbackData.status + "&order_id=<?php echo esc_js( $order_id ); ?>";
 						}
@@ -591,14 +591,14 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 						},
 						"order": {
 							"items": [
-							<?php echo esc_js( $items ); ?>
+						<?php echo $items;// phpcs:ignore ?>
 
 							],
 							"order_ref": "<?php echo esc_js( $paidy_order_ref ); ?>",
-						<?php
-						if ( $not_virtual ) {
-							echo '"shipping": ' . esc_js( $order->get_shipping_total() ) . ',';}
-						?>
+					<?php
+					if ( $not_virtual ) {
+						echo '"shipping": ' . esc_js( $order->get_shipping_total() ) . ',';}
+					?>
 							"tax": <?php echo esc_js( $tax ); ?>
 						},
 						<?php if ( $not_virtual ) { ?>
@@ -616,7 +616,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 					paidyHandler.launch(payload);
 				}
 			</script>
-			<?php elseif ( 'yes' === $this->enabled && isset( $api_public_key ) && '' === $api_public_key ) : ?>
+				<?php elseif ( 'yes' === $this->enabled && isset( $api_public_key ) && '' === $api_public_key ) : ?>
 			<h2><?php esc_html_e( 'This order has already been settled.', 'paidy-wc' ); ?></h2>
 		<?php else : ?>
 			<h2><?php echo esc_html_e( 'API Public key is not set. Please set an API public key in the admin page.', 'paidy-wc' ); ?></h2>
@@ -711,7 +711,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			if ( 'closed' === $_GET['status'] ) { // phpcs:ignore
 				$message = __( 'Once the customer interrupted the payment.. Order ID:', 'paidy-wc' ) . $_GET['order_id'];// phpcs:ignore
 				$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
-			} elseif ( 'rejected' === $_GET['status'] || isset( $_GET['order_id'] ) ) {// phpcs:ignore
+				} elseif ( 'rejected' === $_GET['status'] || isset( $_GET['order_id'] ) ) {// phpcs:ignore
 				$reject_message = __( 'This Paidy payment has been declined. Please select another payment method.', 'paidy-wc' );
 				wc_add_notice( $reject_message, 'error' );
 			}
@@ -861,7 +861,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			$capture_array = json_decode( $capture['body'], true );
 
 			if ( 'closed' === $capture_array['status'] ) {
-				$message = $this->jp4wc_framework->jp4wc_array_to_message( $capture_array ) . 'This is capture data.';
+				$message = $this->jp4wc_framework->jp4wc_array_to_message( $capture_array ) . __( 'This is capture data.', 'paidy-wc' );
 				$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
 
 				$order->set_meta_data( array( 'paidy_capture_id' => $capture_array['captures'][0]['id'] ) );
@@ -879,7 +879,14 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				$message = $this->jp4wc_framework->jp4wc_array_to_message( $capture_array ) . 'This is capture data.';
 				$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
 
-				$order->add_order_note( __( 'Completion processing has not been completed due to a Paidy error.', 'paidy-wc' ) );
+				if ( isset( $capture_array['status'] ) ) {
+					$this->paidy_check_response( $capture_array['status'], $order );
+					if ( isset( $paidy_info ) && isset( $paidy_info['captures'] ) ) {
+						return true;
+					}
+				} else {
+					$order->add_order_note( __( 'There was no status in the notification from Paidy.', 'paidy-wc' ) );
+				}
 			}
 			$situation     = __( 'Status Change from Processing to completed.', 'paidy-wc' );
 			$email_message = $this->notice_message( $order_id, $transaction_id, $situation, $message );
@@ -887,6 +894,33 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Check the response status from Paidy and add an order note if there is an error.
+	 *
+	 * @param int      $status The response status code.
+	 * @param WC_Order $order The WooCommerce order object.
+	 */
+	public function paidy_check_response( $status, $order ) {
+		if ( 403 === $status ) {// Forbidden.
+			$message = __( 'You have made a forbidden request.', 'paidy-wc' ) . __( 'Please go to your Paidy dashboard and check.', 'paidy-wc' );
+			$order->add_order_note( $message );
+		} elseif ( 401 === $status ) {// Unauthorized.
+			$message = __( 'You have made an unauthorized request.', 'paidy-wc' ) . __( 'Please go to your Paidy dashboard and check.', 'paidy-wc' );
+			$order->add_order_note( $message );
+		} elseif ( 409 === $status ) {// Conflict.
+			$message = __( 'You have made a conflict request.', 'paidy-wc' ) . __( 'Please go to your Paidy dashboard and check.', 'paidy-wc' );
+			$order->add_order_note( $message );
+		} elseif ( 404 === $status ) {// Not Found.
+			$message = __( 'The requested resource could not be found.', 'paidy-wc' ) . __( 'Please go to your Paidy dashboard and check.', 'paidy-wc' );
+			$order->add_order_note( $message );
+		} elseif ( 400 === $status ) {// Bad Request.
+			$message = __( 'The request failed.', 'paidy-wc' ) . __( 'Please go to your Paidy dashboard and check.', 'paidy-wc' );
+			$order->add_order_note( $message );
+		} else {
+			$order->add_order_note( __( 'I received a notification from Paidy stating that the status was unexpected.', 'paidy-wc' ) );
+		}
 	}
 
 	/**
@@ -944,11 +978,21 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				$message = $this->jp4wc_framework->jp4wc_array_to_message( $refund_array ) . 'This is refund data.';
 				$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
 
-				$order->add_order_note( __( 'Completion processing has not been completed due to a Paidy error.', 'paidy-wc' ) );
-				return false;
+				if ( isset( $refund_array['status'] ) ) {
+					$this->paidy_check_response( $refund_array['status'], $order );
+					if ( 403 === $refund_array['status'] ) {
+						$paidy_info = $this->paidy_get_payment_data( $transaction_id );
+						if ( isset( $paidy_info ) && isset( $paidy_info['refund'] ) ) {
+							return true;
+						}
+					} else {
+						$order->add_order_note( __( 'There was no status in the notification from Paidy.', 'paidy-wc' ) );
+					}
+					return false;
+				}
 			}
+			return true;
 		}
-		return true;
 	}
 
 	/**
@@ -968,7 +1012,8 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				'Authorization' => 'Bearer ' . $this->set_api_secret_key(),
 			),
 		);
-		return wp_remote_post( $send_url, $args );
+		$response = wp_remote_post( $send_url, $args );
+		return json_decode( $response['body'], true );
 	}
 
 	/**
