@@ -3,7 +3,7 @@
  * Plugin Name: Paidy for WooCommerce
  * Plugin URI: https://wordpress.org/plugins/paidy-wc/
  * Description: Paidy for WooCommerce
- * Version: 1.4.3.10
+ * Version: 1.4.3.11
  * Author: Artisan Workshop
  * Author URI: https://wc.artws.info/
  * Requires at least: 5.0
