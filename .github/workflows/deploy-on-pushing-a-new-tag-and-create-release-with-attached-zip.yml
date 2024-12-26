@@ -17,7 +17,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install subversion
     - name: WordPress Plugin Deploy
-      id: deploy
       uses: 10up/action-wordpress-plugin-deploy@stable
       with:
         generate-zip: true
