@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@master
     - name: Install SVN ( Subversion )
       run: |
         sudo apt-get update
@@ -22,8 +22,8 @@ jobs:
       with:
         generate-zip: true
       env:
-        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
     - name: Create GitHub release
       uses: softprops/action-gh-release@v1
       with:
