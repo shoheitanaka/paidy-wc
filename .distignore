@@ -9,6 +9,8 @@
 /src
 
 # Files
+.wp-env.json
+.gitattributes
 .distignore
 .gitignore
 composer.lock
