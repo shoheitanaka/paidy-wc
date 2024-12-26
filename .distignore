@@ -1,0 +1,17 @@
+# Directories
+/.wordpress-org
+/.vscode
+/.git
+/.github
+/bin
+/node_modules
+/vendor
+/src
+
+# Files
+.distignore
+.gitignore
+composer.lock
+package-lock.json
+LICENSE
+README.md
