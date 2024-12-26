@@ -3,8 +3,8 @@ Contributors: shohei.tanaka, artisan-workshop-1
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=info@artws.info&item_name=Donation+for+Artisan&currency_code=JPY
 Tags: woocommerce, ecommerce, e-commerce, japanese,payment, paidy
 Requires at least: 5.0
-Tested up to: 6.4.3.5
-Stable tag: 1.4.1
+Tested up to: 6.4.3
+Stable tag: 1.4.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
