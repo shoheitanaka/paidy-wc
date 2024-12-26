@@ -22,7 +22,7 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		 *
 		 * @var string
 		 */
-		public $version = '1.4.1';
+		public $version = '1.4.5';
 
 		/**
 		 * Paidy for WooCommerce Framework version.
@@ -130,6 +130,7 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		 */
 		public function load_plugin_textdomain() {
 			// Load plugin text domain.
+			$locale = determine_locale();
 			unload_textdomain( 'paidy-wc', true );
 			load_textdomain( 'paidy-wc', WP_LANG_DIR . '/paidy-wc/paidy-wc-' . $locale . '.mo' );
 			load_plugin_textdomain( 'paidy-wc', false, basename( __DIR__ ) . '/i18n' );

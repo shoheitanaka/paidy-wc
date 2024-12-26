@@ -5,7 +5,7 @@
  * @package WooCommerce\Gateways
  */
 
-use ArtisanWorkshop\WooCommerce\PluginFramework\v2_0_13 as Framework;
+use ArtisanWorkshop\PluginFramework\v2_0_13 as Framework;
 
 /**
  * WC_Paidy_Endpoint class.
@@ -43,7 +43,7 @@ class WC_Paidy_Endpoint {
 	 * @return WP_REST_Response | WP_Error endpoint Paidy webhook response
 	 */
 	public function paidy_check_webhook( $data ) {
-		$jp4wc_framework = new Framework\JP4WC_Plugin();
+		$jp4wc_framework = new Framework\JP4WC_Framework();
 		$paidy           = new WC_Gateway_Paidy();
 		$debug           = $paidy->debug;
 		$body_data       = (array) $data->get_body();
@@ -99,7 +99,7 @@ class WC_Paidy_Endpoint {
 					$order->add_order_note( sprintf( __( 'It succeeded to check the %s of the order in Paidy Webhook.', 'paidy-wc' ), __( 'refunded', 'paidy-wc' ) ) );
 				} else {
 					// translators: %s: status of the order.
-					$order->add_order_note( sprintf( __( 'It failed to check the %s of the order in Paidy Webhook.', 'paidy-wc' ), $main_data['status'] ) );
+					$order->add_order_note( sprintf( __( 'The system received a notification for order %s via Paidy Webhook.', 'paidy-wc' ), $main_data['status'] ) );
 				}
 				return new WP_REST_Response( $main_data, 200 );
 			} else {
