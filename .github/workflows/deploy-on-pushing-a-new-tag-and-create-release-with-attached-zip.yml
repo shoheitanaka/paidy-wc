@@ -24,14 +24,14 @@ jobs:
       env:
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+    - name: WordPress.org plugin asset/readme update
+      uses: 10up/action-wordpress-plugin-asset-update@stable
+      env:
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
     - name: Create GitHub release
       uses: softprops/action-gh-release@v1
       with:
         files: ${{github.workspace}}/${{ github.event.repository.name }}.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: WordPress.org plugin asset/readme update
-      uses: 10up/action-wordpress-plugin-asset-update@stable
-      env:
-        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
