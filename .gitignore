@@ -18,6 +18,11 @@ Thumbs.db
 /node_modules/
 vendor
 package-lock.json
+composer.lock
+
+# translated files
+/i18n/*.mo
+/i18n/*.po
 
 # Optional npm cache directory
 *.npm
