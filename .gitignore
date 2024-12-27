@@ -18,6 +18,7 @@ Thumbs.db
 /node_modules/
 vendor
 package-lock.json
+composer.lock
 
 # Optional npm cache directory
 *.npm
