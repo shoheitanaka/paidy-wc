@@ -864,9 +864,11 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				$message = $this->jp4wc_framework->jp4wc_array_to_message( $capture_array ) . __( 'This is capture data.', 'paidy-wc' );
 				$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
 
-				$order->set_meta_data( array( 'paidy_capture_id' => $capture_array['captures'][0]['id'] ) );
-				$order->save_meta_data();
-				if ( $capture_array['amount'] === $order->get_total() && $transaction_id === $capture_array['id'] ) {
+				if ( isset( $capture_array['captures'][0]['id'] ) ) {
+					$order->update_meta_data( 'paidy_capture_id', $capture_array['captures'][0]['id'] );
+					$order->save_meta_data();
+				}
+				if ( (float) $capture_array['amount'] === $order->get_total() && $transaction_id === $capture_array['id'] ) {
 					$order->add_order_note( __( 'In the payment completion process, the amount and ID match were confirmed.', 'paidy-wc' ) );
 					return true;
 				} else {
@@ -970,7 +972,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				} else {
 					$refunds_array = array_merge( $refunds_array, array( $refund_array['refunds'][0]['id'] ) );
 				}
-				$order->set_meta_data( array( 'paidy_refund_id' => $refunds_array ) );
+				$order->update_meta_data( 'paidy_refund_id', $refunds_array );
 				$order->save_meta_data();
 				$order->add_order_note( __( 'Completion refunding has been completed at Paidy.', 'paidy-wc' ) );
 				return true;
