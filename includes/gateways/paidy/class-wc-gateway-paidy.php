@@ -170,6 +170,8 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 
 		add_action( 'woocommerce_order_status_completed', array( $this, 'jp4wc_order_paidy_status_completed' ) );
 		add_action( 'woocommerce_order_status_cancelled', array( $this, 'jp4wc_order_paidy_status_cancelled' ) );
+
+		add_action( 'admin_print_footer_scripts', array( $this, 'paidy_remove_refund_button_for_processing' ), 99 );
 	}
 
 	/**
@@ -815,6 +817,30 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				$order->add_order_note( __( 'Cancelled processing has not been completed due to a Paidy error. Please check Paidy admin.', 'paidy-wc' ) );
 			}
 		}
+	}
+
+	/**
+	 * Remove the refund button for orders with status 'processing'.
+	 */
+	public function paidy_remove_refund_button_for_processing() {
+		global $post;
+		if ( ! $post || 'shop_order' !== get_post_type( $post->ID ) ) {
+			return;
+		}
+
+		$order = wc_get_order( $post->ID );
+		if ( ! $order ) {
+			return;
+		}
+		if ( 'processing' === $order->get_status() ) :
+			?>
+			<script>
+			jQuery(document).ready(function($){
+				$('.refund-items').remove();
+			});
+			</script>
+			<?php
+		endif;
 	}
 
 	/**
