@@ -3,8 +3,8 @@ Contributors: shohei.tanaka, artisan-workshop-1
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=info@artws.info&item_name=Donation+for+Artisan&currency_code=JPY
 Tags: woocommerce, ecommerce, japanese, payment, paidy
 Requires at least: 5.0
-Tested up to: 6.4.3
-Stable tag: 1.4.5
+Tested up to: 6.7.1
+Stable tag: 1.4.7
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -69,7 +69,7 @@ A: No, after application, it becomes available after providing information such 
 
 == Changelog ==
 
-= 1.4.5 - 2024-12-27 =
+= 1.4.7 - 2024-12-30 =
 * Tweak - Compliance with WordPress coding rules and security measures
 * Fixed - Support situations in which translations are inadvertently loaded too early.
 
