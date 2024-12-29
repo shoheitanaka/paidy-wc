@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @class       WC_Gateway_Paidy
  * @extends     WC_Payment_Gateway
- * @version     1.4.5
+ * @version     1.4.6
  * @package     WooCommerce/Classes/Payment
  * @author      Artisan Workshop
  */
@@ -169,7 +169,8 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_completed' ) );
 
 		add_action( 'woocommerce_order_status_completed', array( $this, 'jp4wc_order_paidy_status_completed' ) );
-		add_action( 'woocommerce_order_status_cancelled', array( $this, 'jp4wc_order_paidy_status_cancelled' ) );
+		add_action( 'woocommerce_order_status_processing_to_cancelled', array( $this, 'paidy_order_paidy_status_processing_to_cancelled' ) );
+		add_action( 'woocommerce_order_status_completed_to_cancelled', array( $this, 'paidy_order_paidy_status_completed_to_cancelled' ) );
 
 		add_action( 'admin_print_footer_scripts', array( $this, 'paidy_remove_refund_button_for_processing' ), 99 );
 	}
@@ -783,42 +784,53 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 *
 	 * @param string $order_id Order ID.
 	 */
-	public function jp4wc_order_paidy_status_cancelled( $order_id ) {
+	public function paidy_order_paidy_status_processing_to_cancelled( $order_id ) {
 		$secret_key           = $this->set_api_secret_key();
 		$order                = wc_get_order( $order_id );
 		$order_payment_method = $order->get_payment_method();
 		$transaction_id       = $order->get_transaction_id();
 		if ( $order_payment_method === $this->id && ! empty( $transaction_id ) ) {
-			$send_url = 'https://api.paidy.com/payments/' . $transaction_id . '/close';
-			$args     = array(
-				'method'  => 'POST',
-				'body'    => '{}',
-				'headers' => array(
-					'Content-Type'  => 'application/json',
-					'Paidy-Version' => '2018-04-10',
-					'Authorization' => 'Bearer ' . $secret_key,
-				),
-			);
+				$send_url = 'https://api.paidy.com/payments/' . $transaction_id . '/close';
+				$args     = array(
+					'method'  => 'POST',
+					'body'    => '{}',
+					'headers' => array(
+						'Content-Type'  => 'application/json',
+						'Paidy-Version' => '2018-04-10',
+						'Authorization' => 'Bearer ' . $secret_key,
+					),
+				);
 
-			$message = 'Send URL is following. : ' . $send_url;
-			$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
-
-			$close       = wp_remote_post( $send_url, $args );
-			$close_array = json_decode( $close['body'], true );
-			if ( is_wp_error( $close ) ) {
-				$order->add_order_note( $close->get_error_message() );
-			} elseif ( 'closed' === $close_array['status'] ) {
-				$message = $this->jp4wc_framework->jp4wc_array_to_message( $close_array ) . 'This is success cancellation data.';
-				$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
-			} else {
-				$message = $this->jp4wc_framework->jp4wc_array_to_message( $close_array ) . 'This is close data.';
+				$message = 'Send URL is following. : ' . $send_url;
 				$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
 
-				$order->add_order_note( __( 'Cancelled processing has not been completed due to a Paidy error. Please check Paidy admin.', 'paidy-wc' ) );
-			}
+				$close       = wp_remote_post( $send_url, $args );
+				$close_array = json_decode( $close['body'], true );
+				if ( is_wp_error( $close ) ) {
+					$order->add_order_note( $close->get_error_message() );
+				} elseif ( 'closed' === $close_array['status'] ) {
+					$message = $this->jp4wc_framework->jp4wc_array_to_message( $close_array ) . __( 'This order is success cancellation data at Paidy.', 'paidy-wc' );
+					$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
+				} else {
+					$message = $this->jp4wc_framework->jp4wc_array_to_message( $close_array ) . __( 'This order is already close data at Paidy.', 'paidy-wc' );
+					$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
+
+					$order->add_order_note( __( 'Cancelled processing has not been completed due to a Paidy error. Please check Paidy admin.', 'paidy-wc' ) );
+					return false;
+				}
 		}
+		return true;
 	}
 
+	/**
+	 * Handle order status change from completed to cancelled.
+	 *
+	 * @param int $order_id Order ID.
+	 */
+	public function paidy_order_paidy_status_completed_to_cancelled( $order_id ) {
+		$amount = $order->get_total();
+		$this->process_refund( $order_id, $amount );
+	}
 	/**
 	 * Remove the refund button for orders with status 'processing'.
 	 */
