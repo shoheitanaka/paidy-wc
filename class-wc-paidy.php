@@ -22,7 +22,7 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		 *
 		 * @var string
 		 */
-		public $version = '1.4.7';
+		public $version = '1.4.8';
 
 		/**
 		 * Paidy for WooCommerce Framework version.

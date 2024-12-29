@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @class       WC_Gateway_Paidy
  * @extends     WC_Payment_Gateway
- * @version     1.4.6
+ * @version     1.4.8
  * @package     WooCommerce/Classes/Payment
  * @author      Artisan Workshop
  */
@@ -828,6 +828,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * @param int $order_id Order ID.
 	 */
 	public function paidy_order_paidy_status_completed_to_cancelled( $order_id ) {
+		$order  = wc_get_order( $order_id );
 		$amount = $order->get_total();
 		$this->process_refund( $order_id, $amount );
 	}
