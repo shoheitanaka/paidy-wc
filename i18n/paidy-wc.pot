@@ -1,15 +1,15 @@
-# Copyright (C) 2024 Artisan Workshop
+# Copyright (C) 2025 Artisan Workshop
 # This file is distributed under the same license as the Paidy for WooCommerce plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Paidy for WooCommerce 1.4.5\n"
+"Project-Id-Version: Paidy for WooCommerce 1.4.8\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/paidy-wc\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-12-29T03:42:04+00:00\n"
+"POT-Creation-Date: 2025-01-24T06:30:16+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 
@@ -35,14 +35,14 @@ msgid "https://wc.artws.info/"
 msgstr ""
 
 #. translators: %s: Payment method name.
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:134
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:216
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:141
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:223
 msgid "Proceed to %s"
 msgstr ""
 
 #. translators: %s: Payment method name.
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:134
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:216
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:141
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:223
 #: includes/gateways/paidy/class-wc-payments-paidy-blocks-support.php:105
 #: includes/gateways/paidy/assets/js/frontend/paidy.js:309
 #: src/paidy/index.js:16
@@ -50,79 +50,82 @@ msgstr ""
 msgid "Paidy"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:140
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:193
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:147
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:200
 msgid "Paidy Payment"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:141
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:148
 msgid "\"Paidy next month payment\" reduces the opportunity loss due to the payment method and contributes to sales increase."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:184
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:191
 msgid "Enable/Disable"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:186
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:193
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1042
+#: src/wizard/components/form-info.jsx:161
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:994
 msgid "Enable Paidy"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:190
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:197
 msgid "Title"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:192
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:199
 msgid "This controls the title which the user sees during checkout."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:197
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:204
 msgid "Description"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:199
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:206
 msgid "Payment method description that the customer will see on your checkout."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:200
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:207
 msgid "No matter how many times you shop a month, you pay once in the following month. <br /> The following payment methods are available."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:204
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:211
 msgid "Paidy description"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:207
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:214
 msgid "Payment method description for paidy explanation that the customer will see on your checkout."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:212
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:219
 msgid "Order Button Text"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:214
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:221
 msgid "This controls the description which the user sees during checkout."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:219
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:226
 msgid "Environment"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:221
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:228
 msgid "This setting specifies whether you will process live transactions, or whether you will process simulated transactions using the Paidy Sandbox."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:225
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:232
 msgid "Live"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:226
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:233
 msgid "Sandbox"
 msgstr ""
 
 #. translators: %s: API Public Key.
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:230
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:233
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:750
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:237
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:240
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:792
 msgid "API Public Key"
 msgstr ""
 
@@ -130,238 +133,238 @@ msgstr ""
 #. translators: %s: API Secret Key.
 #. translators: %s: Test API Public Key.
 #. translators: %s: Test API Secret Key.
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:233
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:243
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:253
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:261
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:240
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:250
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:260
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:268
 msgid "Please enter %s from Paidy Admin site."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:238
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:244
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:761
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:245
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:251
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:803
 msgid "API Secret Key"
 msgstr ""
 
 #. translators: %s: Test API Public Key.
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:250
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:253
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:257
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:260
 msgid "Test API Public Key"
 msgstr ""
 
 #. translators: %s: Test API Secret Key.
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:258
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:261
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:265
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:268
 msgid "Test API Secret Key"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:266
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:273
 msgid "Store Name"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:268
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:275
 msgid "This controls the store name which the user sees during paidy checkout."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:272
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:279
 msgid "Logo Image (168×168 recommend)"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:274
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:281
 msgid "URL of a custom logo that can be displayed in the checkout application header. If no value is specified, the Paidy logo will be displayed."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:276
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:283
 msgid "Optional"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:279
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:286
 msgid "Debug Mode"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:281
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:288
 msgid "Enable Debug Mode"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:283
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:290
 msgid "Save debug data using WooCommerce logging."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:286
-msgid "About Webhook"
-msgstr ""
-
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:288
-msgid "The webhooks set in the Paidy management screen are as follows. <br />"
-msgstr ""
-
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:291
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:293
 msgid "Notice e-mail"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:293
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:295
 msgid "Set an e-mail address to send an e-mail when an error occurs during connection with paidy."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:623
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:299
+msgid "About Webhook"
+msgstr ""
+
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:301
+msgid "The webhooks set in the Paidy management screen are as follows. <br />"
+msgstr ""
+
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:627
 msgid "This order has already been settled."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:625
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:629
 msgid "API Public key is not set. Please set an API public key in the admin page."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:715
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:757
 msgid "Once the customer interrupted the payment.. Order ID:"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:718
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:760
 msgid "This Paidy payment has been declined. Please select another payment method."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:736
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:778
 msgid "Paidy Payment succeeds to authorize and move to thank you page. Get data is following."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:750
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:761
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:792
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:803
 msgid "Production environment"
 msgstr ""
 
 #. translators: 1) Field title 2) Environment 3) Paidy PR link
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:776
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:818
 msgid "If you do not set %1$s, it will not work in the %2$s. Application is necessary for acquisition."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:812
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:854
 msgid "This order is success cancellation data at Paidy."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:815
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:857
 msgid "This order is already close data at Paidy."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:818
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:860
 msgid "Cancelled processing has not been completed due to a Paidy error. Please check Paidy admin."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:902
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:932
 msgid "This is capture data."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:910
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:940
 msgid "In the payment completion process, the amount and ID match were confirmed."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:913
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:943
 msgid "In the payment completion process, the amount and ID did not match. Check on the Paidy admin."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:928
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1029
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:958
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1059
 msgid "There was no status in the notification from Paidy."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:931
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:961
 msgid "Status Change from Processing to completed."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:947
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:977
 msgid "You have made a forbidden request."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:947
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:950
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:953
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:956
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:959
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:977
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:980
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:983
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:986
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:989
 msgid "Please go to your Paidy dashboard and check."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:950
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:980
 msgid "You have made an unauthorized request."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:953
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:983
 msgid "You have made a conflict request."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:956
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:986
 msgid "The requested resource could not be found."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:959
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:989
 msgid "The request failed."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:962
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:992
 msgid "I received a notification from Paidy stating that the status was unexpected."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:999
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1029
 msgid "Refund is not possible because Paidy has not completed processing."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1015
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1045
 msgid "Completion refunding has been completed at Paidy."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1067
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1097
 msgid "[WooCommerce] Notice of error occurrence in Paidy payment linkage"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1084
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1114
 msgid "An error has occurred in the Paidy payment linkage when changing the status of WooCommerce."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1085
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1115
 msgid "Please check the status of Paidy payment and respond accordingly."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1086
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1116
 msgid "Order number:"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1087
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1117
 msgid "Order details URL:"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1088
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1118
 msgid "Paidy payment ID:"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1089
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1119
 msgid "Error occurrence time:"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1090
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1092
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1120
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1122
 msgid "Error situation:"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1094
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1124
 msgid "* This e-mail is for sending only, so you cannot reply directly to this e-mail."
 msgstr ""
 
 #. translators: %s: URL of the image.
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1150
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1180
 msgid "Already using URL as image: %s"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1158
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1188
 msgid "Select a image to upload"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1159
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1189
 msgid "Use this image"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1160
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1163
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1190
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1193
 msgid "Add image"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1171
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1201
 msgid "Remove image"
 msgstr ""
 
@@ -395,6 +398,10 @@ msgstr ""
 
 #: includes/gateways/paidy/class-wc-paidy-admin-notices.php:161
 msgid "Cheatin&#8217; huh?"
+msgstr ""
+
+#: includes/gateways/paidy/class-wc-paidy-admin-wizard.php:76
+msgid "Paidy On Boarding"
 msgstr ""
 
 #: includes/gateways/paidy/class-wc-paidy-endpoint.php:51
@@ -550,26 +557,675 @@ msgstr ""
 msgid "Paidy for WooCommerce is enabled but not effective. It requires WooCommerce in order to work."
 msgstr ""
 
+#: includes/gateways/paidy/assets/js/admin/paidy.js:29
+#: src/admin/components/index.js:11
+#: includes/gateways/paidy/assets/js/admin/paidy.js:11
+msgid "Easy Paidy payment setup"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:40
+#: src/admin/components/index.js:23
+#: includes/gateways/paidy/assets/js/admin/paidy.js:23
+msgid "Start easy Paidy payment setup"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:47
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:967
+#: src/admin/components/index.js:32
+#: src/wizard/components/form-info.jsx:61
+#: includes/gateways/paidy/assets/js/admin/paidy.js:32
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:894
+msgid "Status: Under review"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:47
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:967
+#: src/admin/components/index.js:34
+#: src/wizard/components/form-info.jsx:63
+#: includes/gateways/paidy/assets/js/admin/paidy.js:34
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:896
+msgid "Thank you for your application. We will notify you of the results via email and dashboard."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:47
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:967
+#: src/admin/components/index.js:36
+#: src/wizard/components/form-info.jsx:65
+#: includes/gateways/paidy/assets/js/admin/paidy.js:36
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:898
+msgid "The review process may take up to 10 business days."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:47
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:967
+#: src/admin/components/index.js:37
+#: src/wizard/components/form-info.jsx:66
+#: includes/gateways/paidy/assets/js/admin/paidy.js:37
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:899
+msgid "Inquiries regarding screening: sales@paidy.com"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:236
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:156
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:400
+#: src/main-hooks/on-boarding-settings.js:63
+#: src/wizard/components/controls.jsx:11
+#: includes/gateways/paidy/assets/js/admin/paidy.js:141
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:63
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:236
+msgid "Trade name / Store name"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:239
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:159
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:411
+#: src/main-hooks/on-boarding-settings.js:64
+#: src/wizard/components/controls.jsx:23
+#: includes/gateways/paidy/assets/js/admin/paidy.js:142
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:64
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:248
+msgid "Your EC site name"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:242
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:162
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:422
+#: src/main-hooks/on-boarding-settings.js:65
+#: src/wizard/components/controls.jsx:35
+#: includes/gateways/paidy/assets/js/admin/paidy.js:143
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:65
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:260
+msgid "Store URL"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:245
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:165
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:431
+#: src/main-hooks/on-boarding-settings.js:66
+#: src/wizard/components/controls.jsx:45
+#: includes/gateways/paidy/assets/js/admin/paidy.js:144
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:66
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:270
+msgid "Email address for registering Paidy"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:248
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:168
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:440
+#: src/main-hooks/on-boarding-settings.js:67
+#: src/wizard/components/controls.jsx:55
+#: includes/gateways/paidy/assets/js/admin/paidy.js:145
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:67
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:280
+msgid "Contact phone number"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:251
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:171
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:450
+#: src/main-hooks/on-boarding-settings.js:68
+#: src/wizard/components/controls.jsx:66
+#: includes/gateways/paidy/assets/js/admin/paidy.js:146
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:68
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:291
+msgid "Representative (last name)"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:254
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:174
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:459
+#: src/main-hooks/on-boarding-settings.js:69
+#: src/wizard/components/controls.jsx:76
+#: includes/gateways/paidy/assets/js/admin/paidy.js:147
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:69
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:301
+msgid "Representative (first name)"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:257
+#: includes/gateways/paidy/assets/js/admin/paidy.js:279
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:177
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:199
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:468
+#: src/main-hooks/on-boarding-settings.js:70
+#: src/main-hooks/on-boarding-settings.js:87
+#: src/wizard/components/controls.jsx:86
+#: includes/gateways/paidy/assets/js/admin/paidy.js:148
+#: includes/gateways/paidy/assets/js/admin/paidy.js:165
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:70
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:87
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:311
+msgid "Representative (last name kana)"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:260
+#: includes/gateways/paidy/assets/js/admin/paidy.js:282
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:180
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:202
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:478
+#: src/main-hooks/on-boarding-settings.js:71
+#: src/main-hooks/on-boarding-settings.js:88
+#: src/wizard/components/controls.jsx:97
+#: includes/gateways/paidy/assets/js/admin/paidy.js:149
+#: includes/gateways/paidy/assets/js/admin/paidy.js:166
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:71
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:88
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:322
+msgid "Representative (first name kana)"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:263
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:183
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:488
+#: src/main-hooks/on-boarding-settings.js:72
+#: src/wizard/components/controls.jsx:108
+#: includes/gateways/paidy/assets/js/admin/paidy.js:150
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:72
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:333
+msgid "Representative's date of birth (Gregorian calendar)"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:267
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:187
+#: src/main-hooks/on-boarding-settings.js:77
+#: includes/gateways/paidy/assets/js/admin/paidy.js:155
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:77
+msgid "%s is a required field. Please enter it."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:286
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:206
+#: src/main-hooks/on-boarding-settings.js:93
+#: includes/gateways/paidy/assets/js/admin/paidy.js:171
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:93
+msgid "%s must be in full-width katakana. Please confirm."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:295
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:215
+#: src/main-hooks/on-boarding-settings.js:102
+#: includes/gateways/paidy/assets/js/admin/paidy.js:180
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:102
+msgid "Please fill in all the fields."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/admin/paidy.js:336
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:256
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:996
+#: src/main-hooks/on-boarding-settings.js:145
+#: src/wizard/components/form-info.jsx:105
+#: includes/gateways/paidy/assets/js/admin/paidy.js:223
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:145
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:938
+msgid "Settings saved."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:469
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:479
+#: src/wizard/components/controls.jsx:87
+#: src/wizard/components/controls.jsx:98
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:312
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:323
+msgid "Please enter in full-width katakana."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:498
+#: src/wizard/components/controls.jsx:119
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:344
+msgid "Annual gross merchandise value"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:501
+#: src/wizard/components/controls.jsx:122
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:347
+msgid "Less than 10 million yen"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:504
+#: src/wizard/components/controls.jsx:123
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:348
+msgid "10 million yen or more"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:514
+#: src/wizard/components/controls.jsx:133
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:358
+msgid "Average purchase amount per order"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:517
+#: src/wizard/components/controls.jsx:136
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:361
+msgid "Less than 50,000 yen"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:520
+#: src/wizard/components/controls.jsx:137
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:362
+msgid "Over 50,000 yen"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:530
+#: src/wizard/components/controls.jsx:147
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:372
+msgid "To access (log in to) the cart system management screen, you must enter a password."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:539
+#: src/wizard/components/controls.jsx:157
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:382
+msgid "The cart system's management screen allows for login restrictions using ID and password, as well as access restrictions."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:548
+#: src/wizard/components/controls.jsx:168
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:393
+msgid "Regarding access restrictions to the administration screen, one of the following measures can be taken."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:551
+#: src/wizard/components/controls.jsx:173
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:398
+msgid "Administrators can restrict the IP addresses that can access the system."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:551
+#: src/wizard/components/controls.jsx:174
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:399
+msgid "It is possible to set access restrictions such as basic authentication in the administration screen."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:551
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:569
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:578
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:587
+#: src/wizard/components/controls.jsx:175
+#: src/wizard/components/controls.jsx:206
+#: src/wizard/components/controls.jsx:224
+#: src/wizard/components/controls.jsx:240
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:400
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:431
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:449
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:465
+msgid "This is handled in other ways."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:557
+#: src/wizard/components/controls.jsx:185
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:410
+msgid "The settings for data directory* disclosure are configured in one of the following ways:"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:560
+#: src/wizard/components/controls.jsx:190
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:415
+msgid "Make certain directories private so that important files cannot be placed in the public directory."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:560
+#: src/wizard/components/controls.jsx:191
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:416
+msgid "Take care to place important files outside of public directories."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:566
+#: src/wizard/components/controls.jsx:201
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:426
+msgid "Settings are made to restrict the extensions and files that can be uploaded by the web server or web application."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:575
+#: src/wizard/components/controls.jsx:216
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:441
+msgid "Vulnerability assessments or penetration tests* are conducted regularly (once a year or when the system is changed)."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:578
+#: src/wizard/components/controls.jsx:221
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:446
+msgid "Vulnerability assessments or penetration tests are conducted on a regular basis, and any necessary corrective actions are taken."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:578
+#: src/wizard/components/controls.jsx:222
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:447
+msgid "To counter SQL injection and cross-site scripting vulnerabilities, we are using plugins that do not have the vulnerabilities and upgrading our software."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:578
+#: src/wizard/components/controls.jsx:223
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:448
+msgid "When developing or customizing a web application, we conduct a source code review to confirm that it is securely coded. At that time, we also check the input values of input forms."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:584
+#: src/wizard/components/controls.jsx:234
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:459
+msgid "Anti-virus software is introduced and operated as a measure against malware using the following methods."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:587
+#: src/wizard/components/controls.jsx:239
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:464
+msgid "We have introduced antivirus software as a measure to detect and remove malware, and we update signatures and perform regular full scans."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:593
+#: src/wizard/components/controls.jsx:249
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:474
+msgid "We have not received any disciplinary action under the Act on Specified Commercial Transactions in the past five years."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:602
+#: src/wizard/components/controls.jsx:259
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:484
+msgid "In the last five years, we have not been the subject of a civil lawsuit for violating the Consumer Contract Act and have not lost the case."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:641
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1440
+#: src/wizard/components/first-main-page.jsx:49
+#: src/wizard/index.js:28
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:562
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1215
+msgid "Easy setup for Paidy payment"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:646
+#: src/wizard/components/first-main-page.jsx:57
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:570
+msgid "Paidy application"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:654
+#: src/wizard/components/first-main-page.jsx:65
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:578
+msgid "Get started now"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:664
+#: src/wizard/components/first-main-page.jsx:74
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:587
+msgid "I agree to the above and apply"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:731
+#: src/wizard/components/first-main-page.jsx:148
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:661
+msgid "Basic information"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:797
+#: src/wizard/components/first-main-page.jsx:203
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:716
+msgid "Security survey"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:881
+#: src/wizard/components/first-main-page.jsx:305
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:818
+msgid "Applying for and setting up Paidy is easy."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:887
+#: src/wizard/components/first-main-page.jsx:311
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:824
+msgid "Paidy has zero installation costs and payment fees starting from 3.5%."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:891
+#: src/wizard/components/first-main-page.jsx:312
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:825
+msgid "Learn more about Paidy"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:938
+#: src/wizard/components/form-info.jsx:16
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:849
+msgid "Application flow"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:940
+#: src/wizard/components/form-info.jsx:19
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:852
+msgid "Please fill in all the fields on this application screen and click the \"Agree to the above and apply\" button at the bottom of the screen."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:940
+#: src/wizard/components/form-info.jsx:20
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:853
+msgid "Paidy Co., Ltd. will review your application information and may take up to 10 business days."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:940
+#: src/wizard/components/form-info.jsx:21
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:854
+msgid "The results will be notified via email and dashboard."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:940
+#: src/wizard/components/form-info.jsx:22
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:855
+msgid "If your application is approved, you will be able to activate Paidy from your dashboard."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:940
+#: src/wizard/components/form-info.jsx:23
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:856
+msgid "If your application is rejected, you will not be able to use Paidy."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:947
+#: src/wizard/components/form-info.jsx:34
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:867
+msgid "Agreement"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:951
+#: src/wizard/components/form-info.jsx:39
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:872
+msgid "Please confirm and agree to the following contents."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:954
+#: src/wizard/components/form-info.jsx:42
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:875
+msgid "Paidy Merchant Terms and Conditions"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:954
+#: src/wizard/components/form-info.jsx:43
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:876
+msgid "Agreement on handling of affiliated store information"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:954
+#: src/wizard/components/form-info.jsx:44
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:877
+msgid "Add the notation specified by our company to the notation based on the Specified Commercial Transactions Act."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:957
+#: src/wizard/components/form-info.jsx:45
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:878
+msgid "Display sample based on the Specified Commercial Transactions Act"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:957
+#: src/wizard/components/form-info.jsx:46
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:879
+msgid "Add the specified notation to the privacy policy page."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:960
+#: src/wizard/components/form-info.jsx:47
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:880
+msgid "Example of a privacy policy"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:960
+#: src/wizard/components/form-info.jsx:48
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:881
+msgid "Paidy Inc. will set up the API key on your e-commerce site via WooCommerce on your behalf."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:960
+#: src/wizard/components/form-info.jsx:49
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:882
+msgid "Our company (Shokunin Kobo LLC) will provide personal information to third parties in the following cases."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:960
+#: src/wizard/components/form-info.jsx:50
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:883
+msgid "When disclosing personal information for the purposes of merchant membership screening by payment companies, etc."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:974
+#: src/wizard/components/form-info.jsx:76
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:909
+msgid "Status: The review was rejected"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:974
+#: src/wizard/components/form-info.jsx:79
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:912
+msgid "After careful and repeated review, we regret to inform you that we have decided to postpone the transaction at this time."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:974
+#: src/wizard/components/form-info.jsx:80
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:913
+msgid "We sincerely apologize for not being able to meet your expectations."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:974
+#: src/wizard/components/form-info.jsx:81
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:914
+msgid "Please understand that we cannot provide details about the content of the review."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1000
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1022
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1072
+#: src/wizard/components/form-info.jsx:111
+#: src/wizard/components/form-info.jsx:134
+#: src/wizard/components/form-info.jsx:197
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:944
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:967
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1030
+msgid "Error enabling Paidy"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1033
+#: src/wizard/components/form-info.jsx:142
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:975
+msgid "Status: The review approved"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1033
+#: src/wizard/components/form-info.jsx:144
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:977
+msgid "The review has been completed and the merchant agreement has been concluded."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1033
+#: src/wizard/components/form-info.jsx:145
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:978
+msgid "For terms of use, please check the terms and conditions notification email sent by Paidy Inc."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1035
+#: src/wizard/components/form-info.jsx:147
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:980
+msgid "We recommend setting the Webhook URL in the Paidy merchant management screen before publishing in production mode. Set the Webhook URL to the following value."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1035
+#: src/wizard/components/form-info.jsx:148
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:981
+msgid "[Common for test and production]"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1035
+#: src/wizard/components/form-info.jsx:149
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:982
+msgid "Please refer to the manual for information on the Paidy merchant management screen."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1037
+#: src/wizard/components/form-info.jsx:152
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:985
+msgid "Please click one of the buttons below."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1042
+#: src/wizard/components/form-info.jsx:158
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:991
+msgid "Enable test mode"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1042
+#: src/wizard/components/form-info.jsx:160
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:993
+msgid "Enabling Paidy..."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1047
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1091
+#: src/wizard/components/form-info.jsx:169
+#: src/wizard/components/form-info.jsx:218
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1002
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1051
+msgid "Enable production mode"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1083
+#: src/wizard/components/form-info.jsx:205
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1038
+msgid "Paidy test payments enabled"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1083
+#: src/wizard/components/form-info.jsx:208
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1041
+msgid "You can now test Paidy payments."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1083
+#: src/wizard/components/form-info.jsx:209
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1042
+msgid "Please check the test payment flow."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1086
+#: src/wizard/components/form-info.jsx:210
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1043
+msgid "Paidy test payment flow"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1086
+#: src/wizard/components/form-info.jsx:211
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1044
+msgid "After confirming the test payment, please switch to production mode."
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1098
+#: src/wizard/components/form-info.jsx:228
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1061
+msgid "Paidy Payments is now live"
+msgstr ""
+
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1431
+#: src/wizard/index.js:10
+#: includes/gateways/paidy/assets/js/wizard/paidy.js:1197
+msgid "Back to Paidy settings"
+msgstr ""
+
 #: src/wizard/button.js:6
 msgid "Next"
 msgstr ""
 
 #: src/wizard/button.js:14
 msgid "Save"
-msgstr ""
-
-#: src/wizard/explain/index.js:9
-msgid "Easy Paidy setup"
-msgstr ""
-
-#: src/wizard/explain/index.js:11
-msgid "Applying for and setting up Paidy is easy."
-msgstr ""
-
-#: src/wizard/explain/index.js:17
-msgid "Paidy payment with installation cost of 0 yen and payment fee of 3.5%."
-msgstr ""
-
-#: src/wizard/explain/index.js:22
-msgid "Learn more"
 msgstr ""

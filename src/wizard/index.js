@@ -1,8 +1,32 @@
-import { render, useState } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { Button, Modal, TextControl } from '@wordpress/components';
-import PaidyWizardExplain from './explain';
-import paidyWizardApply from './paidy-wizard-apply';
-import paidyWizardSecurity from './paidy-wizard-security';
-import paidyWizardAgreement from './paidy-wizard-agreement';
+import { addFilter } from '@wordpress/hooks';
+import { FirstMainPage } from './components/first-main-page';
+import './index.scss';
+
+const BackAdminFooter = () => {
+    return (
+        <div className="paidy-on-boarding footer">
+            <a href="/wp-admin/admin.php?page=wc-settings&tab=checkout&section=paidy">
+            { __( 'Back to Paidy settings','paidy-wc') }
+            </a>
+        </div>
+    );
+}
+
+const PaidyOnBoardingPage = () => {
+    return (
+        <>
+        <FirstMainPage />
+        <BackAdminFooter />
+        </>
+    );
+}
+addFilter( 'woocommerce_admin_pages_list', 'paidy-on-boarding', ( pages ) => {
+	pages.push( {
+		container: PaidyOnBoardingPage,
+		path: '/paidy-on-boarding',
+		breadcrumbs: [ __( 'Easy setup for Paidy payment', 'paidy-wc' ) ],
+	} );
+
+	return pages;
+} );
