@@ -51,6 +51,8 @@ class WC_Paidy_Admin_Wizard {
 			add_action( 'added_option', array( $this, 'add_paidy_on_boarding_settings' ), 10, 3 );
 			add_filter( 'woocommerce_gateway_method_description', array( $this, 'paidy_method_description' ), 20, 2 );
 			add_action( 'woocommerce_settings_tabs_checkout', array( $this, 'paidy_after_settings_checkout' ) );
+			// Redirect when the plugin is activated.
+			add_action( 'admin_init', array( $this, 'paidy_redirect_to_wizard' ) );
 		}
 	}
 
@@ -263,21 +265,22 @@ class WC_Paidy_Admin_Wizard {
 
 		if ( isset( $value['currentStep'] ) && '1' === $value['currentStep'] ) {
 			$value['currentStep'] = 2;
+			$site_hash            = $this->generate_random_string( 16 );
+			$hash                 = password_hash( $site_hash, PASSWORD_DEFAULT );
+			$value['hash']        = $hash;
 			update_option( $option, $value );
-			$result = $this->send_apply_data_to_wcartws( $value );
+			$result = $this->send_apply_data_to_wcartws( $value, $site_hash );
 		}
 	}
 
 	/**
 	 * Sends application data to WCART web service.
 	 *
-	 * @param array $value The application data to be sent.
+	 * @param array  $value The application data to be sent.
+	 * @param string $site_hash The site hash.
 	 * @return bool Returns true if data was sent successfully, false otherwise.
 	 */
-	public function send_apply_data_to_wcartws( $value ) {
-		$site_hash     = $this->generate_random_string( 16 );
-		$hash          = password_hash( $site_hash, PASSWORD_DEFAULT );
-		$value['hash'] = $hash;
+	public function send_apply_data_to_wcartws( $value, $site_hash ) {
 
 		$wcartws_api_url = 'https://paidy.artws.info/api/applications/';
 
@@ -297,7 +300,7 @@ class WC_Paidy_Admin_Wizard {
 			'site_name'    => $value['siteName'],
 			'site_url'     => $value['storeUrl'],
 			'trade_name'   => $value['storeName'],
-			'site_hash'    => $value['hash'],
+			'site_hash'    => $site_hash,
 			'email'        => $value['registEmail'],
 			'phone'        => $value['contactPhone'],
 			'ceo'          => $value['representativeLastName'] . ' ' . $value['representativeFirstName'],
@@ -448,6 +451,17 @@ class WC_Paidy_Admin_Wizard {
 			} else {
 				echo '</div>';
 			}
+		}
+	}
+
+	/**
+	 * Redirects to the Paidy wizard after plugin activation.
+	 */
+	public function paidy_redirect_to_wizard() {
+		if ( get_option( 'paidy_do_activation_redirect', false ) ) {
+			delete_option( 'paidy_do_activation_redirect' );
+			wp_safe_redirect( admin_url( 'admin.php?page=wc-admin&path=%2Fpaidy-on-boarding' ) );
+			exit;
 		}
 	}
 }

@@ -89,8 +89,19 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 			$this->includes();
 			// Set up localisation.
 			$this->load_plugin_textdomain();
+			// Register activation hook.
+			register_activation_hook( WC_PAIDY_PLUGIN_FILE, array( $this, 'paidy_activation_redirect' ) );
 			// deactivation.
 			register_deactivation_hook( WC_PAIDY_PLUGIN_FILE, array( $this, 'on_deactivation' ) );
+		}
+
+		/**
+		 * Add option for activation redirect.
+		 *
+		 * @return void
+		 */
+		public function paidy_activation_redirect() {
+			add_option( 'paidy_do_activation_redirect', true );
 		}
 
 		/**
@@ -99,6 +110,7 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		 * @return void
 		 */
 		public function on_deactivation() {
+			add_option( 'paidy_do_activation_redirect', true );
 			flush_rewrite_rules();
 		}
 
