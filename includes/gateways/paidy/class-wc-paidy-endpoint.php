@@ -16,11 +16,14 @@ class WC_Paidy_Endpoint {
 	 * Constructor.
 	 */
 	public function __construct() {
+		// Rest API to receive payment notifications from Paidy.
 		add_action( 'rest_api_init', array( $this, 'paidy_register_routes' ) );
+		// WebHook to get data from paidy.artws.info.
+		add_action( 'rest_api_init', array( $this, 'paidy_check_regist_webhook' ) );
 	}
 
 	/**
-	 * Callback.
+	 * Callback. Rest API to receive payment notifications from Paidy.
 	 */
 	public function paidy_register_routes() {
 		// POST /wp-json/paidy/v1/order .
@@ -117,5 +120,21 @@ class WC_Paidy_Endpoint {
 			$jp4wc_framework->jp4wc_debug_log( $message, $debug, 'paidy-wc' );
 			return new WP_Error( 'no_payment_id', 'Invalid author', array( 'status' => 404 ) );
 		}
+	}
+
+	/**
+	 * Callback. Register WebHook route to get data from paidy.artws.info.
+	 */
+	public function paidy_check_regist_webhook() {
+		// POST /wp-json/paidy/v1/check .
+		register_rest_route(
+			'paidy/v1',
+			'/check',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'paidy_check_webhook' ),
+				'permission_callback' => '__return_true',
+			)
+		);
 	}
 }

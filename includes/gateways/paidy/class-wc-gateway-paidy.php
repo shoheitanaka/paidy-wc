@@ -124,6 +124,13 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	public $instructions;
 
 	/**
+	 * Account details.
+	 *
+	 * @var string
+	 */
+	public $account_details;
+
+	/**
 	 * Constructor for the gateway.
 	 */
 	public function __construct() {
@@ -282,19 +289,16 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				'default'     => 'no',
 				'description' => __( 'Save debug data using WooCommerce logging.', 'paidy-wc' ),
 			),
-			'webhook'             => array(
-				'title'       => __( 'About Webhook', 'paidy-wc' ),
-				'type'        => 'title',
-				'description' => __( 'The webhooks set in the Paidy management screen are as follows. <br />', 'paidy-wc' ) . '<strong>' . site_url() . '/wp-json/paidy/v1/order/</strong>',
-			),
 			'notice_email'        => array(
 				'title'       => __( 'Notice e-mail', 'paidy-wc' ),
 				'type'        => 'text',
 				'description' => __( 'Set an e-mail address to send an e-mail when an error occurs during connection with paidy.', 'paidy-wc' ),
 				'default'     => get_option( 'admin_email' ),
 			),
-			'account_details'     => array(
-				'type' => 'account_details',
+			'webhook'             => array(
+				'title'       => __( 'About Webhook', 'paidy-wc' ),
+				'type'        => 'title',
+				'description' => __( 'The webhooks set in the Paidy management screen are as follows. <br />', 'paidy-wc' ) . '<strong>' . get_rest_url() . '/wp-json/paidy/v1/order/</strong>',
 			),
 		);
 	}
@@ -679,8 +683,13 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 
 	/**
 	 * Load Paidy javascript for Admin
+	 *
+	 * @param string $hook_suffix Hook suffix.
 	 */
-	public function admin_enqueue_scripts() {
+	public function admin_enqueue_scripts( $hook_suffix ) {
+		if ( 'woocommerce_page_wc-settings' !== $hook_suffix ) {
+			return;
+		}
 		// Image upload.
 		wp_enqueue_media();
 		if ( is_admin() && false === wp_script_is( 'wc-gateway-ppec-settings' ) && isset( $_GET['section'] ) && 'paidy' === $_GET['section'] ) {// phpcs:ignore
@@ -693,14 +702,57 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			);
 
 		}
+
 		if ( is_admin() && isset( $_GET['section'] ) && isset( $_GET['tab'] ) && 'paidy' === $_GET['section'] && 'checkout' === $_GET['tab'] ) {// phpcs:ignore
-			wp_register_style(
-				'jp4wc_paidy_admin',
-				WC_PAIDY_PLUGIN_URL . 'assets/css/admin-jp4wc-paidy.css',
-				false,
-				WC_PAIDY_VERSION
+			$handle            = 'wc-paidy-admin-script';
+			$script_path       = '/includes/gateways/paidy/assets/js/admin/paidy.js';
+			$script_asset_path = WC_PAIDY_ABSPATH . 'includes/gateways/paidy/assets/js/admin/paidy.asset.php';
+			$script_asset      = file_exists( $script_asset_path )
+				? require $script_asset_path
+				: array(
+					'dependencies' => array(),
+					'version'      => '1.2.0',
+				);
+			$script_url        = WC_PAIDY_PLUGIN_URL . $script_path;
+
+			$screen = get_current_screen();
+			wp_register_script(
+				$handle,
+				$script_url,
+				$script_asset['dependencies'],
+				$script_asset['version'],
+				true
 			);
-			wp_enqueue_style( 'jp4wc_paidy_admin' );
+
+			wp_set_script_translations(
+				$handle,
+				'paidy-wc',
+				WC_PAIDY_ABSPATH . 'i18n/'
+			);
+
+			wp_enqueue_script( $handle );
+
+			wp_enqueue_style(
+				'paidy-admin-style',
+				WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/admin/paidy.css',
+				array_filter(
+					$script_asset['dependencies'],
+					function ( $style ) {
+						return wp_style_is( $style, 'registered' );
+					}
+				),
+				$script_asset['version'],
+			);
+
+			// Setting data.
+			$rest_url = get_rest_url();
+			wp_localize_script(
+				$handle,
+				'paidyForWcSettings',
+				array(
+					'restUrl' => $rest_url,
+				)
+			);
 		}
 	}
 
@@ -854,19 +906,6 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			</script>
 			<?php
 		endif;
-	}
-
-	/**
-	 * Generate account details HTML.
-	 *
-	 * @return string
-	 */
-	public function generate_account_details_html() {
-		ob_start();
-		?>
-		<div class="wrap" id="paidy-admin-settings">Loading…</div>
-		<?php
-		return ob_get_clean();
 	}
 
 	/**

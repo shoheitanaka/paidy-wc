@@ -64,7 +64,7 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		 *
 		 * @return void
 		 */
-		private function __wakeup() {}
+		// private function __wakeup() {}.
 
 		/**
 		 * Protected constructor to prevent creating a new instance of the
@@ -112,9 +112,16 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 				require_once __DIR__ . '/includes/jp4wc-framework/class-jp4wc-framework.php';
 			}
 			require_once __DIR__ . '/includes/gateways/paidy/class-wc-gateway-paidy.php';
+
+			// Endpoints.
 			require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-endpoint.php';
 			new WC_Paidy_Endpoint();
+
 			require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-admin-notices.php';
+
+			// Admin wizard.
+			require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-admin-wizard.php';
+			new WC_Paidy_Admin_Wizard();
 		}
 		/**
 		 * Init Paidy for WooCommerce when WordPress Initialises.
