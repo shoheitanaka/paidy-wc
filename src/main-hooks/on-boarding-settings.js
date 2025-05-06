@@ -32,28 +32,30 @@ const useOnBoardingSettings = () => {
 
 	useEffect( () => {
 		apiFetch( { path: '/wp/v2/settings' } ).then( ( settings ) => {
-			setCurrentStep( settings.woocommerce_paidy_on_boarding_settings.currentStep );
-			setStoreName( settings.woocommerce_paidy_on_boarding_settings.storeName );
-			setSiteName( settings.woocommerce_paidy_on_boarding_settings.siteName );
-			setStoreUrl( settings.woocommerce_paidy_on_boarding_settings.storeUrl );
-			setRegistEmail( settings.woocommerce_paidy_on_boarding_settings.registEmail );
-			setContactPhone( settings.woocommerce_paidy_on_boarding_settings.contactPhone );
-			setRepesentativeLastName( settings.woocommerce_paidy_on_boarding_settings.representativeLastName );
-			setRepresentativeFirstName( settings.woocommerce_paidy_on_boarding_settings.representativeFirstName );
-			setRepresentativeLastNameKana( settings.woocommerce_paidy_on_boarding_settings.representativeLastNameKana );
-			setRepresentativeFirstNameKana( settings.woocommerce_paidy_on_boarding_settings.representativeFirstNameKana );
-			setRepresentativeDateOfBirth( settings.woocommerce_paidy_on_boarding_settings.representativeDateOfBirth );
-			setAnnualGrossValue( settings.woocommerce_paidy_on_boarding_settings.annualGrossValue );
-			setAveragePurchaseAmount( settings.woocommerce_paidy_on_boarding_settings.averagePurchaseAmount );
-			setSecuritySurvey01CheckControl( settings.woocommerce_paidy_on_boarding_settings.securitySurvey01CheckControl );
-			setSecuritySurvey02CheckControl( settings.woocommerce_paidy_on_boarding_settings.securitySurvey02CheckControl );
-			setSecuritySurvey03CheckControl( settings.woocommerce_paidy_on_boarding_settings.securitySurvey03CheckControl );
-			setSecuritySurvey04CheckControl( settings.woocommerce_paidy_on_boarding_settings.securitySurvey04CheckControl );
-			setSecuritySurvey05CheckControl( settings.woocommerce_paidy_on_boarding_settings.securitySurvey05CheckControl );
-			setSecuritySurvey06CheckControl( settings.woocommerce_paidy_on_boarding_settings.securitySurvey06CheckControl );
-			setSecuritySurvey07CheckControl( settings.woocommerce_paidy_on_boarding_settings.securitySurvey07CheckControl );
-			setSecuritySurvey08CheckControl( settings.woocommerce_paidy_on_boarding_settings.securitySurvey08CheckControl );
-			setSecuritySurvey09CheckControl( settings.woocommerce_paidy_on_boarding_settings.securitySurvey09CheckControl );
+			const onBoardingSettings = settings.woocommerce_paidy_on_boarding_settings;
+			
+			setCurrentStep( onBoardingSettings.currentStep );
+			setStoreName( onBoardingSettings.storeName );
+			setSiteName( onBoardingSettings.siteName );
+			setStoreUrl( onBoardingSettings.storeUrl );
+			setRegistEmail( onBoardingSettings.registEmail );
+			setContactPhone( onBoardingSettings.contactPhone );
+			setRepesentativeLastName( onBoardingSettings.representativeLastName );
+			setRepresentativeFirstName( onBoardingSettings.representativeFirstName );
+			setRepresentativeLastNameKana( onBoardingSettings.representativeLastNameKana );
+			setRepresentativeFirstNameKana( onBoardingSettings.representativeFirstNameKana );
+			setRepresentativeDateOfBirth( onBoardingSettings.representativeDateOfBirth );
+			setAnnualGrossValue( onBoardingSettings.annualGrossValue );
+			setAveragePurchaseAmount( onBoardingSettings.averagePurchaseAmount );
+			setSecuritySurvey01CheckControl( onBoardingSettings.securitySurvey01CheckControl );
+			setSecuritySurvey02CheckControl( onBoardingSettings.securitySurvey02CheckControl );
+			setSecuritySurvey03CheckControl( onBoardingSettings.securitySurvey03CheckControl );
+			setSecuritySurvey04CheckControl( onBoardingSettings.securitySurvey04CheckControl );
+			setSecuritySurvey05CheckControl( onBoardingSettings.securitySurvey05CheckControl );
+			setSecuritySurvey06CheckControl( onBoardingSettings.securitySurvey06CheckControl );
+			setSecuritySurvey07CheckControl( onBoardingSettings.securitySurvey07CheckControl );
+			setSecuritySurvey08CheckControl( onBoardingSettings.securitySurvey08CheckControl );
+			setSecuritySurvey09CheckControl( onBoardingSettings.securitySurvey09CheckControl );
 		} );
 	}, [] );
 
@@ -116,7 +118,7 @@ const useOnBoardingSettings = () => {
 			method: 'POST',
 			data: {
 				woocommerce_paidy_on_boarding_settings: {
-					currentStep,
+					currentStep: Number(currentStep),
 					storeName,
 					siteName,
 					storeUrl,

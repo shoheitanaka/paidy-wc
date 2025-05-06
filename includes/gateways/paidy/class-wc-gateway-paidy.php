@@ -172,6 +172,8 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		add_action( 'wp_enqueue_scripts', array( $this, 'paidy_token_scripts_method' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_wizard_scripts' ), 99 );
+
 		add_action( 'woocommerce_before_checkout_form', array( $this, 'checkout_reject_to_cancel' ) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_completed' ) );
 
@@ -702,38 +704,40 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			);
 
 		}
+	}
 
+	/**
+	 * Enqueues JavaScript and CSS for the admin wizard interface.
+	 *
+	 * This function loads scripts and styles for the Paidy payment gateway settings page.
+	 * It's triggered when viewing the Paidy section in the WooCommerce checkout settings.
+	 */
+	public function admin_wizard_scripts() {
 		if ( is_admin() && isset( $_GET['section'] ) && isset( $_GET['tab'] ) && 'paidy' === $_GET['section'] && 'checkout' === $_GET['tab'] ) {// phpcs:ignore
-			$handle            = 'wc-paidy-admin-script';
+			$handle            = 'paidy-admin-settings-script';
 			$script_path       = '/includes/gateways/paidy/assets/js/admin/paidy.js';
 			$script_asset_path = WC_PAIDY_ABSPATH . 'includes/gateways/paidy/assets/js/admin/paidy.asset.php';
 			$script_asset      = file_exists( $script_asset_path )
 				? require $script_asset_path
 				: array(
 					'dependencies' => array(),
-					'version'      => '1.2.0',
+					'version'      => '1.2.1',
 				);
 			$script_url        = WC_PAIDY_PLUGIN_URL . $script_path;
 
-			$screen = get_current_screen();
-			wp_register_script(
+			wp_enqueue_script(
 				$handle,
 				$script_url,
 				$script_asset['dependencies'],
 				$script_asset['version'],
-				true
+				array(
+					'in_footer' => true,
+				)
 			);
 
-			wp_set_script_translations(
-				$handle,
-				'paidy-wc',
-				WC_PAIDY_ABSPATH . 'i18n/'
-			);
-
-			wp_enqueue_script( $handle );
-
+			// Enqueue CSS.
 			wp_enqueue_style(
-				'paidy-admin-style',
+				'paidy-admin-settings-style',
 				WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/admin/paidy.css',
 				array_filter(
 					$script_asset['dependencies'],
@@ -744,6 +748,12 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				$script_asset['version'],
 			);
 
+			$translation_path = WC_PAIDY_ABSPATH . 'i18n';
+			wp_set_script_translations(
+				$handle,
+				'paidy-wc',
+				$translation_path
+			);
 			// Setting data.
 			$rest_url = get_rest_url();
 			wp_localize_script(

@@ -145,13 +145,22 @@ class WC_Paidy_Admin_Wizard {
 	 */
 	public function paidy_on_boarding_settings() {
 		$default = array(
-			'currentStep'           => 0,
-			'storeName'             => get_bloginfo( 'name' ),
-			'siteName'              => get_bloginfo( 'name' ),
-			'storeUrl'              => get_bloginfo( 'url' ),
-			'registEmail'           => get_bloginfo( 'admin_email' ),
-			'annualGrossValue'      => 'less-than-10-million-yen',
-			'averagePurchaseAmount' => 'less-than-50000-yen',
+			'currentStep'                  => 0,
+			'storeName'                    => get_bloginfo( 'name' ),
+			'siteName'                     => get_bloginfo( 'name' ),
+			'storeUrl'                     => get_bloginfo( 'url' ),
+			'registEmail'                  => get_bloginfo( 'admin_email' ),
+			'annualGrossValue'             => 'less-than-10-million-yen',
+			'averagePurchaseAmount'        => 'less-than-50000-yen',
+			'securitySurvey01CheckControl' => false,
+			'securitySurvey02CheckControl' => false,
+			'securitySurvey03CheckControl' => false,
+			'securitySurvey04CheckControl' => false,
+			'securitySurvey05CheckControl' => false,
+			'securitySurvey06CheckControl' => false,
+			'securitySurvey07CheckControl' => false,
+			'securitySurvey08CheckControl' => false,
+			'securitySurvey09CheckControl' => false,
 		);
 		$schema  = array(
 			'type'       => 'object',
@@ -231,10 +240,16 @@ class WC_Paidy_Admin_Wizard {
 			array(
 				'type'              => 'object',
 				'default'           => $default,
-				'sanitize_callback' => array( $this, 'paidy_sanitize_on_boarding_settings' ),
 				'show_in_rest'      => array(
-					'schema' => $schema,
+					'schema'           => $schema,
+					'prepare_callback' => function ( $value ) {
+						if ( empty( $value ) || ! is_array( $value ) ) {
+							return $this->paidy_on_boarding_settings();
+						}
+						return $value;
+					},
 				),
+				'sanitize_callback' => array( $this, 'paidy_sanitize_on_boarding_settings' ),
 			)
 		);
 	}
@@ -246,9 +261,53 @@ class WC_Paidy_Admin_Wizard {
 	 * @return string Sanitized input.
 	 */
 	public function paidy_sanitize_on_boarding_settings( $input ) {
-		$input = (object) $input;
-		$input = array_map( 'sanitize_text_field', (array) $input );
-		return $input;
+		if ( is_object( $input ) ) {
+			$input = (array) $input;
+		} elseif ( ! is_array( $input ) ) {
+			return array();
+		}
+		$sanitized                = array();
+		$sanitized['currentStep'] = isset( $input['currentStep'] ) ? absint( $input['currentStep'] ) : 0;
+
+		$text_fields = array(
+			'storeName',
+			'siteName',
+			'storeUrl',
+			'registEmail',
+			'contactPhone',
+			'representativeLastName',
+			'representativeFirstName',
+			'representativeLastNameKana',
+			'representativeFirstNameKana',
+			'representativeDateOfBirth',
+		);
+
+		foreach ( $text_fields as $field ) {
+			$sanitized[ $field ] = isset( $input[ $field ] ) ? sanitize_text_field( $input[ $field ] ) : '';
+		}
+
+		$select_fields = array( 'annualGrossValue', 'averagePurchaseAmount' );
+		foreach ( $select_fields as $field ) {
+			$sanitized[ $field ] = isset( $input[ $field ] ) ? sanitize_text_field( $input[ $field ] ) : '';
+		}
+
+		$checkbox_fields = array(
+			'securitySurvey01CheckControl',
+			'securitySurvey02CheckControl',
+			'securitySurvey03CheckControl',
+			'securitySurvey04CheckControl',
+			'securitySurvey05CheckControl',
+			'securitySurvey06CheckControl',
+			'securitySurvey07CheckControl',
+			'securitySurvey08CheckControl',
+			'securitySurvey09CheckControl',
+		);
+
+		foreach ( $checkbox_fields as $field ) {
+			$sanitized[ $field ] = isset( $input[ $field ] ) && rest_sanitize_boolean( $input[ $field ] );
+		}
+
+		return $sanitized;
 	}
 
 	/**
@@ -262,13 +321,12 @@ class WC_Paidy_Admin_Wizard {
 		if ( 'woocommerce_paidy_on_boarding_settings' !== $option ) {
 			return;
 		}
-
-		if ( isset( $value['currentStep'] ) && '1' === $value['currentStep'] ) {
-			$value['currentStep'] = 2;
-			$site_hash            = $this->generate_random_string( 16 );
-			$hash                 = password_hash( $site_hash, PASSWORD_DEFAULT );
-			$value['hash']        = $hash;
-			update_option( $option, $value );
+		if ( isset( $value['currentStep'] ) && 2 === $value['currentStep'] && 1 === $old_value['currentStep'] ) {
+			// $value['currentStep'] = 3;
+			$site_hash = $this->generate_random_string( 16 );
+			update_option( 'paidy_site_hash', $site_hash );
+			$hash = password_hash( $site_hash, PASSWORD_DEFAULT );
+			update_option( 'paidy_hash', $hash );
 			$result = $this->send_apply_data_to_wcartws( $value, $site_hash );
 		}
 	}
@@ -326,7 +384,7 @@ class WC_Paidy_Admin_Wizard {
 			'blocking'    => true,
 			'body'        => $data_array,
 		);
-		$response   = wp_remote_post( $api_url, $args );
+		$response   = wp_remote_post( $wcartws_api_url, $args );
 
 		$result = true;
 		if ( is_wp_error( $response ) ) {
@@ -349,6 +407,11 @@ class WC_Paidy_Admin_Wizard {
 			$result = false;
 		}
 		update_option( 'woocommerce_paidy_on_boarding_settings', $value );
+		if ( $result ) {
+			error_log( 'step2_set_true' );
+		} else {
+			error_log( 'step2_set_false' );
+		}
 
 		return $result;
 	}
@@ -386,7 +449,7 @@ class WC_Paidy_Admin_Wizard {
 		}
 
 		// Shuffle to randomize the order of letters.
-		$random_string = str_shuffle( $$random_string );
+		$random_string = str_shuffle( $random_string );
 
 		return $random_string;
 	}
@@ -402,7 +465,7 @@ class WC_Paidy_Admin_Wizard {
 			return;
 		}
 
-		if ( isset( $value['currentStep'] ) && '1' === $value['currentStep'] ) {
+		if ( isset( $value['currentStep'] ) && 1 === $value['currentStep'] ) {
 			$value['currentStep'] = 2;
 			update_option( $option, $value );
 		}

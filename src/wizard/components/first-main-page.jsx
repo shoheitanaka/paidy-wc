@@ -61,7 +61,7 @@ const PaidyTitle = () => {
 
 const ApplyButton = ( { onClick } ) => {
 	return (
-		<Button isPrimary className="paidy-go-apply paidy-button" onClick={ onClick }>
+		<Button className="paidy-go-apply paidy-button is-primary" onClick={ onClick }>
 			{ __( 'Get started now', 'paidy-wc' ) }
 		</Button>
 	);
@@ -70,7 +70,7 @@ const ApplyButton = ( { onClick } ) => {
 const SaveButton = ( { onClick } ) => {
 	return (
 		<div className="paidy-save">
-		<Button isPrimary className="paidy-save paidy-button" onClick={ onClick }>
+		<Button className="paidy-save paidy-button is-primary" onClick={ onClick }>
 			{ __( 'I agree to the above and apply', 'paidy-wc' ) }
 		</Button>
 		</div>
