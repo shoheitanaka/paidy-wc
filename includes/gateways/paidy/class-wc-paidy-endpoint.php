@@ -132,9 +132,34 @@ class WC_Paidy_Endpoint {
 			'/check',
 			array(
 				'methods'             => 'POST',
-				'callback'            => array( $this, 'paidy_check_webhook' ),
+				'callback'            => array( $this, 'paidy_regist_webhook' ),
 				'permission_callback' => '__return_true',
 			)
 		);
+	}
+
+	/**
+	 * Paidy WebHook registration check.
+	 *
+	 * @param object $data Request data.
+	 * @return WP_REST_Response | WP_Error Response for the webhook registration check.
+	 */
+	public function paidy_regist_webhook( $data ) {
+		$jp4wc_framework = new Framework\JP4WC_Framework();
+		$paidy           = new WC_Gateway_Paidy();
+		$debug           = $paidy->debug;
+		$body_data       = (array) $data->get_body();
+		$main_data       = json_decode( $body_data[0], true );
+		if ( empty( $data ) ) {
+			return new WP_Error( 'no_data', 'Invalid author', array( 'status' => 404 ) );
+		} elseif ( isset( $main_data['webhook_url'] ) && isset( $main_data['status'] ) ) {
+			if ( 'success' === $main_data['status'] ) {
+				return new WP_REST_Response( $main_data, 200 );
+			} else {
+				return new WP_Error( 'no_webhook_url', 'Invalid author', array( 'status' => 404 ) );
+			}
+		} else {
+			return new WP_Error( 'no_webhook_url', 'Invalid author', array( 'status' => 404 ) );
+		}
 	}
 }

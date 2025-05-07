@@ -170,7 +170,9 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		add_action( 'woocommerce_receipt_' . $this->id, array( $this, 'paidy_make_order' ) );
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'paidy_token_scripts_method' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'paidy_admin_enqueue_scripts' ) );
+
+		add_action( 'admin_enqueue_scripts', array( $this, 'paidy_admin_wizard_scripts' ), 99 );
 
 		add_action( 'woocommerce_before_checkout_form', array( $this, 'checkout_reject_to_cancel' ) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_completed' ) );
@@ -686,7 +688,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 *
 	 * @param string $hook_suffix Hook suffix.
 	 */
-	public function admin_enqueue_scripts( $hook_suffix ) {
+	public function paidy_admin_enqueue_scripts( $hook_suffix ) {
 		if ( 'woocommerce_page_wc-settings' !== $hook_suffix ) {
 			return;
 		}
@@ -702,38 +704,29 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			);
 
 		}
+	}
 
+	/**
+	 * Enqueues JavaScript and CSS for the admin wizard interface.
+	 *
+	 * This function loads scripts and styles for the Paidy payment gateway settings page.
+	 * It's triggered when viewing the Paidy section in the WooCommerce checkout settings.
+	 */
+	public function paidy_admin_wizard_scripts() {
 		if ( is_admin() && isset( $_GET['section'] ) && isset( $_GET['tab'] ) && 'paidy' === $_GET['section'] && 'checkout' === $_GET['tab'] ) {// phpcs:ignore
-			$handle            = 'wc-paidy-admin-script';
+			$handle            = 'paidy-admin-settings-script';
 			$script_path       = '/includes/gateways/paidy/assets/js/admin/paidy.js';
 			$script_asset_path = WC_PAIDY_ABSPATH . 'includes/gateways/paidy/assets/js/admin/paidy.asset.php';
 			$script_asset      = file_exists( $script_asset_path )
 				? require $script_asset_path
 				: array(
 					'dependencies' => array(),
-					'version'      => '1.2.0',
+					'version'      => '1.2.1',
 				);
-			$script_url        = WC_PAIDY_PLUGIN_URL . $script_path;
 
-			$screen = get_current_screen();
-			wp_register_script(
-				$handle,
-				$script_url,
-				$script_asset['dependencies'],
-				$script_asset['version'],
-				true
-			);
-
-			wp_set_script_translations(
-				$handle,
-				'paidy-wc',
-				WC_PAIDY_ABSPATH . 'i18n/'
-			);
-
-			wp_enqueue_script( $handle );
-
+			// Enqueue CSS.
 			wp_enqueue_style(
-				'paidy-admin-style',
+				'paidy-admin-settings-style',
 				WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/admin/paidy.css',
 				array_filter(
 					$script_asset['dependencies'],
@@ -744,10 +737,26 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				$script_asset['version'],
 			);
 
+			$translation_path = WC_PAIDY_ABSPATH . 'i18n';
+			wp_set_script_translations(
+				'paidy-admin-settings-script',
+				'paidy-wc',
+				$translation_path
+			);
+
+			$script_url = WC_PAIDY_PLUGIN_URL . $script_path;
+			wp_enqueue_script(
+				'paidy-admin-settings-script',
+				$script_url,
+				$script_asset['dependencies'],
+				$script_asset['version'],
+				true
+			);
+
 			// Setting data.
 			$rest_url = get_rest_url();
 			wp_localize_script(
-				$handle,
+				'paidy-admin-settings-script',
 				'paidyForWcSettings',
 				array(
 					'restUrl' => $rest_url,
@@ -842,34 +851,34 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		$order_payment_method = $order->get_payment_method();
 		$transaction_id       = $order->get_transaction_id();
 		if ( $order_payment_method === $this->id && ! empty( $transaction_id ) ) {
-				$send_url = 'https://api.paidy.com/payments/' . $transaction_id . '/close';
-				$args     = array(
-					'method'  => 'POST',
-					'body'    => '{}',
-					'headers' => array(
-						'Content-Type'  => 'application/json',
-						'Paidy-Version' => '2018-04-10',
-						'Authorization' => 'Bearer ' . $secret_key,
-					),
-				);
+			$send_url = 'https://api.paidy.com/payments/' . $transaction_id . '/close';
+			$args     = array(
+				'method'  => 'POST',
+				'body'    => '{}',
+				'headers' => array(
+					'Content-Type'  => 'application/json',
+					'Paidy-Version' => '2018-04-10',
+					'Authorization' => 'Bearer ' . $secret_key,
+				),
+			);
 
-				$message = 'Send URL is following. : ' . $send_url;
+			$message = 'Send URL is following. : ' . $send_url;
+			$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
+
+			$close       = wp_remote_post( $send_url, $args );
+			$close_array = json_decode( $close['body'], true );
+			if ( is_wp_error( $close ) ) {
+				$order->add_order_note( $close->get_error_message() );
+			} elseif ( 'closed' === $close_array['status'] ) {
+				$message = $this->jp4wc_framework->jp4wc_array_to_message( $close_array ) . __( 'This order is success cancellation data at Paidy.', 'paidy-wc' );
+				$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
+			} else {
+				$message = $this->jp4wc_framework->jp4wc_array_to_message( $close_array ) . __( 'This order is already close data at Paidy.', 'paidy-wc' );
 				$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
 
-				$close       = wp_remote_post( $send_url, $args );
-				$close_array = json_decode( $close['body'], true );
-				if ( is_wp_error( $close ) ) {
-					$order->add_order_note( $close->get_error_message() );
-				} elseif ( 'closed' === $close_array['status'] ) {
-					$message = $this->jp4wc_framework->jp4wc_array_to_message( $close_array ) . __( 'This order is success cancellation data at Paidy.', 'paidy-wc' );
-					$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
-				} else {
-					$message = $this->jp4wc_framework->jp4wc_array_to_message( $close_array ) . __( 'This order is already close data at Paidy.', 'paidy-wc' );
-					$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
-
-					$order->add_order_note( __( 'Cancelled processing has not been completed due to a Paidy error. Please check Paidy admin.', 'paidy-wc' ) );
-					return false;
-				}
+				$order->add_order_note( __( 'Cancelled processing has not been completed due to a Paidy error. Please check Paidy admin.', 'paidy-wc' ) );
+				return false;
+			}
 		}
 		return true;
 	}
@@ -905,7 +914,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			});
 			</script>
 			<?php
-		endif;
+			endif;
 	}
 
 	/**
@@ -1182,14 +1191,14 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 
 			<td class="image-component-wrapper">
 				<div class="image-preview-wrapper">
-					<?php
-					if ( ! $value_is_url ) {
-						echo wp_get_attachment_image( $value, 'thumbnail' );
-					} else {
-						// translators: %s: URL of the image.
-						printf( esc_html__( 'Already using URL as image: %s', 'paidy-wc' ), esc_url( $value ) );
-					}
-					?>
+				<?php
+				if ( ! $value_is_url ) {
+					echo wp_get_attachment_image( $value, 'thumbnail' );
+				} else {
+					// translators: %s: URL of the image.
+					printf( esc_html__( 'Already using URL as image: %s', 'paidy-wc' ), esc_url( $value ) );
+				}
+				?>
 				</div>
 
 				<button
@@ -1218,8 +1227,8 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				/>
 			</td>
 		</tr>
-		<?php
+			<?php
 
-		return ob_get_clean();
+			return ob_get_clean();
 	}
 }

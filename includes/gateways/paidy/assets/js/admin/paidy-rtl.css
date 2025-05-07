@@ -13,6 +13,7 @@
   color: #E5258C;
 }
 #paidy-admin-settings button.paidy-button {
+  color: #ffffff;
   font-size: 2em;
   padding: 30px;
   background: linear-gradient(-90deg, #E5258C 0%, #863BD4 96.36%);

@@ -32,3 +32,4 @@ composer.lock
 
 *.tmp
 *.zip
+*.js.map

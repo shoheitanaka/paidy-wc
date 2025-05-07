@@ -6,9 +6,10 @@ import {
 } from '@wordpress/components';
 
 const PaidyTitle = () => {
+	const heading_text = __( 'Easy Paidy payment setup', 'paidy-wc' );
 	return (
 		<Heading level={ 2 }>
-			{ __( 'Easy Paidy payment setup', 'paidy-wc' ) }
+			{ heading_text }
 		</Heading>
 	);
 }
@@ -19,7 +20,7 @@ const ApplyButton = ( { onClick } ) => {
       };
     
 	return (
-		<Button isPrimary className="paidy-setting-step1 paidy-button" onClick={ handleClick }>
+		<Button className="paidy-setting-step1 paidy-button" onClick={ handleClick }>
 			{ __( 'Start easy Paidy payment setup', 'paidy-wc' ) }
 		</Button>
 	);

@@ -15,5 +15,6 @@
 .gitignore
 composer.lock
 package-lock.json
+*.js.map
 LICENSE
 README.md
