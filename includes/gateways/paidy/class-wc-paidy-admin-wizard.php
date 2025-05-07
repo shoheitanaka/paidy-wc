@@ -104,7 +104,7 @@ class WC_Paidy_Admin_Wizard {
 			$handle,
 			WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/wizard/paidy.js',
 			$asset['dependencies'],
-			$asset['version'] . $screen->id,
+			$asset['version'],
 			array(
 				'in_footer' => true,
 			)
