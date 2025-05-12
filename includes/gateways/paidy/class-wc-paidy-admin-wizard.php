@@ -51,8 +51,6 @@ class WC_Paidy_Admin_Wizard {
 			add_action( 'added_option', array( $this, 'add_paidy_on_boarding_settings' ), 10, 3 );
 			add_filter( 'woocommerce_gateway_method_description', array( $this, 'paidy_method_description' ), 20, 2 );
 			add_action( 'woocommerce_settings_tabs_checkout', array( $this, 'paidy_after_settings_checkout' ) );
-			// Redirect when the plugin is activated.
-			add_action( 'admin_init', array( $this, 'paidy_redirect_to_wizard' ) );
 		}
 	}
 
@@ -514,17 +512,6 @@ class WC_Paidy_Admin_Wizard {
 			} else {
 				echo '</div>';
 			}
-		}
-	}
-
-	/**
-	 * Redirects to the Paidy wizard after plugin activation.
-	 */
-	public function paidy_redirect_to_wizard() {
-		if ( get_option( 'paidy_do_activation_redirect', false ) ) {
-			delete_option( 'paidy_do_activation_redirect' );
-			wp_safe_redirect( admin_url( 'admin.php?page=wc-admin&path=%2Fpaidy-on-boarding' ) );
-			exit;
 		}
 	}
 }

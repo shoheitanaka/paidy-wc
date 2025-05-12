@@ -59,14 +59,6 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		private function __clone() {}
 
 		/**
-		 * Private unserialize method to prevent unserializing of the *Singleton*
-		 * instance.
-		 *
-		 * @return void
-		 */
-		// private function __wakeup() {}.
-
-		/**
 		 * Protected constructor to prevent creating a new instance of the
 		 * *Singleton* via the `new` operator from outside of this class.
 		 *
@@ -89,29 +81,6 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 			$this->includes();
 			// Set up localisation.
 			$this->load_plugin_textdomain();
-			// Register activation hook.
-			register_activation_hook( WC_PAIDY_PLUGIN_FILE, array( $this, 'paidy_activation_redirect' ) );
-			// deactivation.
-			register_deactivation_hook( WC_PAIDY_PLUGIN_FILE, array( $this, 'on_deactivation' ) );
-		}
-
-		/**
-		 * Add option for activation redirect.
-		 *
-		 * @return void
-		 */
-		public function paidy_activation_redirect() {
-			add_option( 'paidy_do_activation_redirect', true );
-		}
-
-		/**
-		 * Flush rewrite rules on deactivate.
-		 *
-		 * @return void
-		 */
-		public function on_deactivation() {
-			add_option( 'paidy_do_activation_redirect', true );
-			flush_rewrite_rules();
 		}
 
 		/**
@@ -130,16 +99,14 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 			new WC_Paidy_Endpoint();
 
 			require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-admin-notices.php';
-
-			// Admin wizard.
-			require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-admin-wizard.php';
-			new WC_Paidy_Admin_Wizard();
 		}
 		/**
 		 * Init Paidy for WooCommerce when WordPress Initialises.
 		 */
 		public static function init() {
 			add_action( 'woocommerce_blocks_loaded', array( __CLASS__, 'wc_paidy_blocks_support' ) );
+			// handle New futures compatibility.
+			add_action( 'before_woocommerce_init', array( __CLASS__, 'wc_paidy_handle_new_feature_compatibility' ) );
 		}
 
 		/**
@@ -167,6 +134,16 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 						$payment_method_registry->register( new WC_Payments_Paidy_Blocks_Support() );
 					}
 				);
+			}
+		}
+
+		/**
+		 * Handle HPOS compatibility.
+		 */
+		public static function wc_paidy_handle_new_feature_compatibility() {
+			if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+				$slug = dirname( plugin_basename( __FILE__ ) );
+				\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', trailingslashit( $slug ) . $slug . '.php', true );
 			}
 		}
 	}
