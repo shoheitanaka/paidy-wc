@@ -144,21 +144,21 @@ class WC_Paidy_Admin_Wizard {
 	public function paidy_on_boarding_settings() {
 		$default = array(
 			'currentStep'                  => 0,
-			'storeName'                    => get_bloginfo( 'name' ),
+			'storeName'                    => '',
 			'siteName'                     => get_bloginfo( 'name' ),
 			'storeUrl'                     => get_bloginfo( 'url' ),
 			'registEmail'                  => get_bloginfo( 'admin_email' ),
 			'annualGrossValue'             => 'less-than-10-million-yen',
 			'averagePurchaseAmount'        => 'less-than-50000-yen',
-			'securitySurvey01CheckControl' => false,
-			'securitySurvey02CheckControl' => false,
-			'securitySurvey03CheckControl' => false,
-			'securitySurvey04CheckControl' => false,
-			'securitySurvey05CheckControl' => false,
-			'securitySurvey06CheckControl' => false,
-			'securitySurvey07CheckControl' => false,
-			'securitySurvey08CheckControl' => false,
-			'securitySurvey09CheckControl' => false,
+			'securitySurvey01CheckControl' => true,
+			'securitySurvey02CheckControl' => true,
+			'securitySurvey03CheckControl' => true,
+			'securitySurvey04CheckControl' => true,
+			'securitySurvey05CheckControl' => true,
+			'securitySurvey06CheckControl' => true,
+			'securitySurvey07CheckControl' => true,
+			'securitySurvey08CheckControl' => true,
+			'securitySurvey09CheckControl' => true,
 		);
 		$schema  = array(
 			'type'       => 'object',
@@ -320,7 +320,6 @@ class WC_Paidy_Admin_Wizard {
 			return;
 		}
 		if ( isset( $value['currentStep'] ) && 2 === $value['currentStep'] && 1 === $old_value['currentStep'] ) {
-			// $value['currentStep'] = 3;
 			$site_hash = $this->generate_random_string( 16 );
 			update_option( 'paidy_site_hash', $site_hash );
 			$hash = password_hash( $site_hash, PASSWORD_DEFAULT );
@@ -405,11 +404,6 @@ class WC_Paidy_Admin_Wizard {
 			$result = false;
 		}
 		update_option( 'woocommerce_paidy_on_boarding_settings', $value );
-		if ( $result ) {
-			error_log( 'step2_set_true' );
-		} else {
-			error_log( 'step2_set_false' );
-		}
 
 		return $result;
 	}

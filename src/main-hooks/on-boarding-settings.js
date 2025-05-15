@@ -18,15 +18,15 @@ const useOnBoardingSettings = () => {
 	const [ representativeDateOfBirth, setRepresentativeDateOfBirth ] = useState();
 	const [ annualGrossValue, setAnnualGrossValue ] = useState();
 	const [ averagePurchaseAmount, setAveragePurchaseAmount ] = useState();
-	const [ securitySurvey01CheckControl, setSecuritySurvey01CheckControl ] = useState( false );
-	const [ securitySurvey02CheckControl, setSecuritySurvey02CheckControl ] = useState( false );
-	const [ securitySurvey03CheckControl, setSecuritySurvey03CheckControl ] = useState( false );
-	const [ securitySurvey04CheckControl, setSecuritySurvey04CheckControl ] = useState( false );
-	const [ securitySurvey05CheckControl, setSecuritySurvey05CheckControl ] = useState( false );
-	const [ securitySurvey06CheckControl, setSecuritySurvey06CheckControl ] = useState( false );
-	const [ securitySurvey07CheckControl, setSecuritySurvey07CheckControl ] = useState( false );
-	const [ securitySurvey08CheckControl, setSecuritySurvey08CheckControl ] = useState( false );
-	const [ securitySurvey09CheckControl, setSecuritySurvey09CheckControl ] = useState( false );
+	const [ securitySurvey01CheckControl, setSecuritySurvey01CheckControl ] = useState( true );
+	const [ securitySurvey02CheckControl, setSecuritySurvey02CheckControl ] = useState( true );
+	const [ securitySurvey03CheckControl, setSecuritySurvey03CheckControl ] = useState( true );
+	const [ securitySurvey04CheckControl, setSecuritySurvey04CheckControl ] = useState( true );
+	const [ securitySurvey05CheckControl, setSecuritySurvey05CheckControl ] = useState( true );
+	const [ securitySurvey06CheckControl, setSecuritySurvey06CheckControl ] = useState( true );
+	const [ securitySurvey07CheckControl, setSecuritySurvey07CheckControl ] = useState( true );
+	const [ securitySurvey08CheckControl, setSecuritySurvey08CheckControl ] = useState( true );
+	const [ securitySurvey09CheckControl, setSecuritySurvey09CheckControl ] = useState( true );
 
 	const { createErrorNotice, createSuccessNotice } = useDispatch( noticesStore );
 

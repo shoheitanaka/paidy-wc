@@ -1684,15 +1684,15 @@ const useOnBoardingSettings = () => {
   const [representativeDateOfBirth, setRepresentativeDateOfBirth] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
   const [annualGrossValue, setAnnualGrossValue] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
   const [averagePurchaseAmount, setAveragePurchaseAmount] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
-  const [securitySurvey01CheckControl, setSecuritySurvey01CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey02CheckControl, setSecuritySurvey02CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey03CheckControl, setSecuritySurvey03CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey04CheckControl, setSecuritySurvey04CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey05CheckControl, setSecuritySurvey05CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey06CheckControl, setSecuritySurvey06CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey07CheckControl, setSecuritySurvey07CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey08CheckControl, setSecuritySurvey08CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey09CheckControl, setSecuritySurvey09CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
+  const [securitySurvey01CheckControl, setSecuritySurvey01CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(true);
+  const [securitySurvey02CheckControl, setSecuritySurvey02CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(true);
+  const [securitySurvey03CheckControl, setSecuritySurvey03CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(true);
+  const [securitySurvey04CheckControl, setSecuritySurvey04CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(true);
+  const [securitySurvey05CheckControl, setSecuritySurvey05CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(true);
+  const [securitySurvey06CheckControl, setSecuritySurvey06CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(true);
+  const [securitySurvey07CheckControl, setSecuritySurvey07CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(true);
+  const [securitySurvey08CheckControl, setSecuritySurvey08CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(true);
+  const [securitySurvey09CheckControl, setSecuritySurvey09CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(true);
   const {
     createErrorNotice,
     createSuccessNotice
