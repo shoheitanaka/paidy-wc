@@ -18,13 +18,6 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 	 */
 	class WC_Paidy {
 		/**
-		 * Paidy for WooCommerce version.
-		 *
-		 * @var string
-		 */
-		public $version = '1.4.8';
-
-		/**
 		 * Paidy for WooCommerce Framework version.
 		 *
 		 * @var string
@@ -67,8 +60,6 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		 * @access public
 		 */
 		private function __construct() {
-			// WooCommerce For Softbank Payment Gateways version.
-			define( 'WC_PAIDY_VERSION', $this->version );
 			// WC4JP Framework version.
 			define( 'JP4WC_PAIDY_FRAMEWORK_VERSION', $this->framework_version );
 			// Paidy for WooCommerce plugin url.

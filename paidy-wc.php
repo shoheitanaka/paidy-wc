@@ -3,7 +3,7 @@
  * Plugin Name: Paidy for WooCommerce
  * Plugin URI: https://wordpress.org/plugins/paidy-wc/
  * Description: Paidy for WooCommerce
- * Version: 1.4.8.1
+ * Version: 1.4.8.2
  * Author: Artisan Workshop
  * Author URI: https://wc.artws.info/
  * Requires at least: 5.0
@@ -23,6 +23,9 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+
+// WooCommerce For Softbank Payment Gateways version.
+define( 'WC_PAIDY_VERSION', '1.4.8.2' );
 
 // Register activation hook.
 register_activation_hook( __FILE__, 'paidy_activation_redirect' );
