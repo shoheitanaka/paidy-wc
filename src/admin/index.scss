@@ -8,6 +8,25 @@
         margin-bottom: 10px;
         color: #E5258C;
     }
+  .paidy-on-boarding{
+    display: flex;
+    flex-wrap: wrap;
+    width: 800px;
+    margin: 0 auto;
+    .paidy-on-boarding__img{
+      width: 50%;
+      img{
+        width: 100%;
+      }
+    }
+    .paidy-on-boarding__content{
+        width: 50%;
+        p{
+          font-size: 1.5em;
+          margin-bottom: 20px;
+        }
+    }
+}
     button.paidy-button{
         color: #ffffff;
         font-size:2em;
@@ -18,4 +37,7 @@
 }
 #paidy-payment-settings{
     display: none;
+}
+.wrap.woocommerce{
+  background-color: #f0f0f1;
 }

@@ -71,7 +71,7 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 			// Include required files.
 			$this->includes();
 			// Set up localisation.
-			$this->load_plugin_textdomain();
+			add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 		}
 
 		/**
@@ -88,9 +88,8 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 			// Endpoints.
 			require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-endpoint.php';
 			new WC_Paidy_Endpoint();
-
-			require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-admin-notices.php';
 		}
+
 		/**
 		 * Init Paidy for WooCommerce when WordPress Initialises.
 		 */
@@ -107,9 +106,6 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		 */
 		public function load_plugin_textdomain() {
 			// Load plugin text domain.
-			$locale = determine_locale();
-			unload_textdomain( 'paidy-wc', true );
-			load_textdomain( 'paidy-wc', WP_LANG_DIR . '/paidy-wc/paidy-wc-' . $locale . '.mo' );
 			load_plugin_textdomain( 'paidy-wc', false, basename( __DIR__ ) . '/i18n' );
 		}
 

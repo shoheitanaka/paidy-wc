@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalHeading as Heading,
-	Button,
+	Button
 } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
@@ -84,6 +84,33 @@ const ReviewRejectedMessage = () => {
     );
 };
 
+const EnableTestButton = ( { onClick } ) => {
+   	const [ environment, setEnvironment ] = useState();
+
+    useEffect( () => {
+        apiFetch( { path: '/wp/v2/settings' } ).then( ( settings ) => {
+            const onPaidySettings = settings.woocommerce_paidy_settings || {};
+        	setEnvironment( onPaidySettings.environment || '' );
+        } );
+    });
+    if ( environment === 'sandbox' ) {
+        return (
+            <div className="paidy-enabled-test-message">
+                { __( 'Now test mode', 'paidy-wc' ) }
+            </div>
+        );
+    } else {
+        return (
+            <Button 
+                className="paidy-button test-button" 
+                onClick={ onClick }
+            >
+                { __( 'Enable test mode', 'paidy-wc' ) }
+            </Button>
+        );
+    }
+}
+
 const ReviewApprovedMessage = () => {
     const [isLoading, setIsLoading] = useState(false);
 	const { createErrorNotice, createSuccessNotice } = useDispatch( noticesStore );
@@ -137,6 +164,7 @@ const ReviewApprovedMessage = () => {
             );
         });
     };
+    
     return (
         <div className="paidy-approved-message">
             <Heading level={ 3 }>
@@ -152,19 +180,10 @@ const ReviewApprovedMessage = () => {
             </ul>
             <div className="paidy-enabled-button">
                 <p>{ __( 'Please click one of the buttons below.', 'paidy-wc' ) }</p>
-                <Button className="paidy-button test-button"
-                isPrimary 
-                onClick={ onSavingTestMode }
-                disabled={ isLoading }
-                >
-                    { __( 'Enable test mode', 'paidy-wc' ) }
-                    { isLoading
-                        ? __('Enabling Paidy...', 'paidy-wc')
-                        : __('Enable Paidy', 'paidy-wc')
-                    }
-                </Button><br />
+                <EnableTestButton onClick={ onSavingTestMode } />
+                <br />
+                <br />
                 <Button className="paidy-button production-button" 
-                isPrimary 
                 onClick={ onSavingProductionMode }
                 disabled={ isLoading }
                 >

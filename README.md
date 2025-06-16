@@ -14,3 +14,11 @@ Japanese
 
 [package.json](https://docs.npmjs.com/cli/v10/configuring-npm/package-json)
 [tsconfig.json](https://www.typescriptlang.org/ja/tsconfig/)
+
+npm install -g @wordpress/env
+
+wp-env start
+
+translate
+npm run make-pot
+npm run make-json

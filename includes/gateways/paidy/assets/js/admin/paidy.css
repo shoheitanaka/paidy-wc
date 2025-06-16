@@ -1,6 +1,6 @@
-/*!*********************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/admin/index.scss ***!
-  \*********************************************************************************************************************************************************************************************************************************************/
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/.pnpm/css-loader@6.11.0_webpack@5.99.9/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/.pnpm/postcss-loader@6.2.1_postcss@8.5.4_webpack@5.99.9/node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/.pnpm/sass-loader@16.0.5_sass@1.89.1_webpack@5.99.9/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/admin/index.scss ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 #paidy-admin-settings {
   text-align: center;
   width: 100%;
@@ -12,6 +12,25 @@
   margin-bottom: 10px;
   color: #E5258C;
 }
+#paidy-admin-settings .paidy-on-boarding {
+  display: flex;
+  flex-wrap: wrap;
+  width: 800px;
+  margin: 0 auto;
+}
+#paidy-admin-settings .paidy-on-boarding .paidy-on-boarding__img {
+  width: 50%;
+}
+#paidy-admin-settings .paidy-on-boarding .paidy-on-boarding__img img {
+  width: 100%;
+}
+#paidy-admin-settings .paidy-on-boarding .paidy-on-boarding__content {
+  width: 50%;
+}
+#paidy-admin-settings .paidy-on-boarding .paidy-on-boarding__content p {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
 #paidy-admin-settings button.paidy-button {
   color: #ffffff;
   font-size: 2em;
@@ -22,6 +41,10 @@
 
 #paidy-payment-settings {
   display: none;
+}
+
+.wrap.woocommerce {
+  background-color: #f0f0f1;
 }
 
 /*# sourceMappingURL=paidy.css.map*/

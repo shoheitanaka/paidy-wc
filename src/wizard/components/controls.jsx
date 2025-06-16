@@ -3,6 +3,7 @@ import {
     TextControl,
     RadioControl,
     CheckboxControl,
+    TextareaControl,
 } from '@wordpress/components';
 
 const StoreNameTextControl = ( { value, onChange } ) => {
@@ -141,124 +142,130 @@ const AveragePurchaseAmountRadioControl = ( { value, onChange } ) => {
     );
 };
 
-const SecuritySurvey01CheckControl = ( { value, onChange } ) => {
+const SecuritySurvey01RadioControl = ( { value, onChange } ) => {
+    return (
+        <RadioControl
+            label={ __( 'Do you use two-step or two-factor authentication to prevent compromised accounts?', 'paidy-wc' ) }
+            selected={ value }
+            onChange={ onChange }
+            options={[
+                {
+                    label: __( 'Yes', 'paidy-wc' ),
+                    value: 'yes'
+                },
+                {
+                    label: __( 'No', 'paidy-wc' ),
+                    value: 'no'
+                },
+                {
+                    label: __( 'Unknown', 'paidy-wc' ),
+                    value: 'unknown'
+                },
+            ]}
+        />
+    );
+};
+
+const SecuritySurvey01TextControl = ( { value, onChange } ) => {
+    return (
+        <TextareaControl
+            label={ __( 'If the answer is "no", please provide an alternative.', 'paidy-wc' ) }
+            value={ value }
+            onChange={ onChange }
+        />
+    );
+};
+
+const SecuritySurvey11CheckControl = ( { value, onChange } ) => {
     return (
         <CheckboxControl
-            label={ __( 'To access (log in to) the cart system management screen, you must enter a password.', 'paidy-wc' ) }
+            label={ __( 'Restricting access from suspicious IP addresses', 'paidy-wc' ) }
+            checked={ value }
+            help={ __( 'This refers to restricting access from suspicious IP addresses, such as those from overseas, using firewalls, WAFs, apps, etc.', 'paidy-wc' ) }
+            onChange={ onChange }
+        />
+    );
+};
+
+const SecuritySurvey12CheckControl = ( { value, onChange } ) => {
+    return (
+        <CheckboxControl
+            label={ __( 'Identity verification using two-factor authentication, etc.', 'paidy-wc' ) }
+            checked={ value }
+            help={ __( 'This refers to increasing security strength by combining multiple levels or elements of authentication, such as biometric authentication using fingerprints or faces, or email or SMS authentication, in addition to ID and password.', 'paidy-wc' ) }
+            onChange={ onChange }
+        />
+    );
+};
+
+const SecuritySurvey13CheckControl = ( { value, onChange } ) => {
+    return (
+        <CheckboxControl
+            label={ __( 'Fraud detection system (Fraud service)', 'paidy-wc' ) }
+            checked={ value }
+            help={ __( 'It is a security technology that constantly monitors communications on the network and detects fraudulent transactions in advance, such as the use of credit cards by third parties or impersonation.', 'paidy-wc' ) }
+            onChange={ onChange }
+        />
+    );
+};
+
+const SecuritySurvey14CheckControl = ( { value, onChange } ) => {
+    return (
+        <CheckboxControl
+            label={ __( 'Device fingerprinting, etc.', 'paidy-wc' ) }
+            help={ __( 'This technology tracks online behavior by using the characteristics of the operating environment of the user\'s device as a kind of fingerprint.', 'paidy-wc' ) }
             checked={ value }
             onChange={ onChange }
         />
     );
 };
 
-const SecuritySurvey02CheckControl = ( { value, onChange } ) => {
+const SecuritySurvey10TextAreaControl = ( { value, onChange } ) => {
     return (
-        <CheckboxControl
-            label={ __( 'The cart system\'s management screen allows for login restrictions using ID and password, as well as access restrictions.', 'paidy-wc' ) }
-            checked={ value }
+        <TextareaControl
+            label={ __( 'If there is more than one question with a "yes" answer, please provide an alternative solution.', 'paidy-wc' ) }
+            value={ value }
             onChange={ onChange }
         />
     );
 };
 
-const SecuritySurvey03CheckControl = ( { value, onChange } ) => {
+const SecuritySurvey08RadioControl = ( { value, onChange } ) => {
     return (
-        <>
-        <CheckboxControl
-            label={ __( 'Regarding access restrictions to the administration screen, one of the following measures can be taken.', 'paidy-wc' ) }
-            checked={ value }
+        <RadioControl
+            label={ __( 'Have you received any administrative disposition under the Specified Commercial Transactions Act in the past five years? If so, please describe the details.', 'paidy-wc' ) }
+            selected={ value }
             onChange={ onChange }
-        />
-        <ul>
-            <li>{ __( 'Administrators can restrict the IP addresses that can access the system.', 'paidy-wc' ) }</li>
-            <li>{ __( 'It is possible to set access restrictions such as basic authentication in the administration screen.', 'paidy-wc' ) }</li>
-            <li>{ __( 'This is handled in other ways.', 'paidy-wc' ) }</li>
-        </ul>
-        </>
-    );
-};
-
-const SecuritySurvey04CheckControl = ( { value, onChange } ) => {
-    return (
-        <>
-        <CheckboxControl
-            label={ __( 'The settings for data directory* disclosure are configured in one of the following ways:', 'paidy-wc' ) }
-            checked={ value }
-            onChange={ onChange }
-        />
-        <ul>
-            <li>{ __( 'Make certain directories private so that important files cannot be placed in the public directory.', 'paidy-wc' ) }</li>
-            <li>{ __( 'Take care to place important files outside of public directories.', 'paidy-wc' ) }</li>
-        </ul>
-        </>
-    );
-};
-
-const SecuritySurvey05CheckControl = ( { value, onChange } ) => {
-    return (
-        <>
-        <CheckboxControl
-            label={ __( 'Settings are made to restrict the extensions and files that can be uploaded by the web server or web application.', 'paidy-wc' ) }
-            checked={ value }
-            onChange={ onChange }
-        />
-        <ul>
-            <li>{ __( 'This is handled in other ways.', 'paidy-wc' ) }</li>
-        </ul>
-        </>
-    );
-};
-
-const SecuritySurvey06CheckControl = ( { value, onChange } ) => {
-    return (
-        <>
-        <CheckboxControl
-            label={ __( 'Vulnerability assessments or penetration tests* are conducted regularly (once a year or when the system is changed).', 'paidy-wc' ) }
-            checked={ value }
-            onChange={ onChange }
-        />
-        <ul>
-            <li>{ __( 'Vulnerability assessments or penetration tests are conducted on a regular basis, and any necessary corrective actions are taken.', 'paidy-wc' ) }</li>
-            <li>{ __( 'To counter SQL injection and cross-site scripting vulnerabilities, we are using plugins that do not have the vulnerabilities and upgrading our software.', 'paidy-wc' ) }</li>
-            <li>{ __( 'When developing or customizing a web application, we conduct a source code review to confirm that it is securely coded. At that time, we also check the input values of input forms.', 'paidy-wc' ) }</li>
-            <li>{ __( 'This is handled in other ways.', 'paidy-wc' ) }</li>
-        </ul>
-        </>
-    );
-};
-
-const SecuritySurvey07CheckControl = ( { value, onChange } ) => {
-    return (
-        <>
-        <CheckboxControl
-            label={ __( 'Anti-virus software is introduced and operated as a measure against malware using the following methods.', 'paidy-wc' ) }
-            checked={ value }
-            onChange={ onChange }
-        />
-        <ul>
-            <li>{ __( 'We have introduced antivirus software as a measure to detect and remove malware, and we update signatures and perform regular full scans.', 'paidy-wc' ) }</li>
-            <li>{ __( 'This is handled in other ways.', 'paidy-wc' ) }</li>
-        </ul>
-        </>
-    );
-};
-
-const SecuritySurvey08CheckControl = ( { value, onChange } ) => {
-    return (
-        <CheckboxControl
-            label={ __( 'We have not received any disciplinary action under the Act on Specified Commercial Transactions in the past five years.', 'paidy-wc' ) }
-            checked={ value }
-            onChange={ onChange }
+            options={[
+                {
+                    label: __( 'No', 'paidy-wc' ),
+                    value: 'no'
+                },
+                {
+                    label: __( 'Yes', 'paidy-wc' ),
+                    value: 'yes'
+                },
+            ]}
         />
     );
 };
 
-const SecuritySurvey09CheckControl = ( { value, onChange } ) => {
+const SecuritySurvey09RadioControl = ( { value, onChange } ) => {
     return (
-        <CheckboxControl
-            label={ __( 'In the last five years, we have not been the subject of a civil lawsuit for violating the Consumer Contract Act and have not lost the case.', 'paidy-wc' ) }
-            checked={ value }
+        <RadioControl
+            label={ __( 'Have you ever been sued in a civil lawsuit for violating the Consumer Contract Act and lost the case? If so, please describe the details.', 'paidy-wc' ) }
+            selected={ value }
             onChange={ onChange }
+            options={[
+                {
+                    label: __( 'No', 'paidy-wc' ),
+                    value: 'no'
+                },
+                {
+                    label: __( 'Yes', 'paidy-wc' ),
+                    value: 'yes'
+                },
+            ]}
         />
     );
 };
@@ -276,13 +283,13 @@ export {
     RepresentativeDateOfBirthTextControl,
     AnnualGrossValueRadioControl,
     AveragePurchaseAmountRadioControl,
-    SecuritySurvey01CheckControl,
-    SecuritySurvey02CheckControl,
-    SecuritySurvey03CheckControl,
-    SecuritySurvey04CheckControl,
-    SecuritySurvey05CheckControl,
-    SecuritySurvey06CheckControl,
-    SecuritySurvey07CheckControl,
-    SecuritySurvey08CheckControl,
-    SecuritySurvey09CheckControl,
+    SecuritySurvey01RadioControl,
+    SecuritySurvey01TextControl,
+    SecuritySurvey11CheckControl,
+    SecuritySurvey12CheckControl,
+    SecuritySurvey13CheckControl,
+    SecuritySurvey14CheckControl,
+    SecuritySurvey10TextAreaControl,
+    SecuritySurvey08RadioControl,
+    SecuritySurvey09RadioControl,
 };

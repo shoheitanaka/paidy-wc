@@ -16,6 +16,7 @@ export const OnBoardingStep = () => {
     const {
         currentStep
     } = useOnBoardingSettings();
+	const paidyAdUrl = window.paidyForWcSettings?.paidyAdUrl || 'https://paidy.com/campaign/merchant/202404_WW';
 
 	if ( currentStep === 2 ) {
         return (
@@ -40,10 +41,26 @@ export const OnBoardingStep = () => {
         );
     } else {
         return (
-            <div>
+            <>
             <PaidyTitle />
-            <ApplyButton/>
+            <div className="paidy-on-boarding">
+                <div className="paidy-on-boarding__img">
+                <a href={paidyAdUrl} target="_blank" rel="noreferrer">
+                <img src="/wp-content/plugins/paidy-wc/assets/images/paidy_logo_w800.png" alt="Paidy" />
+                </a>
+                </div>
+                <div className="paidy-on-boarding__content">
+                    <p>{ __('Applying for and setting up Paidy is easy.', 'paidy-wc') }</p>
+                    <ApplyButton/>
+                </div>
             </div>
+            <div className="paidy-on-boarding__description">
+                <p>
+                    { __( 'There is no setup cost, payment fees start from 3.5%, and if you apply via this service, you will receive a one-month trial with no payment fees!', 'paidy-wc' ) }
+                     <a href={paidyAdUrl} target="_blank" rel="noreferrer">{ __( 'Learn more about Paidy', 'paidy-wc' ) }</a>
+                </p>
+            </div>
+            </>
         );
     }
 }

@@ -190,5 +190,3 @@ class WC_Paidy_Admin_Notices {
 		return admin_url( 'admin.php?page=wc-settings&tab=checkout&section=' . $section_slug );
 	}
 }
-
-new WC_Paidy_Admin_Notices();

@@ -99,6 +99,16 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 	require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-admin-wizard.php';
 	new WC_Paidy_Admin_Wizard();
 
+	if ( is_admin() ) {
+		// Load admin settings controller.
+		require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-settings-controller.php';
+		new WC_Paidy_Settings_Controller();
+
+		// Load admin notices controller.
+		require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-admin-notices.php';
+		new WC_Paidy_Admin_Notices();
+	}
+
 	// Redirect when the plugin is activated.
 	add_action( 'admin_init', 'paidy_redirect_to_wizard' );
 
@@ -117,6 +127,21 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 			}
 		}
 	}
+
+	// API Receiver.
+	require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-apply-receiver.php';
+
+	/**
+	 * Initialize the Paidy receiver.
+	 *
+	 * @return void
+	 */
+	function init_paidy_receiver() {
+		new WC_Paidy_Apply_Receiver();
+	}
+
+	// Load the receiver.
+	add_action( 'init', 'init_paidy_receiver' );
 
 	/**
 	 * The available gateway to woocommerce only Japanese currency
