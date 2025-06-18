@@ -1776,7 +1776,7 @@ const useOnBoardingSettings = () => {
       setRepresentativeDateOfBirth(onBoardingSettings.representativeDateOfBirth);
       setAnnualGrossValue(onBoardingSettings.annualGrossValue);
       setAveragePurchaseAmount(onBoardingSettings.averagePurchaseAmount);
-      setSecuritySurvey01RadioControl(onBoardingSettings.securitySurvey01RadioControl || 'no');
+      setSecuritySurvey01RadioControl(onBoardingSettings.securitySurvey01RadioControl || '');
       setSecuritySurvey01TextControl(onBoardingSettings.securitySurvey01TextControl || '');
       setSecuritySurvey11CheckControl(onBoardingSettings.securitySurvey11CheckControl);
       setSecuritySurvey12CheckControl(onBoardingSettings.securitySurvey12CheckControl);
@@ -2496,7 +2496,10 @@ const FirstMainPage = () => {
             level: 4,
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('[Countermeasures against unauthorized logins]', 'paidy-wc')
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("p", {
-            children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('*At least one "Yes" is required. If any are missing, we will contact you.', 'paidy-wc'), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("br", {}), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Do you take the following measures to prevent unauthorized logins when changing a user\'s attributes?', 'paidy-wc')]
+            children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('*At least one "Yes" is required. If any are missing, we will contact you.', 'paidy-wc'), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("br", {})]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("p", {
+            className: "unauthorized_logins_message",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Do you take the following measures to prevent unauthorized logins when changing a user\'s attributes?', 'paidy-wc')
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_controls__WEBPACK_IMPORTED_MODULE_6__.SecuritySurvey11CheckControl, {
             value: securitySurvey11CheckControl,
             onChange: value => setSecuritySurvey11CheckControl(value)
