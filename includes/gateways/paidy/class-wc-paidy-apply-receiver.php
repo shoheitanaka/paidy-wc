@@ -125,12 +125,12 @@ class WC_Paidy_Apply_Receiver {
 				}
 				// Additional processing for approved status can be added here if needed.
 				$woocommerce_paidy_on_boarding_settings = get_option( 'woocommerce_paidy_on_boarding_settings', array() );
-				$current_step                           = isset( $woocommerce_paidy_on_boarding_settings['current_step'] ) ? $woocommerce_paidy_on_boarding_settings['current_step'] : 0;
+				$current_step                           = isset( $woocommerce_paidy_on_boarding_settings['currentStep'] ) ? $woocommerce_paidy_on_boarding_settings['currentStep'] : 0;
 				if ( 'approved' === $paidy_status ) {
 					// Process approved status.
 					if ( $current_step < 3 ) {
 						// Update the current step to 3 if it's less than 3.
-						$woocommerce_paidy_on_boarding_settings['current_step'] = 3;
+						$woocommerce_paidy_on_boarding_settings['currentStep'] = 3;
 						update_option( 'woocommerce_paidy_on_boarding_settings', $woocommerce_paidy_on_boarding_settings );
 						$woocommerce_paidy_settings                        = get_option( 'woocommerce_paidy_settings', array() );
 						$woocommerce_paidy_settings['api_public_key']      = $filtered_params['public_live_key'];
@@ -143,7 +143,7 @@ class WC_Paidy_Apply_Receiver {
 					do_action( 'paidy_application_approved', $filtered_params );
 				} elseif ( 'rejected' === $paidy_status ) {
 					// Process rejected status.
-					$woocommerce_paidy_on_boarding_settings['current_step'] = 99;
+					$woocommerce_paidy_on_boarding_settings['currentStep'] = 99;
 					update_option( 'woocommerce_paidy_on_boarding_settings', $woocommerce_paidy_on_boarding_settings );
 					do_action( 'paidy_application_rejected', $filtered_params );
 				}
