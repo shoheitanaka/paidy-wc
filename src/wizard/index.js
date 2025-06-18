@@ -21,11 +21,13 @@ const PaidyOnBoardingPage = () => {
         </>
     );
 }
+
 addFilter( 'woocommerce_admin_pages_list', 'paidy-on-boarding', ( pages ) => {
 	pages.push( {
 		container: PaidyOnBoardingPage,
 		path: '/paidy-on-boarding',
 		breadcrumbs: [ __( 'Easy setup for Paidy payment', 'paidy-wc' ) ],
+        capability: 'manage_woocommerce'
 	} );
 
 	return pages;

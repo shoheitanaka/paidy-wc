@@ -172,8 +172,6 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		add_action( 'wp_enqueue_scripts', array( $this, 'paidy_token_scripts_method' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'paidy_admin_enqueue_scripts' ) );
 
-		add_action( 'admin_enqueue_scripts', array( $this, 'paidy_admin_wizard_scripts' ), 99 );
-
 		add_action( 'woocommerce_before_checkout_form', array( $this, 'checkout_reject_to_cancel' ) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_completed' ) );
 
@@ -228,7 +226,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				'title'       => __( 'Environment', 'paidy-wc' ),
 				'type'        => 'select',
 				'description' => __( 'This setting specifies whether you will process live transactions, or whether you will process simulated transactions using the Paidy Sandbox.', 'paidy-wc' ),
-				'default'     => 'live',
+				'default'     => '',
 				'desc_tip'    => true,
 				'options'     => array(
 					'live'    => __( 'Live', 'paidy-wc' ),
@@ -703,65 +701,6 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				true
 			);
 
-		}
-	}
-
-	/**
-	 * Enqueues JavaScript and CSS for the admin wizard interface.
-	 *
-	 * This function loads scripts and styles for the Paidy payment gateway settings page.
-	 * It's triggered when viewing the Paidy section in the WooCommerce checkout settings.
-	 */
-	public function paidy_admin_wizard_scripts() {
-		if ( is_admin() && isset( $_GET['section'] ) && isset( $_GET['tab'] ) && 'paidy' === $_GET['section'] && 'checkout' === $_GET['tab'] ) {// phpcs:ignore
-			$handle            = 'paidy-admin-settings-script';
-			$script_path       = '/includes/gateways/paidy/assets/js/admin/paidy.js';
-			$script_asset_path = WC_PAIDY_ABSPATH . 'includes/gateways/paidy/assets/js/admin/paidy.asset.php';
-			$script_asset      = file_exists( $script_asset_path )
-				? require $script_asset_path
-				: array(
-					'dependencies' => array(),
-					'version'      => '1.2.1',
-				);
-
-			// Enqueue CSS.
-			wp_enqueue_style(
-				'paidy-admin-settings-style',
-				WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/admin/paidy.css',
-				array_filter(
-					$script_asset['dependencies'],
-					function ( $style ) {
-						return wp_style_is( $style, 'registered' );
-					}
-				),
-				$script_asset['version'],
-			);
-
-			$translation_path = WC_PAIDY_ABSPATH . 'i18n';
-			wp_set_script_translations(
-				'paidy-admin-settings-script',
-				'paidy-wc',
-				$translation_path
-			);
-
-			$script_url = WC_PAIDY_PLUGIN_URL . $script_path;
-			wp_enqueue_script(
-				'paidy-admin-settings-script',
-				$script_url,
-				$script_asset['dependencies'],
-				$script_asset['version'],
-				true
-			);
-
-			// Setting data.
-			$rest_url = get_rest_url();
-			wp_localize_script(
-				'paidy-admin-settings-script',
-				'paidyForWcSettings',
-				array(
-					'restUrl' => $rest_url,
-				)
-			);
 		}
 	}
 

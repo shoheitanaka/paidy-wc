@@ -3,6 +3,7 @@ import { createRoot } from '@wordpress/element';
 import { OnBoardingStep } from './onboarding-step';
 import './index.scss';
 
+
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('paidy-admin-settings');
     if (container) {

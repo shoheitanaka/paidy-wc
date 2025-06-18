@@ -1,9 +1,10 @@
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalHeading as Heading,
-	Button,
+	Button
 } from '@wordpress/components';
+import { createInterpolateElement } from '@wordpress/element';
 import {
 	useOnBoardingSettings,
 } from '../../main-hooks/on-boarding-settings';
@@ -32,15 +33,15 @@ import {
     RepresentativeDateOfBirthTextControl,
     AnnualGrossValueRadioControl,
     AveragePurchaseAmountRadioControl,
-    SecuritySurvey01CheckControl,
-    SecuritySurvey02CheckControl,
-    SecuritySurvey03CheckControl,
-    SecuritySurvey04CheckControl,
-    SecuritySurvey05CheckControl,
-    SecuritySurvey06CheckControl,
-    SecuritySurvey07CheckControl,
-    SecuritySurvey08CheckControl,
-    SecuritySurvey09CheckControl,
+    SecuritySurvey01RadioControl,
+    SecuritySurvey01TextControl,
+    SecuritySurvey11CheckControl,
+    SecuritySurvey12CheckControl,
+    SecuritySurvey13CheckControl,
+    SecuritySurvey14CheckControl,
+    SecuritySurvey10TextAreaControl,
+    SecuritySurvey08RadioControl,
+    SecuritySurvey09RadioControl,
 } from './controls';
 
 const SettingsTitle = () => {
@@ -105,24 +106,24 @@ const FirstMainPage = () => {
 		setAnnualGrossValue,
 		averagePurchaseAmount,
 		setAveragePurchaseAmount,
-		securitySurvey01CheckControl,
-		setSecuritySurvey01CheckControl,
-		securitySurvey02CheckControl,
-		setSecuritySurvey02CheckControl,
-		securitySurvey03CheckControl,
-		setSecuritySurvey03CheckControl,
-		securitySurvey04CheckControl,
-		setSecuritySurvey04CheckControl,
-		securitySurvey05CheckControl,
-		setSecuritySurvey05CheckControl,
-		securitySurvey06CheckControl,
-		setSecuritySurvey06CheckControl,
-		securitySurvey07CheckControl,
-		setSecuritySurvey07CheckControl,
-		securitySurvey08CheckControl,
-		setSecuritySurvey08CheckControl,
-		securitySurvey09CheckControl,
-		setSecuritySurvey09CheckControl,
+		securitySurvey01RadioControl,
+		setSecuritySurvey01RadioControl,
+		securitySurvey01TextControl,
+		setSecuritySurvey01TextControl,
+		securitySurvey11CheckControl,
+		setSecuritySurvey11CheckControl,
+		securitySurvey12CheckControl,
+		setSecuritySurvey12CheckControl,
+		securitySurvey13CheckControl,
+		setSecuritySurvey13CheckControl,
+		securitySurvey14CheckControl,
+		setSecuritySurvey14CheckControl,
+		securitySurvey10TextAreaControl,
+		setSecuritySurvey10TextAreaControl,
+		securitySurvey08RadioControl,
+		setSecuritySurvey08RadioControl,
+		securitySurvey09RadioControl,
+		setSecuritySurvey09RadioControl,
 		saveSettings,
 	} = useOnBoardingSettings();
 	const {
@@ -136,7 +137,8 @@ const FirstMainPage = () => {
         return <div>loading...</div>;
     }
 	const PaidyEnvironment = settingPaidy?.settings?.environment?.value || [];
-
+	const paidyAdUrl = window.paidyForWcSettings?.paidyAdUrl || 'https://paidy.com/merchant/';
+	const pluginName = window.paidyForWcSettings?.pluginName || 'Paidy for WooCommerce';
 	if ( currentStep === 1 ) {
 		return (
 			<>
@@ -202,43 +204,80 @@ const FirstMainPage = () => {
 					<Heading level={ 3 }>
 						{ __( 'Security survey', 'paidy-wc' ) }
 					</Heading>
+					<p>
+						{ __('Based on requests from the Ministry of Economy, Trade and Industry and the Japan Consumer Credit Association, all e-commerce affiliates are required to declare the status of their own security measures when joining. Please answer the following questions.', 'paidy-wc') }
+					</p>
+					<p>
+						{createInterpolateElement(
+      					__('For details, please refer to <link>the Security Measures Status Declaration Form FAQ.</link>', 'paidy-wc'),
+      					{
+							link: (
+								<a 
+        							href="https://paidy.com/merchant/faq/security-survey/" 
+            						target="_blank" 
+            					rel="noreferrer"
+    							/>
+							)
+    					}
+						)}
+					</p>
+					<p>
+						{__('*If the system has not yet been built, please declare the check items for each security measure on the assumption that they will be satisfied once the system is built.', 'paidy-wc') }
+					</p>
 				</div>
         		<div className="paidy-security-survey">
-					<SecuritySurvey01CheckControl
-					  value={ securitySurvey01CheckControl }
-					  onChange={ ( value ) => setSecuritySurvey01CheckControl( value ) }
+					<Heading level={ 4 }>
+						{ __( '[Measures to prevent leakage of cardholder data]', 'paidy-wc' ) }
+					</Heading>
+					<p>
+						{ __('Administrator screen access restrictions and administrator ID/PW management', 'paidy-wc') }
+					</p>
+					<SecuritySurvey01RadioControl
+					  value={ securitySurvey01RadioControl }
+					  onChange={ ( value ) => setSecuritySurvey01RadioControl( value ) }
 					/>
-					<SecuritySurvey02CheckControl
-					  value={ securitySurvey02CheckControl }
-					  onChange={ ( value ) => setSecuritySurvey02CheckControl( value ) }
+					<SecuritySurvey01TextControl
+					  value={ securitySurvey01TextControl }
+					  onChange={ ( value ) => setSecuritySurvey01TextControl( value ) }
 					/>
-					<SecuritySurvey03CheckControl
-					  value={ securitySurvey03CheckControl }
-					  onChange={ ( value ) => setSecuritySurvey03CheckControl( value ) }
+					<br/>
+					<Heading level={ 4 }>
+						{ __( '[Countermeasures against unauthorized logins]', 'paidy-wc' ) }
+					</Heading>
+					<p>
+						{ __('*At least one "Yes" is required. If any are missing, we will contact you.', 'paidy-wc') }<br/>
+						{ __('Do you take the following measures to prevent unauthorized logins when changing a user\'s attributes?', 'paidy-wc') }
+					</p>
+					<SecuritySurvey11CheckControl
+					  value={ securitySurvey11CheckControl }
+					  onChange={ ( value ) => setSecuritySurvey11CheckControl( value ) }
 					/>
-					<SecuritySurvey04CheckControl
-					  value={ securitySurvey04CheckControl }
-					  onChange={ ( value ) => setSecuritySurvey04CheckControl( value ) }
+					<SecuritySurvey12CheckControl
+					  value={ securitySurvey12CheckControl }
+					  onChange={ ( value ) => setSecuritySurvey12CheckControl( value ) }
 					/>
-					<SecuritySurvey05CheckControl
-					  value={ securitySurvey05CheckControl }
-					  onChange={ ( value ) => setSecuritySurvey05CheckControl( value ) }
+					<SecuritySurvey13CheckControl
+					  value={ securitySurvey13CheckControl }
+					  onChange={ ( value ) => setSecuritySurvey13CheckControl( value ) }
 					/>
-					<SecuritySurvey06CheckControl
-					  value={ securitySurvey06CheckControl }
-					  onChange={ ( value ) => setSecuritySurvey06CheckControl( value ) }
+					<SecuritySurvey14CheckControl
+					  value={ securitySurvey14CheckControl }
+					  onChange={ ( value ) => setSecuritySurvey14CheckControl( value ) }
 					/>
-					<SecuritySurvey07CheckControl
-					  value={ securitySurvey07CheckControl }
-					  onChange={ ( value ) => setSecuritySurvey07CheckControl( value ) }
+					<SecuritySurvey10TextAreaControl
+					  value={ securitySurvey10TextAreaControl }
+					  onChange={ ( value ) => setSecuritySurvey10TextAreaControl( value ) }
 					/>
-					<SecuritySurvey08CheckControl
-					  value={ securitySurvey08CheckControl }
-					  onChange={ ( value ) => setSecuritySurvey08CheckControl( value ) }
+					<Heading level={ 4 }>
+						{ __( 'Questionnaire', 'paidy-wc' ) }
+					</Heading>
+					<SecuritySurvey08RadioControl
+					  value={ securitySurvey08RadioControl }
+					  onChange={ ( value ) => setSecuritySurvey08RadioControl( value ) }
 					/>
-					<SecuritySurvey09CheckControl
-					  value={ securitySurvey09CheckControl }
-					  onChange={ ( value ) => setSecuritySurvey09CheckControl( value ) }
+					<SecuritySurvey09RadioControl
+					  value={ securitySurvey09RadioControl }
+					  onChange={ ( value ) => setSecuritySurvey09RadioControl( value ) }
 					/>
 				</div>
 				<AgreementInfo />
@@ -295,22 +334,51 @@ const FirstMainPage = () => {
 		return (
 			<>
 			<SettingsTitle />
+			<div className="paidy-on-boarding__description">
+				<p>
+					{ sprintf( __('Easy PayPay setup now available with %s!', 'paidy-wc'), pluginName ) }<br/>
+					{__('Right now, we are offering a one-month trial with no payment fees!', 'paidy-wc')}
+				</p>
+			</div>
 			<div className="paidy-on-boarding">
 				<div className="paidy-on-boarding__img">
-				<a href="https://paidy.com/merchant/" target="_blank" rel="noreferrer">
+				<a href={paidyAdUrl} target="_blank" rel="noreferrer">
 				<img src="/wp-content/plugins/paidy-wc/assets/images/paidy_logo_w800.png" alt="Paidy" />
 				</a>
 				</div>
 				<div className="paidy-on-boarding__content">
-					<p>{__('Applying for and setting up Paidy is easy.', 'paidy-wc')}</p>
 					<ApplyButton onClick={ () => setCurrentStep( 1 ) } />
 				</div>
 			</div>
 			<div className="paidy-on-boarding__description">
-				<p>
-					{__('Paidy has zero installation costs and payment fees starting from 3.5%.', 'paidy-wc')}
-					 <a href="https://paidy.com/merchant/" target="_blank" rel="noreferrer">{__('Learn more about Paidy', 'paidy-wc')}</a>
+				<p className="paidy-on-boarding__description-text">
+					♦️{__('What is Paidy?', 'paidy-wc')}<br/>
+					✅{__('Paidy is a deferred payment service that can be used without the need for a credit card.', 'paidy-wc')}<br/>
+					✅{__('Customers can make purchases with just their mobile phone number and email address.', 'paidy-wc')}<br/>
+					✅{__('Payment can be made from the following month onwards via convenience store, bank or direct debit.', 'paidy-wc')}<br/>
+					{__('We respond to the desire to "buy now."', 'paidy-wc')} <a href={paidyAdUrl} target="_blank" rel="noreferrer">{__('Learn more about Paidy', 'paidy-wc')}</a><br/>
 				</p>
+				<p className="paidy-on-boarding__description-text">
+					♦️{__('Benefits of implementation (for EC businesses)', 'paidy-wc')}<br/>
+					{__('No credit card registration is required, making it easy for new customers to make purchases with confidence.', 'paidy-wc')}<br/>
+					{__('Installment payments are also supported, which is expected to increase the success rate of high-priced products.', 'paidy-wc')}<br/>
+					({__('*Free installment fees only apply when paying by direct debit or bank transfer. Identity verification and app download required.', 'paidy-wc')})<br/>
+					{__('Currently used on over 700,000 websites nationwide, including Amazon. Industry-leading track record.', 'paidy-wc')}<br/>
+				</p>
+				<p className="paidy-on-boarding__description-text">
+					♦️{sprintf( __('%s * Paidy', 'paidy-wc'), pluginName )}<br/>
+					{__('With this update, Paidy can now be installed in as little as 30 seconds!', 'paidy-wc')}<br/>
+					{__('No initial or monthly fees.', 'paidy-wc')}<br/>
+					{__('The review process is completed in as little as 1-2 days, and setup is easy.', 'paidy-wc')}<br/>
+				</p>
+			</div>
+			<div className="paidy-on-boarding_bottom">
+				<div>
+					<ApplyButton onClick={ () => setCurrentStep( 1 ) } />
+				</div>
+				<div>
+					<a href='/wp-admin/admin.php?page=wc-settings&tab=checkout'>{__('pass this time', 'paidy-wc')}</a>
+				</div>
 			</div>
 			</>
 		);

@@ -27,6 +27,7 @@ function wc_paidy_delete_plugin() {
 			delete_option( $option_name );
 		}
 	}
+	delete_option( 'wc_paidy_show_pr_notice' );
 }
 
 wc_paidy_delete_plugin();

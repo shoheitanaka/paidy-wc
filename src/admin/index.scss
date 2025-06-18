@@ -8,6 +8,25 @@
         margin-bottom: 10px;
         color: #E5258C;
     }
+  .paidy-on-boarding{
+    display: flex;
+    flex-wrap: wrap;
+    width: 800px;
+    margin: 0 auto;
+    .paidy-on-boarding__img{
+      width: 50%;
+      img{
+        width: 100%;
+      }
+    }
+    .paidy-on-boarding__content{
+        width: 50%;
+        p{
+          font-size: 1.5em;
+          margin-bottom: 20px;
+        }
+    }
+}
     button.paidy-button{
         color: #ffffff;
         font-size:2em;
@@ -15,7 +34,16 @@
         background: linear-gradient(90deg, #E5258C 0%, #863BD4 96.36%);
         border-radius: 28px;
     }
+    .paidy-approved-message{
+      .paidy-enabled-test-message{
+        padding-top: 15px;
+        font-size: large;
+      }
+    }
 }
 #paidy-payment-settings{
-    display: none;
+  display: none;
+}
+.wrap.woocommerce{
+  background-color: #f0f0f1;
 }

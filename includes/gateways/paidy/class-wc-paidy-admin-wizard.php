@@ -48,11 +48,9 @@ class WC_Paidy_Admin_Wizard {
 			add_action( 'admin_enqueue_scripts', array( $this, 'wc_admin_paidy_on_boarding_scripts' ) );
 			add_action( 'init', array( $this, 'paidy_on_boarding_settings' ) );
 			add_action( 'updated_option', array( $this, 'change_paidy_on_boarding_settings' ), 10, 3 );
-			add_action( 'added_option', array( $this, 'add_paidy_on_boarding_settings' ), 10, 3 );
+			add_action( 'add_option', array( $this, 'add_paidy_on_boarding_settings' ), 10, 2 );
 			add_filter( 'woocommerce_gateway_method_description', array( $this, 'paidy_method_description' ), 20, 2 );
 			add_action( 'woocommerce_settings_tabs_checkout', array( $this, 'paidy_after_settings_checkout' ) );
-			// Redirect when the plugin is activated.
-			add_action( 'admin_init', array( $this, 'paidy_redirect_to_wizard' ) );
 		}
 	}
 
@@ -76,7 +74,7 @@ class WC_Paidy_Admin_Wizard {
 			array(
 				'id'         => 'paidy-on-boarding',
 				'title'      => __( 'Paidy On Boarding', 'paidy-wc' ),
-				'parent'     => '', // Blank for non-display.
+				'parent'     => '',
 				'path'       => '/paidy-on-boarding',
 				'capability' => 'manage_woocommerce',
 			),
@@ -105,13 +103,10 @@ class WC_Paidy_Admin_Wizard {
 			WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/wizard/paidy.js',
 			$asset['dependencies'],
 			$asset['version'],
-			array(
-				'in_footer' => true,
-			)
 		);
 
 		wp_enqueue_style(
-			'paidy-on-boarding-style',
+			$handle,
 			WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/wizard/paidy.css',
 			array_filter(
 				$asset['dependencies'],
@@ -130,12 +125,16 @@ class WC_Paidy_Admin_Wizard {
 		);
 
 		// Setting data.
-		$rest_url = get_rest_url();
+		$rest_url     = get_rest_url();
+		$paidy_ad_url = 'https://paidy.com/campaign/merchant/202404_WW';
+		$plugin_name  = 'Paidy for WooCommerce';
 		wp_localize_script(
 			$handle,
 			'paidyForWcSettings',
 			array(
-				'restUrl' => $rest_url,
+				'restUrl'    => $rest_url,
+				'paidyAdUrl' => $paidy_ad_url,
+				'pluginName' => $plugin_name,
 			)
 		);
 	}
@@ -145,91 +144,91 @@ class WC_Paidy_Admin_Wizard {
 	 */
 	public function paidy_on_boarding_settings() {
 		$default = array(
-			'currentStep'                  => 0,
-			'storeName'                    => get_bloginfo( 'name' ),
-			'siteName'                     => get_bloginfo( 'name' ),
-			'storeUrl'                     => get_bloginfo( 'url' ),
-			'registEmail'                  => get_bloginfo( 'admin_email' ),
-			'annualGrossValue'             => 'less-than-10-million-yen',
-			'averagePurchaseAmount'        => 'less-than-50000-yen',
-			'securitySurvey01CheckControl' => false,
-			'securitySurvey02CheckControl' => false,
-			'securitySurvey03CheckControl' => false,
-			'securitySurvey04CheckControl' => false,
-			'securitySurvey05CheckControl' => false,
-			'securitySurvey06CheckControl' => false,
-			'securitySurvey07CheckControl' => false,
-			'securitySurvey08CheckControl' => false,
-			'securitySurvey09CheckControl' => false,
+			'currentStep'                     => 0,
+			'storeName'                       => '',
+			'siteName'                        => get_bloginfo( 'name' ),
+			'storeUrl'                        => get_bloginfo( 'url' ),
+			'registEmail'                     => get_bloginfo( 'admin_email' ),
+			'annualGrossValue'                => 'less-than-10-million-yen',
+			'averagePurchaseAmount'           => 'less-than-50000-yen',
+			'securitySurvey01RadioControl'    => 'yes',
+			'securitySurvey01TextControl'     => '',
+			'securitySurvey11CheckControl'    => false,
+			'securitySurvey12CheckControl'    => false,
+			'securitySurvey13CheckControl'    => false,
+			'securitySurvey14CheckControl'    => false,
+			'securitySurvey10TextAreaControl' => '',
+			'securitySurvey08RadioControl'    => 'no',
+			'securitySurvey09RadioControl'    => 'no',
 		);
 		$schema  = array(
 			'type'       => 'object',
 			'properties' => array(
-				'currentStep'                  => array(
+				'currentStep'                     => array(
 					'type' => 'integer',
 				),
-				'storeName'                    => array(
+				'storeName'                       => array(
 					'type' => 'string',
 				),
-				'siteName'                     => array(
+				'siteName'                        => array(
 					'type' => 'string',
 				),
-				'storeUrl'                     => array(
+				'storeUrl'                        => array(
 					'type' => 'string',
 				),
-				'registEmail'                  => array(
+				'registEmail'                     => array(
 					'type' => 'string',
 				),
-				'contactPhone'                 => array(
+				'contactPhone'                    => array(
 					'type' => 'string',
 				),
-				'representativeLastName'       => array(
+				'representativeLastName'          => array(
 					'type' => 'string',
 				),
-				'representativeFirstName'      => array(
+				'representativeFirstName'         => array(
 					'type' => 'string',
 				),
-				'representativeLastNameKana'   => array(
+				'representativeLastNameKana'      => array(
 					'type' => 'string',
 				),
-				'representativeFirstNameKana'  => array(
+				'representativeFirstNameKana'     => array(
 					'type' => 'string',
 				),
-				'representativeDateOfBirth'    => array(
+				'representativeDateOfBirth'       => array(
 					'type' => 'date',
 				),
-				'annualGrossValue'             => array(
+				'annualGrossValue'                => array(
 					'type' => 'string',
 				),
-				'averagePurchaseAmount'        => array(
+				'averagePurchaseAmount'           => array(
 					'type' => 'string',
 				),
-				'securitySurvey01CheckControl' => array(
+				'securitySurvey01RadioControl'    => array(
+					'type' => 'string',
+				),
+				'securitySurvey01TextControl'     => array(
+					'type' => 'string',
+				),
+				'securitySurvey11CheckControl'    => array(
 					'type' => 'boolean',
 				),
-				'securitySurvey02CheckControl' => array(
+				'securitySurvey12CheckControl'    => array(
 					'type' => 'boolean',
 				),
-				'securitySurvey03CheckControl' => array(
+				'securitySurvey13CheckControl'    => array(
 					'type' => 'boolean',
 				),
-				'securitySurvey04CheckControl' => array(
+				'securitySurvey14CheckControl'    => array(
 					'type' => 'boolean',
 				),
-				'securitySurvey05CheckControl' => array(
-					'type' => 'boolean',
+				'securitySurvey10TextAreaControl' => array(
+					'type' => 'string',
 				),
-				'securitySurvey06CheckControl' => array(
-					'type' => 'boolean',
+				'securitySurvey08RadioControl'    => array(
+					'type' => 'string',
 				),
-				'securitySurvey07CheckControl' => array(
-					'type' => 'boolean',
-				),
-				'securitySurvey08CheckControl' => array(
-					'type' => 'boolean',
-				),
-				'securitySurvey09CheckControl' => array(
-					'type' => 'boolean',
+				'securitySurvey09RadioControl'    => array(
+					'type' => 'string',
 				),
 			),
 		);
@@ -280,27 +279,30 @@ class WC_Paidy_Admin_Wizard {
 			'representativeLastNameKana',
 			'representativeFirstNameKana',
 			'representativeDateOfBirth',
+			'securitySurvey01TextControl',
+			'securitySurvey10TextAreaControl',
 		);
 
 		foreach ( $text_fields as $field ) {
 			$sanitized[ $field ] = isset( $input[ $field ] ) ? sanitize_text_field( $input[ $field ] ) : '';
 		}
 
-		$select_fields = array( 'annualGrossValue', 'averagePurchaseAmount' );
+		$select_fields = array(
+			'annualGrossValue',
+			'averagePurchaseAmount',
+			'securitySurvey01RadioControl',
+			'securitySurvey08RadioControl',
+			'securitySurvey09RadioControl',
+		);
 		foreach ( $select_fields as $field ) {
 			$sanitized[ $field ] = isset( $input[ $field ] ) ? sanitize_text_field( $input[ $field ] ) : '';
 		}
 
 		$checkbox_fields = array(
-			'securitySurvey01CheckControl',
-			'securitySurvey02CheckControl',
-			'securitySurvey03CheckControl',
-			'securitySurvey04CheckControl',
-			'securitySurvey05CheckControl',
-			'securitySurvey06CheckControl',
-			'securitySurvey07CheckControl',
-			'securitySurvey08CheckControl',
-			'securitySurvey09CheckControl',
+			'securitySurvey11CheckControl',
+			'securitySurvey12CheckControl',
+			'securitySurvey13CheckControl',
+			'securitySurvey14CheckControl',
 		);
 
 		foreach ( $checkbox_fields as $field ) {
@@ -322,11 +324,11 @@ class WC_Paidy_Admin_Wizard {
 			return;
 		}
 		if ( isset( $value['currentStep'] ) && 2 === $value['currentStep'] && 1 === $old_value['currentStep'] ) {
-			// $value['currentStep'] = 3;
-			$site_hash = $this->generate_random_string( 16 );
-			update_option( 'paidy_site_hash', $site_hash );
-			$hash = password_hash( $site_hash, PASSWORD_DEFAULT );
-			update_option( 'paidy_hash', $hash );
+			// Update the site hash and hash in options.
+			if ( ! get_option( 'paidy_site_hash' ) ) {
+				$site_hash = $this->generate_random_string( 16 );
+				add_option( 'paidy_site_hash', $site_hash );
+			}
 			$result = $this->send_apply_data_to_wcartws( $value, $site_hash );
 		}
 	}
@@ -366,15 +368,15 @@ class WC_Paidy_Admin_Wizard {
 			'ceo_birthday' => $value['representativeDateOfBirth'],
 			'gmv_flag'     => $gmv_flag,
 			'average_flag' => $average_flag,
-			'survey01'     => $value['securitySurvey01CheckControl'],
-			'survey02'     => $value['securitySurvey02CheckControl'],
-			'survey03'     => $value['securitySurvey03CheckControl'],
-			'survey04'     => $value['securitySurvey04CheckControl'],
-			'survey05'     => $value['securitySurvey05CheckControl'],
-			'survey06'     => $value['securitySurvey06CheckControl'],
-			'survey07'     => $value['securitySurvey07CheckControl'],
-			'survey08'     => $value['securitySurvey08CheckControl'],
-			'survey09'     => $value['securitySurvey09CheckControl'],
+			'survey01'     => $value['securitySurvey01RadioControl'],
+			'survey02'     => $value['securitySurvey01TextControl'],
+			'survey03'     => $value['securitySurvey11CheckControl'],
+			'survey04'     => $value['securitySurvey12CheckControl'],
+			'survey05'     => $value['securitySurvey13CheckControl'],
+			'survey06'     => $value['securitySurvey14CheckControl'],
+			'survey07'     => $value['securitySurvey10TextAreaControl'],
+			'survey08'     => $value['securitySurvey08RadioControl'],
+			'survey09'     => $value['securitySurvey09RadioControl'],
 		);
 		$args       = array(
 			'method'      => 'POST',
@@ -405,12 +407,6 @@ class WC_Paidy_Admin_Wizard {
 				)
 			);
 			$result = false;
-		}
-		update_option( 'woocommerce_paidy_on_boarding_settings', $value );
-		if ( $result ) {
-			error_log( 'step2_set_true' );
-		} else {
-			error_log( 'step2_set_false' );
 		}
 
 		return $result;
@@ -466,20 +462,21 @@ class WC_Paidy_Admin_Wizard {
 		}
 
 		if ( isset( $value['currentStep'] ) && 1 === $value['currentStep'] ) {
+			// Update the site hash and hash in options.
+			if ( ! get_option( 'paidy_site_hash' ) ) {
+				$site_hash = $this->generate_random_string( 16 );
+				add_option( 'paidy_site_hash', $site_hash );
+			}
 			$value['currentStep'] = 2;
 			update_option( $option, $value );
+		} elseif ( isset( $value['currentStep'] ) && 2 === $value['currentStep'] ) {
+			// Update the site hash and hash in options.
+			if ( ! get_option( 'paidy_site_hash' ) ) {
+				$site_hash = $this->generate_random_string( 16 );
+				add_option( 'paidy_site_hash', $site_hash );
+			}
+			$result = $this->send_apply_data_to_wcartws( $value, $site_hash );
 		}
-	}
-
-	/**
-	 * Update on boarding data.
-	 *
-	 * @param object $data The data to update.
-	 */
-	public function update_on_boarding_settings( $data ) {
-		$paidy_on_boarding_data = get_option( 'woocommerce_paidy_on_boarding_settings' );
-		$paidy_on_boarding_data = array_merge( $paidy_on_boarding_data, $data );
-		update_option( 'woocommerce_paidy_on_boarding_settings', $paidy_on_boarding_data );
 	}
 
 	/**
@@ -495,6 +492,8 @@ class WC_Paidy_Admin_Wizard {
 			&& isset( $this->paidy_settings['test_api_public_key'] )
 			&& ! empty( $this->paidy_settings['api_public_key'] )
 			&& ! empty( $this->paidy_settings['test_api_public_key'] )
+			&& isset( $this->paidy_settings['environment'] )
+			&& 'live' === $this->paidy_settings['environment']
 			) {
 				return $description;
 			}
@@ -514,17 +513,6 @@ class WC_Paidy_Admin_Wizard {
 			} else {
 				echo '</div>';
 			}
-		}
-	}
-
-	/**
-	 * Redirects to the Paidy wizard after plugin activation.
-	 */
-	public function paidy_redirect_to_wizard() {
-		if ( get_option( 'paidy_do_activation_redirect', false ) ) {
-			delete_option( 'paidy_do_activation_redirect' );
-			wp_safe_redirect( admin_url( 'admin.php?page=wc-admin&path=%2Fpaidy-on-boarding' ) );
-			exit;
 		}
 	}
 }

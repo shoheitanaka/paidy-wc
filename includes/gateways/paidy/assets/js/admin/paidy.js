@@ -1353,7 +1353,8 @@ exports.jsxs = jsxs;
 
 
 
-if (false) {} else {
+if (false) // removed by dead control flow
+{} else {
   module.exports = __webpack_require__(/*! ./cjs/react-jsx-runtime.development.js */ "./node_modules/react/cjs/react-jsx-runtime.development.js");
 }
 
@@ -1498,6 +1499,7 @@ const OnBoardingStep = () => {
   const {
     currentStep
   } = (0,_main_hooks_on_boarding_settings__WEBPACK_IMPORTED_MODULE_3__.useOnBoardingSettings)();
+  const paidyAdUrl = window.paidyForWcSettings?.paidyAdUrl || 'https://paidy.com/campaign/merchant/202404_WW';
   if (currentStep === 2) {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.PaidyTitle, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.UnderReviewMessage, {})]
@@ -1511,8 +1513,37 @@ const OnBoardingStep = () => {
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.PaidyTitle, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_main_hooks_form_info__WEBPACK_IMPORTED_MODULE_2__.ReviewRejectedMessage, {})]
     });
   } else {
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.PaidyTitle, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.ApplyButton, {})]
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.PaidyTitle, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+        className: "paidy-on-boarding",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+          className: "paidy-on-boarding__img",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("a", {
+            href: paidyAdUrl,
+            target: "_blank",
+            rel: "noreferrer",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("img", {
+              src: "/wp-content/plugins/paidy-wc/assets/images/paidy_logo_w800.png",
+              alt: "Paidy"
+            })
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+          className: "paidy-on-boarding__content",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("p", {
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Applying for and setting up Paidy is easy.', 'paidy-wc')
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.ApplyButton, {})]
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+        className: "paidy-on-boarding__description",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("p", {
+          children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('There is no setup cost, payment fees start from 3.5%, and if you apply via this service, you will receive a one-month trial with no payment fees!', 'paidy-wc'), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("a", {
+            href: paidyAdUrl,
+            target: "_blank",
+            rel: "noreferrer",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Learn more about Paidy', 'paidy-wc')
+          })]
+        })
+      })]
     });
   }
 };
@@ -1653,15 +1684,98 @@ const ReviewRejectedMessage = () => {
     })]
   });
 };
+const EnableTestButton = ({
+  onClick
+}) => {
+  const [environment, setEnvironment] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)();
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    // WooCommerce Payment Gateway APIを使用
+    _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
+      path: '/wc/v3/payment_gateways/paidy'
+    }).then(response => {
+      const currentEnvironment = response.settings?.environment?.value || response.settings?.environment || '';
+      setEnvironment(currentEnvironment);
+    }).catch(error => {
+      return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
+        path: '/wp/v2/settings'
+      });
+    }).then(settings => {
+      if (settings) {
+        const paidySettings = settings.woocommerce_paidy_settings || {};
+        if (!environment) {
+          // まだ環境が設定されていない場合のみ
+          setEnvironment(paidySettings.environment || '');
+        }
+      }
+    }).catch(error => {
+      console.error('Settings API Error:', error);
+    });
+  }, []);
+  if (environment === 'sandbox') {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+      className: "paidy-enabled-test-message",
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Now test mode', 'paidy-wc')
+    });
+  } else {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+      className: "paidy-button test-button",
+      onClick: onClick,
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Enable test mode', 'paidy-wc')
+    });
+  }
+};
 const ReviewApprovedMessage = () => {
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
+  const [environment, setEnvironment] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)();
   const {
     createErrorNotice,
     createSuccessNotice
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useDispatch)(_wordpress_notices__WEBPACK_IMPORTED_MODULE_4__.store);
   const restUrl = window.paidyForWcSettings?.restUrl || '';
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
+      path: '/wc/v3/payment_gateways/paidy'
+    }).then(response => {
+      const currentEnvironment = response.settings?.environment?.value || response.settings?.environment || '';
+      console.log('Current Environment:', currentEnvironment);
+      setEnvironment(currentEnvironment);
+
+      // environmentがsandboxまたはliveの場合、CSSを変更
+      if (currentEnvironment === 'sandbox' || currentEnvironment === 'live') {
+        const paidySettingsElement = document.getElementById('paidy-payment-settings');
+        if (paidySettingsElement) {
+          paidySettingsElement.style.display = 'block';
+          console.log('CSS updated: #paidy-payment-settings display set to block');
+        } else {
+          console.warn('Element #paidy-payment-settings not found');
+        }
+      }
+    }).catch(error => {
+      console.error('Failed to fetch environment:', error);
+      // フォールバック: WordPress Settings API
+      return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
+        path: '/wp/v2/settings'
+      });
+    }).then(settings => {
+      if (settings && !environment) {
+        const paidySettings = settings.woocommerce_paidy_settings || {};
+        const fallbackEnvironment = paidySettings.environment || '';
+        setEnvironment(fallbackEnvironment);
+
+        // フォールバックでも同様にCSSを変更
+        if (fallbackEnvironment === 'sandbox' || fallbackEnvironment === 'live') {
+          const paidySettingsElement = document.getElementById('paidy-payment-settings');
+          if (paidySettingsElement) {
+            paidySettingsElement.style.display = 'block';
+            console.log('CSS updated (fallback): #paidy-payment-settings display set to block');
+          }
+        }
+      }
+    }).catch(error => {
+      console.error('Failed to fetch settings:', error);
+    });
+  }, []);
   const onSavingTestMode = () => {
-    setIsLoading(true);
     _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
       path: '/wc/v3/payment_gateways/paidy',
       method: 'PUT',
@@ -1684,7 +1798,6 @@ const ReviewApprovedMessage = () => {
     });
   };
   const onSavingProductionMode = () => {
-    setIsLoading(true);
     _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
       path: '/wc/v3/payment_gateways/paidy',
       method: 'PUT',
@@ -1705,72 +1818,56 @@ const ReviewApprovedMessage = () => {
       });
     });
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-    className: "paidy-approved-message",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
-      level: 3,
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Status: The review approved', 'paidy-wc')
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("p", {
-      children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('The review has been completed and the merchant agreement has been concluded.', 'paidy-wc'), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('For terms of use, please check the terms and conditions notification email sent by Paidy Inc.', 'paidy-wc')]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("ul", {
-      className: "paidy-approved-list",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('We recommend setting the Webhook URL in the Paidy merchant management screen before publishing in production mode. Set the Webhook URL to the following value.', 'paidy-wc')
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('[Common for test and production]', 'paidy-wc')
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("li", {
-        children: [restUrl, "wp-json/paidy/v1/order/"]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Please refer to the manual for information on the Paidy merchant management screen.', 'paidy-wc')
+  if (environment === 'sandbox') {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Fragment, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(SettingSandboxMessage, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+        className: "paidy-enabled-button",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+          className: "paidy-button production-button",
+          onClick: onSavingProductionMode,
+          disabled: isLoading,
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Enable production mode', 'paidy-wc')
+        })
       })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-      className: "paidy-enabled-button",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("p", {
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Please click one of the buttons below.', 'paidy-wc')
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
-        className: "paidy-button test-button",
-        isPrimary: true,
-        onClick: onSavingTestMode,
-        disabled: isLoading,
-        children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Enable test mode', 'paidy-wc'), isLoading ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Enabling Paidy...', 'paidy-wc') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Enable Paidy', 'paidy-wc')]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
-        className: "paidy-button production-button",
-        isPrimary: true,
-        onClick: onSavingProductionMode,
-        disabled: isLoading,
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Enable production mode', 'paidy-wc')
+    });
+  } else if (environment === 'live') {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(SettingCompletedMessage, {});
+  } else {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
+      className: "paidy-approved-message",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
+        level: 3,
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Status: The review approved', 'paidy-wc')
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("p", {
+        children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('The review has been completed and the merchant agreement has been concluded.', 'paidy-wc'), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('For terms of use, please check the terms and conditions notification email sent by Paidy Inc.', 'paidy-wc')]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("ul", {
+        className: "paidy-approved-list",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('We recommend setting the Webhook URL in the Paidy merchant management screen before publishing in production mode. Set the Webhook URL to the following value.', 'paidy-wc')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('[Common for test and production]', 'paidy-wc')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("li", {
+          children: [restUrl, "wp-json/paidy/v1/order/"]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Please refer to the manual for information on the Paidy merchant management screen.', 'paidy-wc')
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
+        className: "paidy-enabled-button",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("p", {
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Please click one of the buttons below.', 'paidy-wc')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(EnableTestButton, {
+          onClick: onSavingTestMode
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+          className: "paidy-button production-button",
+          onClick: onSavingProductionMode,
+          disabled: isLoading,
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Enable production mode', 'paidy-wc')
+        })]
       })]
-    })]
-  });
+    });
+  }
 };
 const SettingSandboxMessage = () => {
-  const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
-  const {
-    createErrorNotice,
-    createSuccessNotice
-  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useDispatch)(_wordpress_notices__WEBPACK_IMPORTED_MODULE_4__.store);
-  const onSavingProductionMode = () => {
-    setIsLoading(true);
-    _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
-      path: '/wc/v3/payment_gateways/paidy',
-      method: 'PUT',
-      data: {
-        enabled: true,
-        settings: {
-          environment: 'live'
-        }
-      }
-    }).then(response => {
-      window.location.href = '/wp-admin/admin.php?page=wc-settings&tab=checkout&section=paidy';
-    }).catch(error => {
-      setIsLoading(false);
-      createErrorNotice(error.message || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Error enabling Paidy', 'paidy-wc'), {
-        type: 'snackbar',
-        isDismissible: true,
-        autoDismiss: false
-      });
-    });
-  };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
     className: "paidy-setting-sandbox-message",
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
@@ -1782,12 +1879,6 @@ const SettingSandboxMessage = () => {
         target: "_blank",
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Paidy test payment flow', 'paidy-wc')
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('After confirming the test payment, please switch to production mode.', 'paidy-wc')]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
-      className: "paidy-button production-button",
-      isPrimary: true,
-      onClick: onSavingProductionMode,
-      disabled: isLoading,
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Enable production mode', 'paidy-wc')
     })]
   });
 };
@@ -1830,7 +1921,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const useOnBoardingSettings = () => {
-  const [currentStep, setCurrentStep] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
+  const [currentStep, setCurrentStep] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(0);
   const [storeName, setStoreName] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
   const [siteName, setSiteName] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
   const [storeUrl, setStoreUrl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
@@ -1843,15 +1934,15 @@ const useOnBoardingSettings = () => {
   const [representativeDateOfBirth, setRepresentativeDateOfBirth] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
   const [annualGrossValue, setAnnualGrossValue] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
   const [averagePurchaseAmount, setAveragePurchaseAmount] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
-  const [securitySurvey01CheckControl, setSecuritySurvey01CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey02CheckControl, setSecuritySurvey02CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey03CheckControl, setSecuritySurvey03CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey04CheckControl, setSecuritySurvey04CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey05CheckControl, setSecuritySurvey05CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey06CheckControl, setSecuritySurvey06CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey07CheckControl, setSecuritySurvey07CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey08CheckControl, setSecuritySurvey08CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
-  const [securitySurvey09CheckControl, setSecuritySurvey09CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
+  const [securitySurvey01RadioControl, setSecuritySurvey01RadioControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
+  const [securitySurvey01TextControl, setSecuritySurvey01TextControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)('');
+  const [securitySurvey11CheckControl, setSecuritySurvey11CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
+  const [securitySurvey12CheckControl, setSecuritySurvey12CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
+  const [securitySurvey13CheckControl, setSecuritySurvey13CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
+  const [securitySurvey14CheckControl, setSecuritySurvey14CheckControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)();
+  const [securitySurvey10TextAreaControl, setSecuritySurvey10TextAreaControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)('');
+  const [securitySurvey08RadioControl, setSecuritySurvey08RadioControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)('no');
+  const [securitySurvey09RadioControl, setSecuritySurvey09RadioControl] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)('no');
   const {
     createErrorNotice,
     createSuccessNotice
@@ -1861,28 +1952,28 @@ const useOnBoardingSettings = () => {
       path: '/wp/v2/settings'
     }).then(settings => {
       const onBoardingSettings = settings.woocommerce_paidy_on_boarding_settings;
-      setCurrentStep(onBoardingSettings.currentStep);
-      setStoreName(onBoardingSettings.storeName);
-      setSiteName(onBoardingSettings.siteName);
-      setStoreUrl(onBoardingSettings.storeUrl);
-      setRegistEmail(onBoardingSettings.registEmail);
-      setContactPhone(onBoardingSettings.contactPhone);
-      setRepesentativeLastName(onBoardingSettings.representativeLastName);
-      setRepresentativeFirstName(onBoardingSettings.representativeFirstName);
-      setRepresentativeLastNameKana(onBoardingSettings.representativeLastNameKana);
-      setRepresentativeFirstNameKana(onBoardingSettings.representativeFirstNameKana);
+      setCurrentStep(Number(onBoardingSettings.currentStep || 0));
+      setStoreName(onBoardingSettings.storeName || '');
+      setSiteName(onBoardingSettings.siteName || '');
+      setStoreUrl(onBoardingSettings.storeUrl || '');
+      setRegistEmail(onBoardingSettings.registEmail || '');
+      setContactPhone(onBoardingSettings.contactPhone || '');
+      setRepesentativeLastName(onBoardingSettings.representativeLastName || '');
+      setRepresentativeFirstName(onBoardingSettings.representativeFirstName || '');
+      setRepresentativeLastNameKana(onBoardingSettings.representativeLastNameKana || '');
+      setRepresentativeFirstNameKana(onBoardingSettings.representativeFirstNameKana || '');
       setRepresentativeDateOfBirth(onBoardingSettings.representativeDateOfBirth);
       setAnnualGrossValue(onBoardingSettings.annualGrossValue);
       setAveragePurchaseAmount(onBoardingSettings.averagePurchaseAmount);
-      setSecuritySurvey01CheckControl(onBoardingSettings.securitySurvey01CheckControl);
-      setSecuritySurvey02CheckControl(onBoardingSettings.securitySurvey02CheckControl);
-      setSecuritySurvey03CheckControl(onBoardingSettings.securitySurvey03CheckControl);
-      setSecuritySurvey04CheckControl(onBoardingSettings.securitySurvey04CheckControl);
-      setSecuritySurvey05CheckControl(onBoardingSettings.securitySurvey05CheckControl);
-      setSecuritySurvey06CheckControl(onBoardingSettings.securitySurvey06CheckControl);
-      setSecuritySurvey07CheckControl(onBoardingSettings.securitySurvey07CheckControl);
-      setSecuritySurvey08CheckControl(onBoardingSettings.securitySurvey08CheckControl);
-      setSecuritySurvey09CheckControl(onBoardingSettings.securitySurvey09CheckControl);
+      setSecuritySurvey01RadioControl(onBoardingSettings.securitySurvey01RadioControl || 'no');
+      setSecuritySurvey01TextControl(onBoardingSettings.securitySurvey01TextControl || '');
+      setSecuritySurvey11CheckControl(onBoardingSettings.securitySurvey11CheckControl);
+      setSecuritySurvey12CheckControl(onBoardingSettings.securitySurvey12CheckControl);
+      setSecuritySurvey13CheckControl(onBoardingSettings.securitySurvey13CheckControl);
+      setSecuritySurvey14CheckControl(onBoardingSettings.securitySurvey14CheckControl);
+      setSecuritySurvey10TextAreaControl(onBoardingSettings.securitySurvey10TextAreaControl || '');
+      setSecuritySurvey08RadioControl(onBoardingSettings.securitySurvey08RadioControl || 'no');
+      setSecuritySurvey09RadioControl(onBoardingSettings.securitySurvey09RadioControl || 'no');
     });
   }, []);
   const saveSettings = () => {
@@ -1958,13 +2049,14 @@ const useOnBoardingSettings = () => {
     if (kanaFlag) {
       return;
     }
-    setCurrentStep(currentStep + 1);
+    const nextStep = currentStep + 1;
+    setCurrentStep(nextStep);
     _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_1___default()({
       path: '/wp/v2/settings',
       method: 'POST',
       data: {
         woocommerce_paidy_on_boarding_settings: {
-          currentStep: Number(currentStep),
+          currentStep: nextStep,
           storeName,
           siteName,
           storeUrl,
@@ -1977,15 +2069,15 @@ const useOnBoardingSettings = () => {
           representativeDateOfBirth,
           annualGrossValue,
           averagePurchaseAmount,
-          securitySurvey01CheckControl,
-          securitySurvey02CheckControl,
-          securitySurvey03CheckControl,
-          securitySurvey04CheckControl,
-          securitySurvey05CheckControl,
-          securitySurvey06CheckControl,
-          securitySurvey07CheckControl,
-          securitySurvey08CheckControl,
-          securitySurvey09CheckControl
+          securitySurvey01RadioControl,
+          securitySurvey01TextControl,
+          securitySurvey11CheckControl,
+          securitySurvey12CheckControl,
+          securitySurvey13CheckControl,
+          securitySurvey14CheckControl,
+          securitySurvey10TextAreaControl,
+          securitySurvey08RadioControl,
+          securitySurvey09RadioControl
         }
       }
     }).then(() => {
@@ -2019,24 +2111,24 @@ const useOnBoardingSettings = () => {
     setAnnualGrossValue,
     averagePurchaseAmount,
     setAveragePurchaseAmount,
-    securitySurvey01CheckControl,
-    setSecuritySurvey01CheckControl,
-    securitySurvey02CheckControl,
-    setSecuritySurvey02CheckControl,
-    securitySurvey03CheckControl,
-    setSecuritySurvey03CheckControl,
-    securitySurvey04CheckControl,
-    setSecuritySurvey04CheckControl,
-    securitySurvey05CheckControl,
-    setSecuritySurvey05CheckControl,
-    securitySurvey06CheckControl,
-    setSecuritySurvey06CheckControl,
-    securitySurvey07CheckControl,
-    setSecuritySurvey07CheckControl,
-    securitySurvey08CheckControl,
-    setSecuritySurvey08CheckControl,
-    securitySurvey09CheckControl,
-    setSecuritySurvey09CheckControl,
+    securitySurvey01RadioControl,
+    setSecuritySurvey01RadioControl,
+    securitySurvey01TextControl,
+    setSecuritySurvey01TextControl,
+    securitySurvey11CheckControl,
+    setSecuritySurvey11CheckControl,
+    securitySurvey12CheckControl,
+    setSecuritySurvey12CheckControl,
+    securitySurvey13CheckControl,
+    setSecuritySurvey13CheckControl,
+    securitySurvey14CheckControl,
+    setSecuritySurvey14CheckControl,
+    securitySurvey10TextAreaControl,
+    setSecuritySurvey10TextAreaControl,
+    securitySurvey08RadioControl,
+    setSecuritySurvey08RadioControl,
+    securitySurvey09RadioControl,
+    setSecuritySurvey09RadioControl,
     saveSettings
   };
 };

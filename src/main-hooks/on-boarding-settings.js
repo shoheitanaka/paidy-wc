@@ -5,7 +5,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 
 const useOnBoardingSettings = () => {
-	const [ currentStep, setCurrentStep ] = useState();
+	const [ currentStep, setCurrentStep ] = useState( 0 );
 	const [ storeName, setStoreName ] = useState();
 	const [ siteName, setSiteName ] = useState();
 	const [ storeUrl, setStoreUrl ] = useState();
@@ -18,15 +18,15 @@ const useOnBoardingSettings = () => {
 	const [ representativeDateOfBirth, setRepresentativeDateOfBirth ] = useState();
 	const [ annualGrossValue, setAnnualGrossValue ] = useState();
 	const [ averagePurchaseAmount, setAveragePurchaseAmount ] = useState();
-	const [ securitySurvey01CheckControl, setSecuritySurvey01CheckControl ] = useState( false );
-	const [ securitySurvey02CheckControl, setSecuritySurvey02CheckControl ] = useState( false );
-	const [ securitySurvey03CheckControl, setSecuritySurvey03CheckControl ] = useState( false );
-	const [ securitySurvey04CheckControl, setSecuritySurvey04CheckControl ] = useState( false );
-	const [ securitySurvey05CheckControl, setSecuritySurvey05CheckControl ] = useState( false );
-	const [ securitySurvey06CheckControl, setSecuritySurvey06CheckControl ] = useState( false );
-	const [ securitySurvey07CheckControl, setSecuritySurvey07CheckControl ] = useState( false );
-	const [ securitySurvey08CheckControl, setSecuritySurvey08CheckControl ] = useState( false );
-	const [ securitySurvey09CheckControl, setSecuritySurvey09CheckControl ] = useState( false );
+	const [ securitySurvey01RadioControl, setSecuritySurvey01RadioControl ] = useState();
+	const [ securitySurvey01TextControl, setSecuritySurvey01TextControl ] = useState( '' );
+	const [ securitySurvey11CheckControl, setSecuritySurvey11CheckControl ] = useState();
+	const [ securitySurvey12CheckControl, setSecuritySurvey12CheckControl ] = useState();
+	const [ securitySurvey13CheckControl, setSecuritySurvey13CheckControl ] = useState();
+	const [ securitySurvey14CheckControl, setSecuritySurvey14CheckControl ] = useState();
+	const [ securitySurvey10TextAreaControl, setSecuritySurvey10TextAreaControl ] = useState('');
+	const [ securitySurvey08RadioControl, setSecuritySurvey08RadioControl ] = useState('no');
+	const [ securitySurvey09RadioControl, setSecuritySurvey09RadioControl ] = useState('no');
 
 	const { createErrorNotice, createSuccessNotice } = useDispatch( noticesStore );
 
@@ -34,28 +34,28 @@ const useOnBoardingSettings = () => {
 		apiFetch( { path: '/wp/v2/settings' } ).then( ( settings ) => {
 			const onBoardingSettings = settings.woocommerce_paidy_on_boarding_settings;
 			
-			setCurrentStep( onBoardingSettings.currentStep );
-			setStoreName( onBoardingSettings.storeName );
-			setSiteName( onBoardingSettings.siteName );
-			setStoreUrl( onBoardingSettings.storeUrl );
-			setRegistEmail( onBoardingSettings.registEmail );
-			setContactPhone( onBoardingSettings.contactPhone );
-			setRepesentativeLastName( onBoardingSettings.representativeLastName );
-			setRepresentativeFirstName( onBoardingSettings.representativeFirstName );
-			setRepresentativeLastNameKana( onBoardingSettings.representativeLastNameKana );
-			setRepresentativeFirstNameKana( onBoardingSettings.representativeFirstNameKana );
+			setCurrentStep( Number( onBoardingSettings.currentStep || 0 ) );
+			setStoreName( onBoardingSettings.storeName || '' );
+			setSiteName( onBoardingSettings.siteName || '' );
+			setStoreUrl( onBoardingSettings.storeUrl || '' );
+			setRegistEmail( onBoardingSettings.registEmail || '' );
+			setContactPhone( onBoardingSettings.contactPhone || '' );
+			setRepesentativeLastName( onBoardingSettings.representativeLastName || '' );
+			setRepresentativeFirstName( onBoardingSettings.representativeFirstName || '' );
+			setRepresentativeLastNameKana( onBoardingSettings.representativeLastNameKana || '' );
+			setRepresentativeFirstNameKana( onBoardingSettings.representativeFirstNameKana || '' );
 			setRepresentativeDateOfBirth( onBoardingSettings.representativeDateOfBirth );
 			setAnnualGrossValue( onBoardingSettings.annualGrossValue );
 			setAveragePurchaseAmount( onBoardingSettings.averagePurchaseAmount );
-			setSecuritySurvey01CheckControl( onBoardingSettings.securitySurvey01CheckControl );
-			setSecuritySurvey02CheckControl( onBoardingSettings.securitySurvey02CheckControl );
-			setSecuritySurvey03CheckControl( onBoardingSettings.securitySurvey03CheckControl );
-			setSecuritySurvey04CheckControl( onBoardingSettings.securitySurvey04CheckControl );
-			setSecuritySurvey05CheckControl( onBoardingSettings.securitySurvey05CheckControl );
-			setSecuritySurvey06CheckControl( onBoardingSettings.securitySurvey06CheckControl );
-			setSecuritySurvey07CheckControl( onBoardingSettings.securitySurvey07CheckControl );
-			setSecuritySurvey08CheckControl( onBoardingSettings.securitySurvey08CheckControl );
-			setSecuritySurvey09CheckControl( onBoardingSettings.securitySurvey09CheckControl );
+			setSecuritySurvey01RadioControl( onBoardingSettings.securitySurvey01RadioControl || 'no' );
+			setSecuritySurvey01TextControl( onBoardingSettings.securitySurvey01TextControl || '' );
+			setSecuritySurvey11CheckControl( onBoardingSettings.securitySurvey11CheckControl );
+			setSecuritySurvey12CheckControl( onBoardingSettings.securitySurvey12CheckControl );
+			setSecuritySurvey13CheckControl( onBoardingSettings.securitySurvey13CheckControl );
+			setSecuritySurvey14CheckControl( onBoardingSettings.securitySurvey14CheckControl );
+			setSecuritySurvey10TextAreaControl( onBoardingSettings.securitySurvey10TextAreaControl || '' );
+			setSecuritySurvey08RadioControl( onBoardingSettings.securitySurvey08RadioControl || 'no' );
+			setSecuritySurvey09RadioControl( onBoardingSettings.securitySurvey09RadioControl || 'no' );
 		} );
 	}, [] );
 
@@ -111,14 +111,15 @@ const useOnBoardingSettings = () => {
 			return;
 		}
 
-		setCurrentStep( currentStep + 1 );
+		const nextStep = currentStep + 1;
+		setCurrentStep( nextStep );
 
 		apiFetch( {
 			path: '/wp/v2/settings',
 			method: 'POST',
 			data: {
 				woocommerce_paidy_on_boarding_settings: {
-					currentStep: Number(currentStep),
+					currentStep: nextStep,
 					storeName,
 					siteName,
 					storeUrl,
@@ -131,15 +132,15 @@ const useOnBoardingSettings = () => {
 					representativeDateOfBirth,
 					annualGrossValue,
 					averagePurchaseAmount,
-					securitySurvey01CheckControl,
-					securitySurvey02CheckControl,
-					securitySurvey03CheckControl,
-					securitySurvey04CheckControl,
-					securitySurvey05CheckControl,
-					securitySurvey06CheckControl,
-					securitySurvey07CheckControl,
-					securitySurvey08CheckControl,
-					securitySurvey09CheckControl,
+					securitySurvey01RadioControl,
+					securitySurvey01TextControl,
+					securitySurvey11CheckControl,
+					securitySurvey12CheckControl,
+					securitySurvey13CheckControl,
+					securitySurvey14CheckControl,
+					securitySurvey10TextAreaControl,
+					securitySurvey08RadioControl,
+					securitySurvey09RadioControl,
 				},
 			},
 		} ).then( () => {
@@ -176,24 +177,24 @@ const useOnBoardingSettings = () => {
 		setAnnualGrossValue,
 		averagePurchaseAmount,
 		setAveragePurchaseAmount,
-		securitySurvey01CheckControl,
-		setSecuritySurvey01CheckControl,
-		securitySurvey02CheckControl,
-		setSecuritySurvey02CheckControl,
-		securitySurvey03CheckControl,
-		setSecuritySurvey03CheckControl,
-		securitySurvey04CheckControl,
-		setSecuritySurvey04CheckControl,
-		securitySurvey05CheckControl,
-		setSecuritySurvey05CheckControl,
-		securitySurvey06CheckControl,
-		setSecuritySurvey06CheckControl,
-		securitySurvey07CheckControl,
-		setSecuritySurvey07CheckControl,
-		securitySurvey08CheckControl,
-		setSecuritySurvey08CheckControl,
-		securitySurvey09CheckControl,
-		setSecuritySurvey09CheckControl,
+		securitySurvey01RadioControl,
+		setSecuritySurvey01RadioControl,
+		securitySurvey01TextControl,
+		setSecuritySurvey01TextControl,
+		securitySurvey11CheckControl,
+		setSecuritySurvey11CheckControl,
+		securitySurvey12CheckControl,
+		setSecuritySurvey12CheckControl,
+		securitySurvey13CheckControl,
+		setSecuritySurvey13CheckControl,
+		securitySurvey14CheckControl,
+		setSecuritySurvey14CheckControl,
+		securitySurvey10TextAreaControl,
+		setSecuritySurvey10TextAreaControl,
+		securitySurvey08RadioControl,
+		setSecuritySurvey08RadioControl,
+		securitySurvey09RadioControl,
+		setSecuritySurvey09RadioControl,
         saveSettings,
     };
 };

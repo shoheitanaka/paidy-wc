@@ -24,10 +24,7 @@ div#adminmenuwrap, div#adminmenuback {
     }
     .paidy-on-boarding__content{
         width: 50%;
-        p{
-          font-size: 1.5em;
-          margin-bottom: 20px;
-        }
+        margin: auto;
     }
     ol li{
       font-size: 1.2em;
@@ -68,6 +65,22 @@ div#adminmenuwrap, div#adminmenuback {
           margin-left: 30px;
         }
       }
+      .components-radio-control__group-wrapper {
+        display: flex;
+        flex-direction: row;
+        font-size: small;
+        justify-content: flex-start;
+        gap: 20px;
+        padding-bottom: 15px;
+      }
+      .components-radio-control__option {
+        display: flex;
+        align-items: left;
+        gap: 5px;
+      }
+      legend.components-base-control__label{
+        font-size: 1.2em;
+      }
     }
     .paidy-agreement-text{
       text-align: left;
@@ -90,8 +103,22 @@ div#adminmenuwrap, div#adminmenuback {
         }
       }
     }
+  .paidy-on-boarding_bottom{
+    text-align: left;
+  }
+  .paidy-approved-message{
+    .paidy-enabled-button{
+      button.test-button{
+        margin-bottom: 15px;
+      }
+    }
+  }
   }
   .paidy-on-boarding__description{
+    text-align: left;
+    p{
+      font-size:16px;
+    }
     a{margin-left: 5px;}
   }
   button.paidy-button{
