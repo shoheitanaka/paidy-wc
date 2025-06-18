@@ -48,7 +48,7 @@ class WC_Paidy_Admin_Wizard {
 			add_action( 'admin_enqueue_scripts', array( $this, 'wc_admin_paidy_on_boarding_scripts' ) );
 			add_action( 'init', array( $this, 'paidy_on_boarding_settings' ) );
 			add_action( 'updated_option', array( $this, 'change_paidy_on_boarding_settings' ), 10, 3 );
-			add_action( 'added_option', array( $this, 'add_paidy_on_boarding_settings' ), 10, 3 );
+			add_action( 'add_option', array( $this, 'add_paidy_on_boarding_settings' ), 10, 2 );
 			add_filter( 'woocommerce_gateway_method_description', array( $this, 'paidy_method_description' ), 20, 2 );
 			add_action( 'woocommerce_settings_tabs_checkout', array( $this, 'paidy_after_settings_checkout' ) );
 		}
@@ -324,12 +324,10 @@ class WC_Paidy_Admin_Wizard {
 			return;
 		}
 		if ( isset( $value['currentStep'] ) && 2 === $value['currentStep'] && 1 === $old_value['currentStep'] ) {
-			$site_hash = $this->generate_random_string( 16 );
 			// Update the site hash and hash in options.
 			if ( ! get_option( 'paidy_site_hash' ) ) {
+				$site_hash = $this->generate_random_string( 16 );
 				add_option( 'paidy_site_hash', $site_hash );
-				$hash = password_hash( $site_hash, PASSWORD_DEFAULT );
-				add_option( 'paidy_hash', $hash );
 			}
 			$result = $this->send_apply_data_to_wcartws( $value, $site_hash );
 		}
@@ -410,7 +408,6 @@ class WC_Paidy_Admin_Wizard {
 			);
 			$result = false;
 		}
-		update_option( 'woocommerce_paidy_on_boarding_settings', $value );
 
 		return $result;
 	}
@@ -465,20 +462,21 @@ class WC_Paidy_Admin_Wizard {
 		}
 
 		if ( isset( $value['currentStep'] ) && 1 === $value['currentStep'] ) {
+			// Update the site hash and hash in options.
+			if ( ! get_option( 'paidy_site_hash' ) ) {
+				$site_hash = $this->generate_random_string( 16 );
+				add_option( 'paidy_site_hash', $site_hash );
+			}
 			$value['currentStep'] = 2;
 			update_option( $option, $value );
+		} elseif ( isset( $value['currentStep'] ) && 2 === $value['currentStep'] ) {
+			// Update the site hash and hash in options.
+			if ( ! get_option( 'paidy_site_hash' ) ) {
+				$site_hash = $this->generate_random_string( 16 );
+				add_option( 'paidy_site_hash', $site_hash );
+			}
+			$result = $this->send_apply_data_to_wcartws( $value, $site_hash );
 		}
-	}
-
-	/**
-	 * Update on boarding data.
-	 *
-	 * @param object $data The data to update.
-	 */
-	public function update_on_boarding_settings( $data ) {
-		$paidy_on_boarding_data = get_option( 'woocommerce_paidy_on_boarding_settings' );
-		$paidy_on_boarding_data = array_merge( $paidy_on_boarding_data, $data );
-		update_option( 'woocommerce_paidy_on_boarding_settings', $paidy_on_boarding_data );
 	}
 
 	/**

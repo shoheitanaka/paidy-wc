@@ -336,7 +336,7 @@ const FirstMainPage = () => {
 			<SettingsTitle />
 			<div className="paidy-on-boarding__description">
 				<p>
-					{ sprintf( __('Easy PayPay setup now available with %s.', 'paidy-wc'), pluginName ) }<br/>
+					{ sprintf( __('Easy PayPay setup now available with %s!', 'paidy-wc'), pluginName ) }<br/>
 					{__('Right now, we are offering a one-month trial with no payment fees!', 'paidy-wc')}
 				</p>
 			</div>

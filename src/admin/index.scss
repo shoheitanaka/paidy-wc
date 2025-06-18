@@ -34,9 +34,15 @@
         background: linear-gradient(90deg, #E5258C 0%, #863BD4 96.36%);
         border-radius: 28px;
     }
+    .paidy-approved-message{
+      .paidy-enabled-test-message{
+        padding-top: 15px;
+        font-size: large;
+      }
+    }
 }
 #paidy-payment-settings{
-    display: none;
+  display: none;
 }
 .wrap.woocommerce{
   background-color: #f0f0f1;

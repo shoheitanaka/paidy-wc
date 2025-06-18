@@ -1500,13 +1500,28 @@ const EnableTestButton = ({
 }) => {
   const [environment, setEnvironment] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)();
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    // WooCommerce Payment Gateway APIを使用
     _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
-      path: '/wp/v2/settings'
+      path: '/wc/v3/payment_gateways/paidy'
+    }).then(response => {
+      const currentEnvironment = response.settings?.environment?.value || response.settings?.environment || '';
+      setEnvironment(currentEnvironment);
+    }).catch(error => {
+      return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
+        path: '/wp/v2/settings'
+      });
     }).then(settings => {
-      const onPaidySettings = settings.woocommerce_paidy_settings || {};
-      setEnvironment(onPaidySettings.environment || '');
+      if (settings) {
+        const paidySettings = settings.woocommerce_paidy_settings || {};
+        if (!environment) {
+          // まだ環境が設定されていない場合のみ
+          setEnvironment(paidySettings.environment || '');
+        }
+      }
+    }).catch(error => {
+      console.error('Settings API Error:', error);
     });
-  });
+  }, []);
   if (environment === 'sandbox') {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
       className: "paidy-enabled-test-message",
@@ -1522,13 +1537,56 @@ const EnableTestButton = ({
 };
 const ReviewApprovedMessage = () => {
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
+  const [environment, setEnvironment] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)();
   const {
     createErrorNotice,
     createSuccessNotice
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useDispatch)(_wordpress_notices__WEBPACK_IMPORTED_MODULE_4__.store);
   const restUrl = window.paidyForWcSettings?.restUrl || '';
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
+      path: '/wc/v3/payment_gateways/paidy'
+    }).then(response => {
+      const currentEnvironment = response.settings?.environment?.value || response.settings?.environment || '';
+      console.log('Current Environment:', currentEnvironment);
+      setEnvironment(currentEnvironment);
+
+      // environmentがsandboxまたはliveの場合、CSSを変更
+      if (currentEnvironment === 'sandbox' || currentEnvironment === 'live') {
+        const paidySettingsElement = document.getElementById('paidy-payment-settings');
+        if (paidySettingsElement) {
+          paidySettingsElement.style.display = 'block';
+          console.log('CSS updated: #paidy-payment-settings display set to block');
+        } else {
+          console.warn('Element #paidy-payment-settings not found');
+        }
+      }
+    }).catch(error => {
+      console.error('Failed to fetch environment:', error);
+      // フォールバック: WordPress Settings API
+      return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
+        path: '/wp/v2/settings'
+      });
+    }).then(settings => {
+      if (settings && !environment) {
+        const paidySettings = settings.woocommerce_paidy_settings || {};
+        const fallbackEnvironment = paidySettings.environment || '';
+        setEnvironment(fallbackEnvironment);
+
+        // フォールバックでも同様にCSSを変更
+        if (fallbackEnvironment === 'sandbox' || fallbackEnvironment === 'live') {
+          const paidySettingsElement = document.getElementById('paidy-payment-settings');
+          if (paidySettingsElement) {
+            paidySettingsElement.style.display = 'block';
+            console.log('CSS updated (fallback): #paidy-payment-settings display set to block');
+          }
+        }
+      }
+    }).catch(error => {
+      console.error('Failed to fetch settings:', error);
+    });
+  }, []);
   const onSavingTestMode = () => {
-    setIsLoading(true);
     _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
       path: '/wc/v3/payment_gateways/paidy',
       method: 'PUT',
@@ -1551,7 +1609,6 @@ const ReviewApprovedMessage = () => {
     });
   };
   const onSavingProductionMode = () => {
-    setIsLoading(true);
     _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
       path: '/wc/v3/payment_gateways/paidy',
       method: 'PUT',
@@ -1572,67 +1629,56 @@ const ReviewApprovedMessage = () => {
       });
     });
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-    className: "paidy-approved-message",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
-      level: 3,
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Status: The review approved', 'paidy-wc')
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("p", {
-      children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('The review has been completed and the merchant agreement has been concluded.', 'paidy-wc'), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('For terms of use, please check the terms and conditions notification email sent by Paidy Inc.', 'paidy-wc')]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("ul", {
-      className: "paidy-approved-list",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('We recommend setting the Webhook URL in the Paidy merchant management screen before publishing in production mode. Set the Webhook URL to the following value.', 'paidy-wc')
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('[Common for test and production]', 'paidy-wc')
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("li", {
-        children: [restUrl, "wp-json/paidy/v1/order/"]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Please refer to the manual for information on the Paidy merchant management screen.', 'paidy-wc')
+  if (environment === 'sandbox') {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Fragment, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(SettingSandboxMessage, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+        className: "paidy-enabled-button",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+          className: "paidy-button production-button",
+          onClick: onSavingProductionMode,
+          disabled: isLoading,
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Enable production mode', 'paidy-wc')
+        })
       })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-      className: "paidy-enabled-button",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("p", {
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Please click one of the buttons below.', 'paidy-wc')
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(EnableTestButton, {
-        onClick: onSavingTestMode
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
-        className: "paidy-button production-button",
-        onClick: onSavingProductionMode,
-        disabled: isLoading,
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Enable production mode', 'paidy-wc')
+    });
+  } else if (environment === 'live') {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(SettingCompletedMessage, {});
+  } else {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
+      className: "paidy-approved-message",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
+        level: 3,
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Status: The review approved', 'paidy-wc')
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("p", {
+        children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('The review has been completed and the merchant agreement has been concluded.', 'paidy-wc'), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('For terms of use, please check the terms and conditions notification email sent by Paidy Inc.', 'paidy-wc')]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("ul", {
+        className: "paidy-approved-list",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('We recommend setting the Webhook URL in the Paidy merchant management screen before publishing in production mode. Set the Webhook URL to the following value.', 'paidy-wc')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('[Common for test and production]', 'paidy-wc')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("li", {
+          children: [restUrl, "wp-json/paidy/v1/order/"]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Please refer to the manual for information on the Paidy merchant management screen.', 'paidy-wc')
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
+        className: "paidy-enabled-button",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("p", {
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Please click one of the buttons below.', 'paidy-wc')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(EnableTestButton, {
+          onClick: onSavingTestMode
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+          className: "paidy-button production-button",
+          onClick: onSavingProductionMode,
+          disabled: isLoading,
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Enable production mode', 'paidy-wc')
+        })]
       })]
-    })]
-  });
+    });
+  }
 };
 const SettingSandboxMessage = () => {
-  const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
-  const {
-    createErrorNotice,
-    createSuccessNotice
-  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useDispatch)(_wordpress_notices__WEBPACK_IMPORTED_MODULE_4__.store);
-  const onSavingProductionMode = () => {
-    setIsLoading(true);
-    _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
-      path: '/wc/v3/payment_gateways/paidy',
-      method: 'PUT',
-      data: {
-        enabled: true,
-        settings: {
-          environment: 'live'
-        }
-      }
-    }).then(response => {
-      window.location.href = '/wp-admin/admin.php?page=wc-settings&tab=checkout&section=paidy';
-    }).catch(error => {
-      setIsLoading(false);
-      createErrorNotice(error.message || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Error enabling Paidy', 'paidy-wc'), {
-        type: 'snackbar',
-        isDismissible: true,
-        autoDismiss: false
-      });
-    });
-  };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
     className: "paidy-setting-sandbox-message",
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
@@ -1644,12 +1690,6 @@ const SettingSandboxMessage = () => {
         target: "_blank",
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Paidy test payment flow', 'paidy-wc')
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {}), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('After confirming the test payment, please switch to production mode.', 'paidy-wc')]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
-      className: "paidy-button production-button",
-      isPrimary: true,
-      onClick: onSavingProductionMode,
-      disabled: isLoading,
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Enable production mode', 'paidy-wc')
     })]
   });
 };
@@ -2527,7 +2567,7 @@ const FirstMainPage = () => {
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(SettingsTitle, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("div", {
         className: "paidy-on-boarding__description",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("p", {
-          children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Easy PayPay setup now available with %s.', 'paidy-wc'), pluginName), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("br", {}), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Right now, we are offering a one-month trial with no payment fees!', 'paidy-wc')]
+          children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Easy PayPay setup now available with %s!', 'paidy-wc'), pluginName), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("br", {}), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Right now, we are offering a one-month trial with no payment fees!', 'paidy-wc')]
         })
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
         className: "paidy-on-boarding",

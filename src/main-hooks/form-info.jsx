@@ -88,11 +88,28 @@ const EnableTestButton = ( { onClick } ) => {
    	const [ environment, setEnvironment ] = useState();
 
     useEffect( () => {
-        apiFetch( { path: '/wp/v2/settings' } ).then( ( settings ) => {
-            const onPaidySettings = settings.woocommerce_paidy_settings || {};
-        	setEnvironment( onPaidySettings.environment || '' );
-        } );
-    });
+        // WooCommerce Payment Gateway APIを使用
+        apiFetch( { path: '/wc/v3/payment_gateways/paidy' } )
+            .then( ( response ) => {
+                const currentEnvironment = response.settings?.environment?.value || response.settings?.environment || '';
+                setEnvironment( currentEnvironment );
+            } )
+            .catch( ( error ) => {
+                return apiFetch( { path: '/wp/v2/settings' } );
+            } )
+            .then( ( settings ) => {
+                if ( settings ) {
+                    const paidySettings = settings.woocommerce_paidy_settings || {};
+                    if ( !environment ) { // まだ環境が設定されていない場合のみ
+                        setEnvironment( paidySettings.environment || '' );
+                    }
+                }
+            } )
+            .catch( ( error ) => {
+                console.error('Settings API Error:', error);
+            } );
+    }, [] );
+
     if ( environment === 'sandbox' ) {
         return (
             <div className="paidy-enabled-test-message">
@@ -113,11 +130,55 @@ const EnableTestButton = ( { onClick } ) => {
 
 const ReviewApprovedMessage = () => {
     const [isLoading, setIsLoading] = useState(false);
+    const [environment, setEnvironment] = useState();
 	const { createErrorNotice, createSuccessNotice } = useDispatch( noticesStore );
 	const restUrl = window.paidyForWcSettings?.restUrl || '';
 
+    useEffect(() => {
+        apiFetch({ path: '/wc/v3/payment_gateways/paidy' })
+            .then((response) => {
+                const currentEnvironment = response.settings?.environment?.value || response.settings?.environment || '';
+                console.log('Current Environment:', currentEnvironment);
+                setEnvironment(currentEnvironment);
+                
+                // environmentがsandboxまたはliveの場合、CSSを変更
+                if (currentEnvironment === 'sandbox' || currentEnvironment === 'live') {
+                    const paidySettingsElement = document.getElementById('paidy-payment-settings');
+                    if (paidySettingsElement) {
+                        paidySettingsElement.style.display = 'block';
+                        console.log('CSS updated: #paidy-payment-settings display set to block');
+                    } else {
+                        console.warn('Element #paidy-payment-settings not found');
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error('Failed to fetch environment:', error);
+                // フォールバック: WordPress Settings API
+                return apiFetch({ path: '/wp/v2/settings' });
+            })
+            .then((settings) => {
+                if (settings && !environment) {
+                    const paidySettings = settings.woocommerce_paidy_settings || {};
+                    const fallbackEnvironment = paidySettings.environment || '';
+                    setEnvironment(fallbackEnvironment);
+                    
+                    // フォールバックでも同様にCSSを変更
+                    if (fallbackEnvironment === 'sandbox' || fallbackEnvironment === 'live') {
+                        const paidySettingsElement = document.getElementById('paidy-payment-settings');
+                        if (paidySettingsElement) {
+                            paidySettingsElement.style.display = 'block';
+                            console.log('CSS updated (fallback): #paidy-payment-settings display set to block');
+                        }
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error('Failed to fetch settings:', error);
+            });
+    }, []);
+
     const onSavingTestMode = () => {
-        setIsLoading(true);
 
         apiFetch({
             path: '/wc/v3/payment_gateways/paidy',
@@ -143,7 +204,6 @@ const ReviewApprovedMessage = () => {
     };
 
     const onSavingProductionMode = () => {
-        setIsLoading(true);
 
         apiFetch({
             path: '/wc/v3/payment_gateways/paidy',
@@ -164,7 +224,25 @@ const ReviewApprovedMessage = () => {
             );
         });
     };
-    
+    if ( environment === 'sandbox' ) {
+        return (
+            <>
+            <SettingSandboxMessage />
+            <div className="paidy-enabled-button">
+                <Button className="paidy-button production-button" 
+                onClick={ onSavingProductionMode }
+                disabled={ isLoading }
+                >
+                    { __( 'Enable production mode', 'paidy-wc' ) }
+                </Button>
+            </div>
+            </>
+        );
+    }else if ( environment === 'live' ) {
+        return (
+            <SettingCompletedMessage />
+        );
+    }else{
     return (
         <div className="paidy-approved-message">
             <Heading level={ 3 }>
@@ -192,34 +270,10 @@ const ReviewApprovedMessage = () => {
             </div>
         </div>
     );
+    }
 };
 
 const SettingSandboxMessage = () => {
-    const [isLoading, setIsLoading] = useState(false);
-	const { createErrorNotice, createSuccessNotice } = useDispatch( noticesStore );
-
-    const onSavingProductionMode = () => {
-        setIsLoading(true);
-
-        apiFetch({
-            path: '/wc/v3/payment_gateways/paidy',
-            method: 'PUT',
-            data: {
-                enabled: true,
-                settings: {
-                    environment:'live'
-                },
-            },
-        }).then((response) => {
-            window.location.href = '/wp-admin/admin.php?page=wc-settings&tab=checkout&section=paidy';
-        }).catch((error) => {
-            setIsLoading(false);
-            createErrorNotice(
-                ( error.message || __('Error enabling Paidy', 'paidy-wc') ),
-                { type: 'snackbar', isDismissible: true, autoDismiss: false }
-            );
-        });
-    };
     return (
         <div className="paidy-setting-sandbox-message">
             <Heading level={ 3 }>
@@ -231,13 +285,6 @@ const SettingSandboxMessage = () => {
                 <a href="https://paidy.com/docs/jp/testing.html" target="_blank">{ __( 'Paidy test payment flow', 'paidy-wc' ) }</a><br/>
                 { __( 'After confirming the test payment, please switch to production mode.', 'paidy-wc' ) }
             </p>
-            <Button className="paidy-button production-button" 
-                isPrimary 
-                onClick={ onSavingProductionMode }
-                disabled={ isLoading }
-                >
-                    { __( 'Enable production mode', 'paidy-wc' ) }
-            </Button>
         </div>
     );
 };
