@@ -88,6 +88,11 @@ div#adminmenuwrap, div#adminmenuback {
 .wrap .woocommerce-layout__main .paidy-on-boarding .paidy-security-survey legend.components-base-control__label {
   font-size: 1.2em;
 }
+.wrap .woocommerce-layout__main .paidy-on-boarding .paidy-security-survey .unauthorized_logins_message {
+  font-size: 1.2em;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
 .wrap .woocommerce-layout__main .paidy-on-boarding .paidy-agreement-text {
   text-align: right;
   font-size: 1.2em;

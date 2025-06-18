@@ -246,6 +246,8 @@ const FirstMainPage = () => {
 					</Heading>
 					<p>
 						{ __('*At least one "Yes" is required. If any are missing, we will contact you.', 'paidy-wc') }<br/>
+					</p>
+					<p className="unauthorized_logins_message">
 						{ __('Do you take the following measures to prevent unauthorized logins when changing a user\'s attributes?', 'paidy-wc') }
 					</p>
 					<SecuritySurvey11CheckControl

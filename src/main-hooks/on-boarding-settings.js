@@ -47,7 +47,7 @@ const useOnBoardingSettings = () => {
 			setRepresentativeDateOfBirth( onBoardingSettings.representativeDateOfBirth );
 			setAnnualGrossValue( onBoardingSettings.annualGrossValue );
 			setAveragePurchaseAmount( onBoardingSettings.averagePurchaseAmount );
-			setSecuritySurvey01RadioControl( onBoardingSettings.securitySurvey01RadioControl || 'no' );
+			setSecuritySurvey01RadioControl( onBoardingSettings.securitySurvey01RadioControl || '' );
 			setSecuritySurvey01TextControl( onBoardingSettings.securitySurvey01TextControl || '' );
 			setSecuritySurvey11CheckControl( onBoardingSettings.securitySurvey11CheckControl );
 			setSecuritySurvey12CheckControl( onBoardingSettings.securitySurvey12CheckControl );

@@ -151,7 +151,7 @@ class WC_Paidy_Admin_Wizard {
 			'registEmail'                     => get_bloginfo( 'admin_email' ),
 			'annualGrossValue'                => 'less-than-10-million-yen',
 			'averagePurchaseAmount'           => 'less-than-50000-yen',
-			'securitySurvey01RadioControl'    => 'yes',
+			'securitySurvey01RadioControl'    => '',
 			'securitySurvey01TextControl'     => '',
 			'securitySurvey11CheckControl'    => false,
 			'securitySurvey12CheckControl'    => false,
