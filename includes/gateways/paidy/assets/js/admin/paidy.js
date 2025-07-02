@@ -2038,6 +2038,24 @@ const useOnBoardingSettings = () => {
         kanaFlag = true;
       }
     });
+    let securityValidationFlag = false;
+    if (securitySurvey01RadioControl === 'no' && !securitySurvey01TextControl?.trim()) {
+      createErrorNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('When selecting "No" for the security survey question, please provide additional details in the text field.', 'paidy-wc'), {
+        type: 'snackbar',
+        isDismissible: true,
+        autoDismiss: false
+      });
+      securityValidationFlag = true;
+    }
+    const hasAnyYesCheck = securitySurvey11CheckControl === true || securitySurvey12CheckControl === true || securitySurvey13CheckControl === true || securitySurvey14CheckControl === true;
+    if (!hasAnyYesCheck && !securitySurvey10TextAreaControl?.trim()) {
+      createErrorNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Since none of the security measures are implemented, please provide details about your security approach in the additional information field.', 'paidy-wc'), {
+        type: 'snackbar',
+        isDismissible: true,
+        autoDismiss: false
+      });
+      securityValidationFlag = true;
+    }
     if (requiredFlag) {
       createErrorNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Please fill in all the fields.', 'paidy-wc'), {
         type: 'snackbar',
@@ -2046,7 +2064,7 @@ const useOnBoardingSettings = () => {
       });
       return;
     }
-    if (kanaFlag) {
+    if (kanaFlag || securityValidationFlag) {
       return;
     }
     const nextStep = currentStep + 1;

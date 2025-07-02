@@ -99,6 +99,28 @@ const useOnBoardingSettings = () => {
 			}
 		} );
 
+		let securityValidationFlag = false;
+		if ( securitySurvey01RadioControl === 'no' && !securitySurvey01TextControl?.trim() ) {
+			createErrorNotice(
+				__( 'When selecting "No" for the security survey question, please provide additional details in the text field.', 'paidy-wc' ),
+				{ type: 'snackbar', isDismissible: true, autoDismiss: false }
+			);
+			securityValidationFlag = true;
+		}
+
+		const hasAnyYesCheck = securitySurvey11CheckControl === true || 
+							securitySurvey12CheckControl === true || 
+							securitySurvey13CheckControl === true || 
+							securitySurvey14CheckControl === true;
+
+		if ( !hasAnyYesCheck && !securitySurvey10TextAreaControl?.trim() ) {
+			createErrorNotice(
+				__( 'Since none of the security measures are implemented, please provide details about your security approach in the additional information field.', 'paidy-wc' ),
+				{ type: 'snackbar', isDismissible: true, autoDismiss: false }
+			);
+			securityValidationFlag = true;
+		}
+
 		if ( requiredFlag  ) {
 			createErrorNotice(
 				__( 'Please fill in all the fields.', 'paidy-wc' ),
@@ -107,7 +129,7 @@ const useOnBoardingSettings = () => {
 			return;
 		}
 
-		if ( kanaFlag ) {
+		if ( kanaFlag || securityValidationFlag ) {
 			return;
 		}
 
@@ -151,7 +173,7 @@ const useOnBoardingSettings = () => {
 	};
 
 	return {
-        currentStep,
+		currentStep,
 		setCurrentStep,
 		storeName,
 		setStoreName,

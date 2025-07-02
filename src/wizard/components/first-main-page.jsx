@@ -87,7 +87,6 @@ const FirstMainPage = () => {
 		siteName,
 		setSiteName,
 		storeUrl,
-		setStoreUrl,
 		registEmail,
 		setRegistEmail,
 		contactPhone,
@@ -161,7 +160,6 @@ const FirstMainPage = () => {
         		/>
 				<StoreUrlTextControl
          		  value={ storeUrl }
-				  onChange={ ( value ) => setStoreUrl( value ) } 
 				/>
 				<RegistEmailTextControl 
          		  value={ registEmail }

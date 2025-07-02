@@ -30,13 +30,16 @@ const SiteNameTextControl = ( { value, onChange } ) => {
     );
 }
 
-const StoreUrlTextControl = ( { value, onChange } ) => {
+const StoreUrlTextControl = ( { value } ) => {
     return (
-        <TextControl
-            label={ __( 'Store URL', 'paidy-wc' ) }
-            value={ value }
-            onChange={ onChange }
-        />
+        <div className="components-base-control">
+            <label className="components-base-control__label">
+                { __( 'Store URL', 'paidy-wc' ) }
+            </label>
+            <div className="paidy-readonly-field">
+                { value }
+            </div>
+        </div>
     );
 };
 
@@ -107,6 +110,7 @@ const RepresentativeDateOfBirthTextControl = ( { value, onChange } ) => {
     return (
         <TextControl
             label={ __( 'Representative\'s date of birth (Gregorian calendar)', 'paidy-wc' ) }
+            help={ __( 'Please select a date from the calendar icon on the far right.', 'paidy-wc' ) }
             value={ value }
             type="date"
             onChange={ onChange }
@@ -233,7 +237,7 @@ const SecuritySurvey10TextAreaControl = ( { value, onChange } ) => {
 const SecuritySurvey08RadioControl = ( { value, onChange } ) => {
     return (
         <RadioControl
-            label={ __( 'Have you received any administrative disposition under the Specified Commercial Transactions Act in the past five years? If so, please describe the details.', 'paidy-wc' ) }
+            label={ __( 'Have you received any administrative disposition under the Specified Commercial Transactions Act in the past five years?', 'paidy-wc' ) }
             selected={ value }
             onChange={ onChange }
             options={[
@@ -253,7 +257,7 @@ const SecuritySurvey08RadioControl = ( { value, onChange } ) => {
 const SecuritySurvey09RadioControl = ( { value, onChange } ) => {
     return (
         <RadioControl
-            label={ __( 'Have you ever been sued in a civil lawsuit for violating the Consumer Contract Act and lost the case? If so, please describe the details.', 'paidy-wc' ) }
+            label={ __( 'Have you ever been sued in a civil lawsuit for violating the Consumer Contract Act and lost the case?', 'paidy-wc' ) }
             selected={ value }
             onChange={ onChange }
             options={[

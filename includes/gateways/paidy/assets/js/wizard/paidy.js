@@ -1849,6 +1849,24 @@ const useOnBoardingSettings = () => {
         kanaFlag = true;
       }
     });
+    let securityValidationFlag = false;
+    if (securitySurvey01RadioControl === 'no' && !securitySurvey01TextControl?.trim()) {
+      createErrorNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('When selecting "No" for the security survey question, please provide additional details in the text field.', 'paidy-wc'), {
+        type: 'snackbar',
+        isDismissible: true,
+        autoDismiss: false
+      });
+      securityValidationFlag = true;
+    }
+    const hasAnyYesCheck = securitySurvey11CheckControl === true || securitySurvey12CheckControl === true || securitySurvey13CheckControl === true || securitySurvey14CheckControl === true;
+    if (!hasAnyYesCheck && !securitySurvey10TextAreaControl?.trim()) {
+      createErrorNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Since none of the security measures are implemented, please provide details about your security approach in the additional information field.', 'paidy-wc'), {
+        type: 'snackbar',
+        isDismissible: true,
+        autoDismiss: false
+      });
+      securityValidationFlag = true;
+    }
     if (requiredFlag) {
       createErrorNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Please fill in all the fields.', 'paidy-wc'), {
         type: 'snackbar',
@@ -1857,7 +1875,7 @@ const useOnBoardingSettings = () => {
       });
       return;
     }
-    if (kanaFlag) {
+    if (kanaFlag || securityValidationFlag) {
       return;
     }
     const nextStep = currentStep + 1;
@@ -2048,13 +2066,17 @@ const SiteNameTextControl = ({
   });
 };
 const StoreUrlTextControl = ({
-  value,
-  onChange
+  value
 }) => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Store URL', 'paidy-wc'),
-    value: value,
-    onChange: onChange
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+    className: "components-base-control",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("label", {
+      className: "components-base-control__label",
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Store URL', 'paidy-wc')
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+      className: "paidy-readonly-field",
+      children: value
+    })]
   });
 };
 const RegistEmailTextControl = ({
@@ -2126,6 +2148,7 @@ const RepresentativeDateOfBirthTextControl = ({
 }) => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Representative\'s date of birth (Gregorian calendar)', 'paidy-wc'),
+    help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Please select a date from the calendar icon on the far right.', 'paidy-wc'),
     value: value,
     type: "date",
     onChange: onChange
@@ -2254,7 +2277,7 @@ const SecuritySurvey08RadioControl = ({
   onChange
 }) => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RadioControl, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Have you received any administrative disposition under the Specified Commercial Transactions Act in the past five years? If so, please describe the details.', 'paidy-wc'),
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Have you received any administrative disposition under the Specified Commercial Transactions Act in the past five years?', 'paidy-wc'),
     selected: value,
     onChange: onChange,
     options: [{
@@ -2271,7 +2294,7 @@ const SecuritySurvey09RadioControl = ({
   onChange
 }) => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RadioControl, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Have you ever been sued in a civil lawsuit for violating the Consumer Contract Act and lost the case? If so, please describe the details.', 'paidy-wc'),
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Have you ever been sued in a civil lawsuit for violating the Consumer Contract Act and lost the case?', 'paidy-wc'),
     selected: value,
     onChange: onChange,
     options: [{
@@ -2358,7 +2381,6 @@ const FirstMainPage = () => {
     siteName,
     setSiteName,
     storeUrl,
-    setStoreUrl,
     registEmail,
     setRegistEmail,
     contactPhone,
@@ -2431,8 +2453,7 @@ const FirstMainPage = () => {
             value: siteName,
             onChange: value => setSiteName(value)
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_controls__WEBPACK_IMPORTED_MODULE_6__.StoreUrlTextControl, {
-            value: storeUrl,
-            onChange: value => setStoreUrl(value)
+            value: storeUrl
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_controls__WEBPACK_IMPORTED_MODULE_6__.RegistEmailTextControl, {
             value: registEmail,
             onChange: value => setRegistEmail(value)

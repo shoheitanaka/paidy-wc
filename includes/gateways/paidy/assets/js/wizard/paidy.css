@@ -56,6 +56,9 @@ div#adminmenuwrap, div#adminmenuback {
 .wrap .woocommerce-layout__main .paidy-on-boarding .paidy-basic-info fieldset.components-radio-control {
   margin-bottom: 10px;
 }
+.wrap .woocommerce-layout__main .paidy-on-boarding .paidy-basic-info .paidy-readonly-field {
+  padding: 10px;
+}
 .wrap .woocommerce-layout__main .paidy-on-boarding .paidy-security-survey {
   width: 80%;
   margin: 0 10% 20px;
