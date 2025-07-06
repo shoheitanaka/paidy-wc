@@ -47,7 +47,9 @@ const AgreementInfo = () => {
                 <a href="https://merchant-support.paidy.com/hc/ja/articles/16631714849561-%E3%83%97%E3%83%A9%E3%82%A4%E3%83%90%E3%82%B7%E3%83%BC%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%81%AE%E8%A8%98%E5%85%A5%E4%BE%8B" target="_blank">{ __( 'Example of a privacy policy', 'paidy-wc' ) }</a></li>
                 <li>{ __( 'Paidy Inc. will set up the API key on your e-commerce site via WooCommerce on your behalf.', 'paidy-wc' ) }</li>
                 <li>{ __( 'Our company (Shokunin Kobo LLC) will provide personal information to third parties in the following cases.', 'paidy-wc' ) }</li>
-                <li>{ __( 'When disclosing personal information for the purposes of merchant membership screening by payment companies, etc.', 'paidy-wc' ) }</li>
+                <ul>
+                    <li>{ __( 'When disclosing personal information for the purposes of merchant membership screening by payment companies, etc.', 'paidy-wc' ) }</li>
+                </ul>
             </ol>
         </div>
         </>

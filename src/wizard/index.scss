@@ -26,10 +26,20 @@ div#adminmenuwrap, div#adminmenuback {
         width: 50%;
         margin: auto;
     }
-    ol li{
-      font-size: 1.2em;
-      margin-bottom: 10px;
-      text-align: left;
+    ol {
+      li{
+        font-size: 1.2em;
+        margin-bottom: 10px;
+        text-align: left;
+      }
+      ul{
+        list-style: disc;
+        li{
+          font-size: 1.2em;
+          margin-bottom: 10px;
+          margin-left: 15px;
+        }
+      }
     }
     .paidy-heading{
       width: 100%;

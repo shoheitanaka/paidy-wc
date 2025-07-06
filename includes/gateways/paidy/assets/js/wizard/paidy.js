@@ -1454,8 +1454,10 @@ const AgreementInfo = () => {
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Paidy Inc. will set up the API key on your e-commerce site via WooCommerce on your behalf.', 'paidy-wc')
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Our company (Shokunin Kobo LLC) will provide personal information to third parties in the following cases.', 'paidy-wc')
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('When disclosing personal information for the purposes of merchant membership screening by payment companies, etc.', 'paidy-wc')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("ul", {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('When disclosing personal information for the purposes of merchant membership screening by payment companies, etc.', 'paidy-wc')
+          })
         })]
       })]
     })]
