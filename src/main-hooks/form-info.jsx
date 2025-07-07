@@ -17,7 +17,7 @@ const FlowExplanation = () => {
         </Heading>
         <ol className="paidy-flow">
             <li>{ __( 'Please fill in all the fields on this application screen and click the "Agree to the above and apply" button at the bottom of the screen.', 'paidy-wc' ) }</li>
-            <li>{ __( 'Paidy Co., Ltd. will review your application information and may take up to 10 business days.', 'paidy-wc' ) }</li>
+            <li>{ __( 'Paidy Co., Ltd. will review your application information and may take up to 5 business days.', 'paidy-wc' ) }</li>
             <li>{ __( 'The results will be notified via email and dashboard.', 'paidy-wc' ) }</li>
             <li>{ __( 'If your application is approved, you will be able to activate Paidy from your dashboard.', 'paidy-wc' ) } <br/> 
                 { __( 'If your application is rejected, you will not be able to use Paidy.', 'paidy-wc' ) }</li>
@@ -46,10 +46,7 @@ const AgreementInfo = () => {
                 <li>{ __( 'Add the specified notation to the privacy policy page.', 'paidy-wc' ) }<br />
                 <a href="https://merchant-support.paidy.com/hc/ja/articles/16631714849561-%E3%83%97%E3%83%A9%E3%82%A4%E3%83%90%E3%82%B7%E3%83%BC%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%81%AE%E8%A8%98%E5%85%A5%E4%BE%8B" target="_blank">{ __( 'Example of a privacy policy', 'paidy-wc' ) }</a></li>
                 <li>{ __( 'Paidy Inc. will set up the API key on your e-commerce site via WooCommerce on your behalf.', 'paidy-wc' ) }</li>
-                <li>{ __( 'Our company (Shokunin Kobo LLC) will provide personal information to third parties in the following cases.', 'paidy-wc' ) }</li>
-                <ul>
-                    <li>{ __( 'When disclosing personal information for the purposes of merchant membership screening by payment companies, etc.', 'paidy-wc' ) }</li>
-                </ul>
+                <li>{ __( 'Our company (Shokunin Kobo LLC) will provide personal information to third parties when disclosing such information for purposes such as member store screening by payment companies.', 'paidy-wc' ) }</li>
             </ol>
         </div>
         </>
@@ -64,7 +61,7 @@ const ApplyCompletedMessage = () => {
             </Heading>
             <p>{ __( 'Thank you for your application. We will notify you of the results via email and dashboard.', 'paidy-wc' ) }</p>
             <ul>
-                <li>{ __( 'The review process may take up to 10 business days.', 'paidy-wc' ) }</li>
+                <li>{ __( 'The review process may take up to 5 business days.', 'paidy-wc' ) }</li>
                 <li>{ __( 'Inquiries regarding screening: sales@paidy.com', 'paidy-wc' ) }</li>
             </ul>
         </div>

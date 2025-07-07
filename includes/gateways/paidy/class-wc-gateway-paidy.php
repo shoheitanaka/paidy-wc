@@ -236,17 +236,21 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			'api_public_key'      => array(
 				'title'       => __( 'API Public Key', 'paidy-wc' ),
 				'type'        => 'text',
-				// translators: %s: API Public Key.
-				'description' => sprintf( __( 'Please enter %s from Paidy Admin site.', 'paidy-wc' ), __( 'API Public Key', 'paidy-wc' ) ),
+				// API Public Key.
+				'description' => sprintf(
+					/* translators: %s: Enter Key. */
+					__( 'Please enter %s from Paidy Admin site.', 'paidy-wc' ),
+					__( 'API Public Key', 'paidy-wc' )
+				),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
 			'api_secret_key'      => array(
 				'title'       => __( 'API Secret Key', 'paidy-wc' ),
 				'type'        => 'password',
-				// translators: %s: API Secret Key.
+				// API Secret Key.
 				'description' => sprintf(
-					/* translators: %s: API Secret Key. */
+					/* translators: %s: Enter Key. */
 					__( 'Please enter %s from Paidy Admin site.', 'paidy-wc' ),
 					__( 'API Secret Key', 'paidy-wc' )
 				),
@@ -256,16 +260,24 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			'test_api_public_key' => array(
 				'title'       => __( 'Test API Public Key', 'paidy-wc' ),
 				'type'        => 'text',
-				// translators: %s: Test API Public Key.
-				'description' => sprintf( __( 'Please enter %s from Paidy Admin site.', 'paidy-wc' ), __( 'Test API Public Key', 'paidy-wc' ) ),
+				// Test API Public Key.
+				'description' => sprintf(
+					/* translators: %s: Enter Key. */
+					__( 'Please enter %s from Paidy Admin site.', 'paidy-wc' ),
+					__( 'Test API Public Key', 'paidy-wc' )
+				),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
 			'test_api_secret_key' => array(
 				'title'       => __( 'Test API Secret Key', 'paidy-wc' ),
 				'type'        => 'password',
-				// translators: %s: Test API Secret Key.
-				'description' => sprintf( __( 'Please enter %s from Paidy Admin site.', 'paidy-wc' ), __( 'Test API Secret Key', 'paidy-wc' ) ),
+				// Test API Secret Key.
+				'description' => sprintf(
+					/* translators: %s: Enter Key. */
+					__( 'Please enter %s from Paidy Admin site.', 'paidy-wc' ),
+					__( 'Test API Secret Key', 'paidy-wc' )
+				),
 				'default'     => '',
 				'desc_tip'    => true,
 			),

@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import { useEffect, useState } from '@wordpress/element';
@@ -76,7 +76,8 @@ const useOnBoardingSettings = () => {
 		requiredFields.forEach( ( field ) => {
 			if ( ! field.value ) {
 				createErrorNotice(
-					__( '%s is a required field. Please enter it.', 'paidy-wc').replace( '%s', field.label ),
+					/* translators: %s: field label name */
+					sprintf( __( '%s is a required field. Please enter it.', 'paidy-wc' ), field.label ),
 					{ type: 'snackbar', isDismissible: true, autoDismiss: false }
 				);
 				requiredFlag = true;
@@ -92,7 +93,8 @@ const useOnBoardingSettings = () => {
 		requiredKanaFields.forEach( ( field ) => {
 			if ( ! fullWidthKatakanaRegex.test( field.value ) ) {
 				createErrorNotice(
-					__( '%s must be in full-width katakana. Please confirm.', 'paidy-wc').replace( '%s', field.label ),
+					/* translators: %s: field label name */
+					sprintf( __( '%s must be in full-width katakana. Please confirm.', 'paidy-wc'), field.label ),
 					{ type: 'snackbar', isDismissible: true, autoDismiss: false }
 				);
 			kanaFlag = true;

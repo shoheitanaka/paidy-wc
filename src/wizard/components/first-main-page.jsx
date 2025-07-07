@@ -336,7 +336,10 @@ const FirstMainPage = () => {
 			<SettingsTitle />
 			<div className="paidy-on-boarding__description">
 				<p>
-					{ sprintf( __('Easy PayPay setup now available with %s!', 'paidy-wc'), pluginName ) }<br/>
+					{
+					  /* translators: %s: plugin name */
+					  sprintf( __('Easy Paidy setup now available with %s!', 'paidy-wc'), pluginName ) 
+					}<br/>
 					{__('Right now, we are offering a one-month trial with no payment fees!', 'paidy-wc')}
 				</p>
 			</div>
@@ -366,7 +369,10 @@ const FirstMainPage = () => {
 					{__('Currently used on over 700,000 websites nationwide, including Amazon. Industry-leading track record.', 'paidy-wc')}<br/>
 				</p>
 				<p className="paidy-on-boarding__description-text">
-					♦️{sprintf( __('%s * Paidy', 'paidy-wc'), pluginName )}<br/>
+					♦️{
+					/* translators: %s: plugin name */
+					sprintf( __('%s * Paidy', 'paidy-wc'), pluginName )
+					}<br/>
 					{__('With this update, Paidy can now be installed in as little as 30 seconds!', 'paidy-wc')}<br/>
 					{__('No initial or monthly fees.', 'paidy-wc')}<br/>
 					{__('The review process is completed in as little as 1-2 days, and setup is easy.', 'paidy-wc')}<br/>

@@ -87,22 +87,52 @@ class WC_Paidy_Endpoint {
 					} else {
 						$order->payment_complete();
 					}
-					// translators: %s: authorization status of the order.
-					$order->add_order_note( sprintf( __( 'It succeeded to check the %s of the order in Paidy Webhook.', 'paidy-wc' ), __( 'authorization', 'paidy-wc' ) ) );
+					$order->add_order_note(
+						// Authorization status.
+						sprintf(
+							// translators: %s: status of the order.
+							__( 'It succeeded to check the %s of the order in Paidy Webhook.', 'paidy-wc' ),
+							__( 'authorization', 'paidy-wc' )
+						)
+					);
 				} elseif ( 'authorize_success' === $main_data['status'] && 'processing' === $status ) {
 					$order->add_order_note( __( 'This order status is processing, this site received authorize_success from the Paidy webhook.', 'paidy-wc' ) );
 				} elseif ( 'capture_success' === $main_data['status'] && 'completed' === $status ) {
-					// translators: %s: completed status of the order.
-					$order->add_order_note( sprintf( __( 'It succeeded to check the %s of the order in Paidy Webhook.', 'paidy-wc' ), __( 'completed', 'paidy-wc' ) ) );
+					$order->add_order_note(
+						// Completed status.
+						sprintf(
+							// translators: %s: status of the order.
+							__( 'It succeeded to check the %s of the order in Paidy Webhook.', 'paidy-wc' ),
+							__( 'completed', 'paidy-wc' )
+						)
+					);
 				} elseif ( 'close_success' === $main_data['status'] && 'cancelled' === $status ) {
-					// translators: %s: cancelled status of the order.
-					$order->add_order_note( sprintf( __( 'It succeeded to check the %s of the order in Paidy Webhook.', 'paidy-wc' ), __( 'cancelled', 'paidy-wc' ) ) );
+					$order->add_order_note(
+						// Cancelled status.
+						sprintf(
+							// translators: %s: status of the order.
+							__( 'It succeeded to check the %s of the order in Paidy Webhook.', 'paidy-wc' ),
+							__( 'cancelled', 'paidy-wc' )
+						)
+					);
 				} elseif ( 'close_success' === $main_data['status'] && 'completed' === $status ) {
-					// translators: %s: close status of the order.
-					$order->add_order_note( sprintf( __( 'It succeeded to check the %s of the order in Paidy Webhook.', 'paidy-wc' ), __( 'close', 'paidy-wc' ) ) );
+					$order->add_order_note(
+						// Close status.
+						sprintf(
+							// translators: %s: status of the order.
+							__( 'It succeeded to check the %s of the order in Paidy Webhook.', 'paidy-wc' ),
+							__( 'close', 'paidy-wc' )
+						)
+					);
 				} elseif ( 'refund_success' === $main_data['status'] && 'refunded' === $status ) {
-					// translators: %s: refunded status of the order.
-					$order->add_order_note( sprintf( __( 'It succeeded to check the %s of the order in Paidy Webhook.', 'paidy-wc' ), __( 'refunded', 'paidy-wc' ) ) );
+					$order->add_order_note(
+						// Refunded status.
+						sprintf(
+							// translators: %s: status of the order.
+							__( 'It succeeded to check the %s of the order in Paidy Webhook.', 'paidy-wc' ),
+							__( 'refunded', 'paidy-wc' )
+						)
+					);
 				} else {
 					// translators: %s: status of the order.
 					$order->add_order_note( sprintf( __( 'The system received a notification for order %s via Paidy Webhook.', 'paidy-wc' ), $main_data['status'] ) );

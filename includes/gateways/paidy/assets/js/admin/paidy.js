@@ -1412,7 +1412,7 @@ const UnderReviewMessage = () => {
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Thank you for your application. We will notify you of the results via email and dashboard.', 'paidy-wc')
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("ul", {
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("li", {
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('The review process may take up to 10 business days.', 'paidy-wc')
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('The review process may take up to 5 business days.', 'paidy-wc')
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("li", {
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Inquiries regarding screening: sales@paidy.com', 'paidy-wc')
       })]
@@ -1596,7 +1596,7 @@ const FlowExplanation = () => {
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Please fill in all the fields on this application screen and click the "Agree to the above and apply" button at the bottom of the screen.', 'paidy-wc')
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Paidy Co., Ltd. will review your application information and may take up to 10 business days.', 'paidy-wc')
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Paidy Co., Ltd. will review your application information and may take up to 5 business days.', 'paidy-wc')
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('The results will be notified via email and dashboard.', 'paidy-wc')
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("li", {
@@ -1642,11 +1642,7 @@ const AgreementInfo = () => {
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Paidy Inc. will set up the API key on your e-commerce site via WooCommerce on your behalf.', 'paidy-wc')
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Our company (Shokunin Kobo LLC) will provide personal information to third parties in the following cases.', 'paidy-wc')
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("ul", {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('When disclosing personal information for the purposes of merchant membership screening by payment companies, etc.', 'paidy-wc')
-          })
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Our company (Shokunin Kobo LLC) will provide personal information to third parties when disclosing such information for purposes such as member store screening by payment companies.', 'paidy-wc')
         })]
       })]
     })]
@@ -1662,7 +1658,7 @@ const ApplyCompletedMessage = () => {
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Thank you for your application. We will notify you of the results via email and dashboard.', 'paidy-wc')
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("ul", {
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('The review process may take up to 10 business days.', 'paidy-wc')
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('The review process may take up to 5 business days.', 'paidy-wc')
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Inquiries regarding screening: sales@paidy.com', 'paidy-wc')
       })]
@@ -2013,7 +2009,8 @@ const useOnBoardingSettings = () => {
     }];
     requiredFields.forEach(field => {
       if (!field.value) {
-        createErrorNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('%s is a required field. Please enter it.', 'paidy-wc').replace('%s', field.label), {
+        createErrorNotice(/* translators: %s: field label name */
+        (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('%s is a required field. Please enter it.', 'paidy-wc'), field.label), {
           type: 'snackbar',
           isDismissible: true,
           autoDismiss: false
@@ -2032,7 +2029,8 @@ const useOnBoardingSettings = () => {
     }];
     requiredKanaFields.forEach(field => {
       if (!fullWidthKatakanaRegex.test(field.value)) {
-        createErrorNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('%s must be in full-width katakana. Please confirm.', 'paidy-wc').replace('%s', field.label), {
+        createErrorNotice(/* translators: %s: field label name */
+        (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('%s must be in full-width katakana. Please confirm.', 'paidy-wc'), field.label), {
           type: 'snackbar',
           isDismissible: true,
           autoDismiss: false
