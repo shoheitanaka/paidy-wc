@@ -34,7 +34,7 @@ const UnderReviewMessage = () => {
             </Heading>
             <p>{ __( 'Thank you for your application. We will notify you of the results via email and dashboard.', 'paidy-wc' ) }</p>
             <ul>
-                <li>{ __( 'The review process may take up to 10 business days.', 'paidy-wc' ) }</li>
+                <li>{ __( 'The review process may take up to 5 business days.', 'paidy-wc' ) }</li>
                 <li>{ __( 'Inquiries regarding screening: sales@paidy.com', 'paidy-wc' ) }</li>
             </ul>
         </div>

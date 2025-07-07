@@ -37,6 +37,14 @@ div#adminmenuwrap, div#adminmenuback {
   margin-bottom: 10px;
   text-align: left;
 }
+.wrap .woocommerce-layout__main .paidy-on-boarding ol ul {
+  list-style: disc;
+}
+.wrap .woocommerce-layout__main .paidy-on-boarding ol ul li {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  margin-left: 15px;
+}
 .wrap .woocommerce-layout__main .paidy-on-boarding .paidy-heading {
   width: 100%;
   margin-bottom: 20px;
@@ -55,6 +63,9 @@ div#adminmenuwrap, div#adminmenuback {
 }
 .wrap .woocommerce-layout__main .paidy-on-boarding .paidy-basic-info fieldset.components-radio-control {
   margin-bottom: 10px;
+}
+.wrap .woocommerce-layout__main .paidy-on-boarding .paidy-basic-info .paidy-readonly-field {
+  padding: 10px;
 }
 .wrap .woocommerce-layout__main .paidy-on-boarding .paidy-security-survey {
   width: 80%;

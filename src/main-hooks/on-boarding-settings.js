@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import { useEffect, useState } from '@wordpress/element';
@@ -76,7 +76,8 @@ const useOnBoardingSettings = () => {
 		requiredFields.forEach( ( field ) => {
 			if ( ! field.value ) {
 				createErrorNotice(
-					__( '%s is a required field. Please enter it.', 'paidy-wc').replace( '%s', field.label ),
+					/* translators: %s: field label name */
+					sprintf( __( '%s is a required field. Please enter it.', 'paidy-wc' ), field.label ),
 					{ type: 'snackbar', isDismissible: true, autoDismiss: false }
 				);
 				requiredFlag = true;
@@ -92,12 +93,35 @@ const useOnBoardingSettings = () => {
 		requiredKanaFields.forEach( ( field ) => {
 			if ( ! fullWidthKatakanaRegex.test( field.value ) ) {
 				createErrorNotice(
-					__( '%s must be in full-width katakana. Please confirm.', 'paidy-wc').replace( '%s', field.label ),
+					/* translators: %s: field label name */
+					sprintf( __( '%s must be in full-width katakana. Please confirm.', 'paidy-wc'), field.label ),
 					{ type: 'snackbar', isDismissible: true, autoDismiss: false }
 				);
 			kanaFlag = true;
 			}
 		} );
+
+		let securityValidationFlag = false;
+		if ( securitySurvey01RadioControl === 'no' && !securitySurvey01TextControl?.trim() ) {
+			createErrorNotice(
+				__( 'When selecting "No" for the security survey question, please provide additional details in the text field.', 'paidy-wc' ),
+				{ type: 'snackbar', isDismissible: true, autoDismiss: false }
+			);
+			securityValidationFlag = true;
+		}
+
+		const hasAnyYesCheck = securitySurvey11CheckControl === true || 
+							securitySurvey12CheckControl === true || 
+							securitySurvey13CheckControl === true || 
+							securitySurvey14CheckControl === true;
+
+		if ( !hasAnyYesCheck && !securitySurvey10TextAreaControl?.trim() ) {
+			createErrorNotice(
+				__( 'Since none of the security measures are implemented, please provide details about your security approach in the additional information field.', 'paidy-wc' ),
+				{ type: 'snackbar', isDismissible: true, autoDismiss: false }
+			);
+			securityValidationFlag = true;
+		}
 
 		if ( requiredFlag  ) {
 			createErrorNotice(
@@ -107,7 +131,7 @@ const useOnBoardingSettings = () => {
 			return;
 		}
 
-		if ( kanaFlag ) {
+		if ( kanaFlag || securityValidationFlag ) {
 			return;
 		}
 
@@ -151,7 +175,7 @@ const useOnBoardingSettings = () => {
 	};
 
 	return {
-        currentStep,
+		currentStep,
 		setCurrentStep,
 		storeName,
 		setStoreName,
