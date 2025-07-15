@@ -42,11 +42,19 @@ class WC_Paidy_Settings_Controller {
 	 * @return void
 	 */
 	public function paidy_admin_settings_scripts( $hook_suffix ) {
-		if ( 'woocommerce_page_wc-settings' !== $hook_suffix ) {
+		$screen = get_current_screen();
+		if ( 'woocommerce_page_wc-settings' !== $hook_suffix && ( is_object( $screen ) && 'dashboard' !== $screen->id ) ) {
 			return;
 		}
 
+		$display_flag = false;
 		if ( is_admin() && isset( $_GET['section'] ) && 'paidy' === $_GET['section'] ) {// phpcs:ignore
+			$display_flag = true;
+		}
+		if ( is_object( $screen ) && 'dashboard' === $screen->id ) {
+			$display_flag = true;
+		}
+		if ( $display_flag ) {
 			$handle = 'paidy-admin-setting-script';
 
 			$script_path       = 'includes/gateways/paidy/assets/js/admin/paidy.js';

@@ -86,8 +86,17 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 			require_once __DIR__ . '/includes/gateways/paidy/class-wc-gateway-paidy.php';
 
 			// Endpoints.
+			if ( ! class_exists( 'WC_Paidy_Endpoint' ) ) {
+				require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-endpoint.php';
+				new WC_Paidy_Endpoint();
+			}
 			require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-endpoint.php';
-			new WC_Paidy_Endpoint();
+
+			// Admin dashboard.
+			if ( ! class_exists( 'WC_Paidy_Apply_Admin_Dashboard' ) ) {
+				require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-apply-admin-dashboard.php';
+				new WC_Paidy_Apply_Admin_Dashboard();
+			}
 		}
 
 		/**
