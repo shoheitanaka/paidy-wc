@@ -583,7 +583,6 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 						}
 					}
 				};
-
 				var paidyHandler = Paidy.configure(config);
 				function paidyPay() {
 					var payload = {
@@ -611,7 +610,6 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 						"order": {
 							"items": [
 						<?php echo $items;// phpcs:ignore ?>
-
 							],
 							"order_ref": "<?php echo esc_js( $paidy_order_ref ); ?>",
 					<?php
@@ -699,6 +697,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * @param string $hook_suffix Hook suffix.
 	 */
 	public function paidy_admin_enqueue_scripts( $hook_suffix ) {
+		$screen = get_current_screen();
 		if ( 'woocommerce_page_wc-settings' !== $hook_suffix ) {
 			return;
 		}
@@ -712,7 +711,6 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				WC_PAIDY_VERSION,
 				true
 			);
-
 		}
 	}
 

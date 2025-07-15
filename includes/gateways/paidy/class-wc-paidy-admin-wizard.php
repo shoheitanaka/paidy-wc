@@ -103,6 +103,7 @@ class WC_Paidy_Admin_Wizard {
 			WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/wizard/paidy.js',
 			$asset['dependencies'],
 			$asset['version'],
+			true
 		);
 
 		wp_enqueue_style(
@@ -324,10 +325,13 @@ class WC_Paidy_Admin_Wizard {
 			return;
 		}
 		if ( isset( $value['currentStep'] ) && 2 === $value['currentStep'] && 1 === $old_value['currentStep'] ) {
+
 			// Update the site hash and hash in options.
 			if ( ! get_option( 'paidy_site_hash' ) ) {
 				$site_hash = $this->generate_random_string( 16 );
 				add_option( 'paidy_site_hash', $site_hash );
+			} else {
+				$site_hash = get_option( 'paidy_site_hash' );
 			}
 			$result = $this->send_apply_data_to_wcartws( $value, $site_hash );
 		}
@@ -507,7 +511,8 @@ class WC_Paidy_Admin_Wizard {
 	 * Outputs the closing div tag for the payment settings section.
 	 */
 	public function paidy_after_settings_checkout() {
-		if ( isset( $_GET['section'] ) && $_GET['section'] === $this->id ) {// phpcs:ignore WordPress.Security.NonceVerification.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['section'] ) && $_GET['section'] === $this->id ) {
 			if ( isset( $this->paidy_settings['api_public_key'] ) && isset( $this->paidy_settings['test_api_public_key'] ) ) {
 				return;
 			} else {

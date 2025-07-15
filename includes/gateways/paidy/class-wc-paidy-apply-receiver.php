@@ -111,7 +111,13 @@ class WC_Paidy_Apply_Receiver {
 				'public_test_key' => openssl_decrypt( base64_decode( $filtered_params['public_test_key'] ), $method, $key, 0, $iv ),
 				'secret_test_key' => openssl_decrypt( base64_decode( $filtered_params['secret_test_key'] ), $method, $key, 0, $iv ),
 			);
-			$filtered_params = array_merge( $filtered_params, array_intersect_key( $decrypted, $filtered_params ) );
+			$filtered_params = array_merge(
+				$filtered_params,
+				array_intersect_key( $decrypted, $filtered_params )
+			);
+			$logger          = wc_get_logger( 'paidy' );
+			$logger->info( 'Paidy recieved result data: ' . json_encode( $filtered_params ) );
+
 			if ( isset( $filtered_params['paidy_status'] ) ) {
 				$paidy_status         = $filtered_params['paidy_status'];
 				$allowed_status_array = array( 'approved', 'rejected', 'canceled' );
@@ -128,30 +134,42 @@ class WC_Paidy_Apply_Receiver {
 				$current_step                           = isset( $woocommerce_paidy_on_boarding_settings['currentStep'] ) ? $woocommerce_paidy_on_boarding_settings['currentStep'] : 0;
 				if ( 'approved' === $paidy_status ) {
 					// Process approved status.
-					if ( $current_step < 3 ) {
-						// Update the current step to 3 if it's less than 3.
-						$woocommerce_paidy_on_boarding_settings['currentStep'] = 3;
-						update_option( 'woocommerce_paidy_on_boarding_settings', $woocommerce_paidy_on_boarding_settings );
-						$woocommerce_paidy_settings                        = get_option( 'woocommerce_paidy_settings', array() );
-						$woocommerce_paidy_settings['api_public_key']      = $filtered_params['public_live_key'];
-						$woocommerce_paidy_settings['api_secret_key']      = $filtered_params['secret_live_key'];
-						$woocommerce_paidy_settings['test_api_public_key'] = $filtered_params['public_test_key'];
-						$woocommerce_paidy_settings['test_api_secret_key'] = $filtered_params['secret_test_key'];
-						$woocommerce_paidy_settings['environment']         = '';
-						update_option( 'woocommerce_paidy_settings', $woocommerce_paidy_settings );
-					}
-					do_action( 'paidy_application_approved', $filtered_params );
-				} elseif ( 'rejected' === $paidy_status ) {
-					// Process rejected status.
-					$woocommerce_paidy_on_boarding_settings['currentStep'] = 99;
+					$woocommerce_paidy_on_boarding_settings['currentStep'] = 3;
 					update_option( 'woocommerce_paidy_on_boarding_settings', $woocommerce_paidy_on_boarding_settings );
+
+					$woocommerce_paidy_settings                        = get_option( 'woocommerce_paidy_settings', array() );
+					$woocommerce_paidy_settings['api_public_key']      = $filtered_params['public_live_key'];
+					$woocommerce_paidy_settings['api_secret_key']      = $filtered_params['secret_live_key'];
+					$woocommerce_paidy_settings['test_api_public_key'] = $filtered_params['public_test_key'];
+					$woocommerce_paidy_settings['test_api_secret_key'] = $filtered_params['secret_test_key'];
+					$woocommerce_paidy_settings['environment']         = '';
+					update_option( 'woocommerce_paidy_settings', $woocommerce_paidy_settings );
+
+					do_action( 'paidy_application_approved', $filtered_params );
+				} elseif ( 'rejected' === $paidy_status || 'canceled' === $paidy_status ) {
+					if ( 'canceled' === $paidy_status ) {
+						// Process canceled status.
+						delete_option( 'woocommerce_paidy_on_boarding_settings' );
+					} else {
+						// Process rejected status.
+						$woocommerce_paidy_on_boarding_settings['currentStep'] = 99;
+						update_option( 'woocommerce_paidy_on_boarding_settings', $woocommerce_paidy_on_boarding_settings );
+					}
+
+					$woocommerce_paidy_settings                        = get_option( 'woocommerce_paidy_settings', array() );
+					$woocommerce_paidy_settings['api_public_key']      = '';
+					$woocommerce_paidy_settings['api_secret_key']      = '';
+					$woocommerce_paidy_settings['test_api_public_key'] = '';
+					$woocommerce_paidy_settings['test_api_secret_key'] = '';
+					$woocommerce_paidy_settings['environment']         = '';
+					update_option( 'woocommerce_paidy_settings', $woocommerce_paidy_settings );
+
 					do_action( 'paidy_application_rejected', $filtered_params );
 				}
 			}
 
 			// Save data to wp_option.
 			$saved = update_option( 'paidy_received_data', $filtered_params, false );
-			wc_get_logger( 'paidy' )->info( 'Saved data: ' . $saved );
 			if ( false === $saved ) {
 				// If update_option fails, try to add it.
 				$saved = add_option( 'paidy_received_data', $filtered_params, '', 'no' );
