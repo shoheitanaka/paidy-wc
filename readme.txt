@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=info@art
 Tags: woocommerce, ecommerce, japanese, payment, paidy
 Requires at least: 5.0
 Tested up to: 6.7.1
-Stable tag: 1.4.8.1
+Stable tag: 1.5.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -69,20 +69,6 @@ A: No, after application, it becomes available after providing information such 
 
 == Changelog ==
 
-= 1.4.7 - 2024-12-30 =
-* Tweak - Compliance with WordPress coding rules and security measures
-* Fixed - Support situations in which translations are inadvertently loaded too early.
-
-= 1.4.0 - 2024-01-30 =
-* Dev - Support for custom Payment Request Buttons when using the Checkout block.
-
-= 1.3.0 - 2023-08-03 =
-* Update - Compatible HPOS
-* Update - Changed the required version of WooCommerce to 6.0 or higher.
-
-= 1.2.0 - 2023-02-28 =
-* Update - update 1.2 Version.
-* Dev - New anounce and log.
-* Dev - Add metadata to WooCommerce for checking.
-* Dev - Allow to buy the content products.
-* Update - Framework Version 2.0.12
+= 1.5.0 - 2025-07-30 =
+* Dev - Payment application wizard function added.
+* Fixed - Some bugs Fixed.
