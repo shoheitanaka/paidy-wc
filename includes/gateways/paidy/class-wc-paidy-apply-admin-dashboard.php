@@ -28,6 +28,13 @@ class WC_Paidy_Apply_Admin_Dashboard {
 	public $current_step;
 
 	/**
+	 * Notices (array)
+	 *
+	 * @var array
+	 */
+	public $notices = array();
+
+	/**
 	 * Constructor.
 	 *
 	 * Sets up the admin dashboard for Paidy application status.
@@ -38,6 +45,7 @@ class WC_Paidy_Apply_Admin_Dashboard {
 
 		add_action( 'admin_notices', array( $this, 'paidy_apply_notice' ), 0 );
 		add_action( 'network_admin_notices', array( $this, 'paidy_apply_notice' ), 0 );
+		add_action( 'wp_loaded', array( $this, 'hide_notices' ) );
 	}
 
 	/**
@@ -59,10 +67,16 @@ class WC_Paidy_Apply_Admin_Dashboard {
 		}
 
 		if ( 2 === $this->current_step || 3 === $this->current_step || 99 === $this->current_step ) {
-			echo '<div class="notice notice-info"><p>';
-			// 2: Apply Completed ,3: Approved, 99: Error.
-			$this->paidy_apply_approved();
-			echo '</p></div>';
+			$notice_key         = 'paidy_apply_notice_' . $this->current_step;
+			$notice_dismissible = get_option( 'wc_' . $notice_key ) ? get_option( 'wc_' . $notice_key ) : 'yes';
+			if ( 'no' !== $notice_dismissible ) {
+				echo '<div class="notice notice-info">';
+				echo '<a href="' . esc_url( wp_nonce_url( add_query_arg( 'wc-paidy-apply-hide-notice', $notice_key ), 'wc_paidy_apply_hide_notices_nonce', '_wc_paidy_apply_notice_nonce' ) ) . '" class="woocommerce-message-close notice-dismiss" style="position:relative;float:right;padding:9px 0 9px 9px;text-decoration:none;"></a>';
+				echo '<p>';
+				// 2: Apply Completed ,3: Approved, 99: Error.
+				$this->paidy_apply_approved();
+				echo '</p></div>';
+			}
 		}
 	}
 
@@ -73,5 +87,37 @@ class WC_Paidy_Apply_Admin_Dashboard {
 	 */
 	public function paidy_apply_approved() {
 		echo '<div id="paidy-admin-settings"></div>';
+	}
+
+	/**
+	 * Hides any admin notices.
+	 *
+	 * @since 1.0.0
+	 * @version 1.1.0
+	 */
+	public function hide_notices() {
+		if ( isset( $_GET['wc-paidy-apply-hide-notice'] ) && isset( $_GET['_wc_paidy_apply_notice_nonce'] ) ) {
+			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wc_paidy_apply_notice_nonce'] ) ), 'wc_paidy_apply_hide_notices_nonce' ) ) {
+				wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'paidy-wc' ) );
+			}
+
+			if ( ! current_user_can( 'manage_woocommerce' ) ) {
+				wp_die( esc_html__( 'Cheatin&#8217; huh?', 'paidy-wc' ) );
+			}
+
+			$notice = isset( $_GET['wc-paidy-apply-hide-notice'] ) ? sanitize_text_field( wp_unslash( $_GET['wc-paidy-apply-hide-notice'] ) ) : '';
+
+			switch ( $notice ) {
+				case 'paidy_apply_notice_2':
+					update_option( 'wc_paidy_apply_notice_2', 'no' );
+					break;
+				case 'paidy_apply_notice_3':
+					update_option( 'wc_paidy_apply_notice_3', 'no' );
+					break;
+				case 'paidy_apply_notice_99':
+					update_option( 'wc_paidy_apply_notice_99', 'no' );
+					break;
+			}
+		}
 	}
 }
