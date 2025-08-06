@@ -53,15 +53,15 @@ final class WC_Payments_Paidy_Blocks_Support extends AbstractPaymentMethodType {
 	 * @return array
 	 */
 	public function get_payment_method_script_handles() {
-		$script_path       = '/includes/gateways/paidy/assets/js/frontend/paidy.js';
-		$script_asset_path = WC_PAIDY_ABSPATH . 'includes/gateways/paidy/assets/js/frontend/paidy.asset.php';
+		$script_path       = 'frontend/paidy.js';
+		$script_asset_path = WC_PAIDY_ASSETS_ABSPATH . 'frontend/paidy.asset.php';
 		$script_asset      = file_exists( $script_asset_path )
 			? require $script_asset_path
 			: array(
 				'dependencies' => array(),
 				'version'      => '1.2.0',
 			);
-		$script_url        = WC_PAIDY_PLUGIN_URL . $script_path;
+		$script_url        = WC_PAIDY_BLOCKS_URL . $script_path;
 
 		wp_register_script(
 			'wc-paidy-payments-blocks',
@@ -101,7 +101,7 @@ final class WC_Payments_Paidy_Blocks_Support extends AbstractPaymentMethodType {
 	private function get_icons() {
 		$icons_src = array(
 			'paidy' => array(
-				'src' => WC_PAIDY_PLUGIN_URL . 'assets/images/paidy_logo_100_2023.png',
+				'src' => WC_PAIDY_ASSETS_URL . 'images/paidy_logo_100_2023.png',
 				'alt' => __( 'Paidy', 'paidy-wc' ),
 			),
 		);

@@ -57,8 +57,8 @@ class WC_Paidy_Settings_Controller {
 		if ( $display_flag ) {
 			$handle = 'paidy-admin-setting-script';
 
-			$script_path       = 'includes/gateways/paidy/assets/js/admin/paidy.js';
-			$script_asset_path = WC_PAIDY_ABSPATH . 'includes/gateways/paidy/assets/js/admin/paidy.asset.php';
+			$script_path       = 'admin/paidy.js';
+			$script_asset_path = WC_PAIDY_ASSETS_ABSPATH . 'admin/paidy.asset.php';
 			$script_asset      = file_exists( $script_asset_path )
 				? require $script_asset_path
 				: array(
@@ -66,7 +66,7 @@ class WC_Paidy_Settings_Controller {
 					'version'      => '1.2.1',
 				);
 
-			$script_url = WC_PAIDY_PLUGIN_URL . $script_path;
+			$script_url = WC_PAIDY_BLOCKS_URL . $script_path;
 			wp_register_script(
 				$handle,
 				$script_url,
@@ -78,7 +78,7 @@ class WC_Paidy_Settings_Controller {
 			// Enqueue CSS.
 			wp_enqueue_style(
 				$handle,
-				WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/admin/paidy.css',
+				WC_PAIDY_BLOCKS_URL . 'admin/paidy.css',
 				array_filter(
 					$script_asset['dependencies'],
 					function ( $style ) {

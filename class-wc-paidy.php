@@ -64,7 +64,10 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 			define( 'JP4WC_PAIDY_FRAMEWORK_VERSION', $this->framework_version );
 			// Paidy for WooCommerce plugin url.
 			define( 'WC_PAIDY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+			define( 'WC_PAIDY_ASSETS_URL', WC_PAIDY_PLUGIN_URL . 'assets/' );
+			define( 'WC_PAIDY_BLOCKS_URL', WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/' );
 			define( 'WC_PAIDY_ABSPATH', __DIR__ . '/' );
+			define( 'WC_PAIDY_ASSETS_ABSPATH', WC_PAIDY_ABSPATH . 'includes/gateways/paidy/assets/js/' );
 			// Paidy for WooCommerce plugin file.
 			define( 'WC_PAIDY_PLUGIN_FILE', __FILE__ );
 			$this->init();

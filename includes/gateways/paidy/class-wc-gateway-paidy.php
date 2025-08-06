@@ -135,7 +135,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 */
 	public function __construct() {
 		$this->id         = 'paidy';
-		$this->icon       = apply_filters( 'woocommerce_paidy_icon', WC_PAIDY_PLUGIN_URL . 'assets/images/paidy_logo_100_2023.png' );
+		$this->icon       = apply_filters( 'woocommerce_paidy_icon', WC_PAIDY_ASSETS_URL . 'images/paidy_logo_100_2023.png' );
 		$this->has_fields = false;
 		// translators: %s: Payment method name.
 		$this->order_button_text = sprintf( __( 'Proceed to %s', 'paidy-wc' ), __( 'Paidy', 'paidy-wc' ) );
@@ -323,7 +323,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		?>
 		<br />
 		<a href="https://paidy.com/consumer" target="_blank" class="jp4wc-paidy-icon">
-			<img src="<?php echo esc_url( WC_PAIDY_PLUGIN_URL . 'assets/images/paidy_checkout_2023_320x100.png' ); ?>" alt="Paidy 翌月まとめてお支払い" style="max-height: none; float: none;">
+			<img src="<?php echo esc_url( WC_PAIDY_ASSETS_URL . 'images/paidy_checkout_2023_320x100.png' ); ?>" alt="Paidy 翌月まとめてお支払い" style="max-height: none; float: none;">
 		</a>
 		<br />
 		<p class="jp4wc-paidy-description"><?php echo esc_html( $this->description ); ?></p>
@@ -355,7 +355,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * @return string HTML content explaining Paidy payment method.
 	 */
 	protected function paidy_explanation() {
-		$image_url    = WC_PAIDY_PLUGIN_URL . 'assets/images/paidy_checkout_2023_320x100.png';
+		$image_url    = WC_PAIDY_ASSETS_URL . 'images/paidy_checkout_2023_320x100.png';
 		$explain_html = '
         <div class="jp4wc-paidy-explanation">
 		<img src="' . esc_url( $image_url ) . '" alt="Paidy 翌月まとめてお支払い" style="max-height: none; float: none;">
@@ -665,7 +665,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 
 			wp_enqueue_script(
 				'paidy-redirect',
-				WC_PAIDY_PLUGIN_URL . 'assets/js/jp4wc-paidy.js',
+				WC_PAIDY_ASSETS_URL . 'js/jp4wc-paidy.js',
 				array(),
 				WC_PAIDY_VERSION,
 				true
@@ -682,7 +682,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				// Paidy Payment for Checkout page.
 				wp_register_style(
 					'jp4wc-paidy',
-					WC_PAIDY_PLUGIN_URL . 'assets/css/jp4wc-paidy.css',
+					WC_PAIDY_ASSETS_URL . 'css/jp4wc-paidy.css',
 					false,
 					WC_PAIDY_VERSION
 				);
@@ -706,7 +706,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		if ( is_admin() && false === wp_script_is( 'wc-gateway-ppec-settings' ) && isset( $_GET['section'] ) && 'paidy' === $_GET['section'] ) {// phpcs:ignore
 			wp_enqueue_script(
 				'wc-gateway-paidy-settings',
-				WC_PAIDY_PLUGIN_URL . 'assets/js/wc-gateway-paidy-settings.js',
+				WC_PAIDY_ASSETS_URL . 'js/wc-gateway-paidy-settings.js',
 				array( 'jquery' ),
 				WC_PAIDY_VERSION,
 				true
