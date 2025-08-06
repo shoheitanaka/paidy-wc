@@ -12,7 +12,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 /**
- * Deletes the plugin options from the database.
+ * Deletes the Paidy plugin options from the database.
  */
 function wc_paidy_delete_plugin() {
 	global $wpdb;

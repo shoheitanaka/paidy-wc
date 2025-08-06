@@ -3,14 +3,14 @@
  * Plugin Name: Paidy for WooCommerce
  * Plugin URI: https://wordpress.org/plugins/paidy-wc/
  * Description: Paidy for WooCommerce
- * Version: 1.5.0
+ * Version: 1.5.1
  * Author: Artisan Workshop
  * Author URI: https://wc.artws.info/
  * Requires at least: 5.0
- * Requires PHP: 7.4
- * Tested up to: 6.7.1
+ * Requires PHP: 8.1
+ * Tested up to: 6.8.2
  * WC requires at least: 6.0.0
- * WC tested up to: 9.5.1
+ * WC tested up to: 10.0.4
  *
  * Text Domain: paidy-wc
  * Domain Path: /i18n/
@@ -23,9 +23,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
-
-// WooCommerce For Softbank Payment Gateways version.
-define( 'WC_PAIDY_VERSION', '1.5.0' );
 
 // Register activation hook.
 register_activation_hook( __FILE__, 'paidy_activation_redirect' );
@@ -52,6 +49,9 @@ function on_deactivation() {
 }
 
 if ( ! class_exists( 'WC_Paidy' ) ) :
+	// WooCommerce For Softbank Payment Gateways version.
+	define( 'WC_PAIDY_VERSION', '1.5.1' );
+
 	require_once 'class-wc-paidy.php';
 
 	/**

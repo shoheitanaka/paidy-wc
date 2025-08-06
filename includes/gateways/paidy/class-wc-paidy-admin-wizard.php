@@ -90,7 +90,7 @@ class WC_Paidy_Admin_Wizard {
 			return;
 		}
 
-		$asset_file = WC_PAIDY_ABSPATH . 'includes/gateways/paidy/assets/js/wizard/paidy.asset.php';
+		$asset_file = WC_PAIDY_ASSETS_ABSPATH . 'wizard/paidy.asset.php';
 		if ( ! file_exists( $asset_file ) ) {
 			return;
 		}
@@ -100,7 +100,7 @@ class WC_Paidy_Admin_Wizard {
 
 		wp_enqueue_script(
 			$handle,
-			WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/wizard/paidy.js',
+			WC_PAIDY_BLOCKS_URL . 'wizard/paidy.js',
 			$asset['dependencies'],
 			$asset['version'],
 			true
@@ -108,7 +108,7 @@ class WC_Paidy_Admin_Wizard {
 
 		wp_enqueue_style(
 			$handle,
-			WC_PAIDY_PLUGIN_URL . 'includes/gateways/paidy/assets/js/wizard/paidy.css',
+			WC_PAIDY_BLOCKS_URL . 'wizard/paidy.css',
 			array_filter(
 				$asset['dependencies'],
 				function ( $style ) {
