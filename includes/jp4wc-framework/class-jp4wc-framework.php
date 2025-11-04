@@ -1,7 +1,7 @@
 <?php
 /**
  * Framework Name: Artisan Workshop FrameWork for WooCommerce
- * Framework Version : 2.0.13
+ * Framework Version : 2.0.14
  * Author: Artisan Workshop
  * Author URI: https://wc.artws.info/
  *
@@ -10,7 +10,7 @@
  * @author Artisan Workshop
  */
 
-namespace ArtisanWorkshop\PluginFramework\v2_0_13;
+namespace ArtisanWorkshop\PluginFramework\v2_0_14;
 
 use WP_Error;
 
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( '\\ArtisanWorkshop\\PluginFramework\\v2_0_13\\JP4WC_Framework' ) ) :
+if ( ! class_exists( '\\ArtisanWorkshop\\PluginFramework\\v2_0_14\\JP4WC_Framework' ) ) :
 	/**
 	 * Class JP4WC_Framework
 	 *
@@ -51,6 +51,7 @@ if ( ! class_exists( '\\ArtisanWorkshop\\PluginFramework\\v2_0_13\\JP4WC_Framewo
 		 * Constructor for the config class.
 		 */
 		public function __construct() {
+			// Initialize the framework.
 			$this->text_array = require 'config-jp4wc-framework.php';
 			foreach ( $this->text_array as $key => $value ) {
 				$this->text_array[ $key ] = wp_kses( $value, $this->allowed_html );
@@ -465,7 +466,7 @@ if ( ! class_exists( '\\ArtisanWorkshop\\PluginFramework\\v2_0_13\\JP4WC_Framewo
 		public function jp4wc_pro_notice( $jp4wc_pro_url ) {
 			?>
 			<h4 class="inner"><?php echo esc_html( $this->text_array['pro_notice_01'] ); ?></h4>
-			<p class="inner"><?php echo esc_html( sprintf( $this->text_array['pro_notice_02'], esc_url( $jp4wc_pro_url ) . '?utm_source=jp4wc-settings&utm_medium=link&utm_campaign=top-pro' ) ); ?></p>
+			<p class="inner"><?php echo wp_kses_post( sprintf( $this->text_array['pro_notice_02'], esc_url( $jp4wc_pro_url ) . '?utm_source=jp4wc-settings&utm_medium=link&utm_campaign=top-pro' ) ); ?></p>
 			<p class="inner"><?php echo esc_html( $this->text_array['pro_notice_03'] ); ?></p>
 			<?php
 		}
@@ -486,8 +487,8 @@ if ( ! class_exists( '\\ArtisanWorkshop\\PluginFramework\\v2_0_13\\JP4WC_Framewo
 		public function jp4wc_community_info() {
 			?>
 			<h4 class="inner"><?php echo esc_html( $this->text_array['community_info_01'] ); ?></h4>
-			<p class="inner"><?php echo esc_html( sprintf( $this->text_array['community_info_02'], 'http://meetup.com/ja-JP/Tokyo-WooCommerce-Meetup/?' ) ); ?><br />
-				<?php echo esc_html( sprintf( $this->text_array['community_info_03'], 'http://meetup.com/ja-JP/Kansai-WooCommerce-Meetup/' ) ); ?><br />
+			<p class="inner"><?php echo wp_kses_post( sprintf( $this->text_array['community_info_02'], 'http://meetup.com/ja-JP/Tokyo-WooCommerce-Meetup/?' ) ); ?><br />
+				<?php echo wp_kses_post( sprintf( $this->text_array['community_info_03'], 'http://meetup.com/ja-JP/Kansai-WooCommerce-Meetup/' ) ); ?><br />
 				<?php echo esc_html( $this->text_array['community_info_04'] ); ?>
 			</p>
 			<?php
@@ -753,8 +754,8 @@ if ( ! class_exists( '\\ArtisanWorkshop\\PluginFramework\\v2_0_13\\JP4WC_Framewo
 				foreach ( $obj->errors as $error ) {
 					echo '<div id="message" class="error inline"><p><strong>' . esc_html( $error ) . '</strong></p></div>';
 				}
-			} elseif ( count( $object->messages ) > 0 ) {
-				foreach ( $object->messages as $message ) {
+			} elseif ( count( $obj->messages ) > 0 ) {
+				foreach ( $obj->messages as $message ) {
 					echo '<div id="message" class="updated inline"><p><strong>' . esc_html( $message ) . '</strong></p></div>';
 				}
 			}
@@ -778,6 +779,34 @@ if ( ! class_exists( '\\ArtisanWorkshop\\PluginFramework\\v2_0_13\\JP4WC_Framewo
 			} else {
 				return new WP_Error( 'round_type_error', 'Round Type Error' );
 			}
+		}
+
+		/**
+		 * Create a URL with GET parameters from an array.
+		 *
+		 * @param string $url Base URL.
+		 * @param array  $params Parameters to add as GET variables.
+		 * @return string The URL with added GET parameters.
+		 */
+		public function jp4wc_make_add_get_url( $url, $params ) {
+			if ( substr( $url, -1 ) === '/' ) {
+				$add_url = '?' . http_build_query( $params );
+			} else {
+				$add_url = '&' . http_build_query( $params );
+			}
+			return $url . $add_url;
+		}
+
+		/**
+		 * Get post data if set
+		 *
+		 * @param string $name The name of the POST field.
+		 * @return string|null The sanitized POST field value or null if not set.
+		 */
+		public function get_post( $name ) {
+			// Get the WC_Checkout object.
+			$checkout = WC()->checkout();
+			return $checkout->get_value( $name );
 		}
 	}
 endif;
