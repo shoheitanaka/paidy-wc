@@ -3,8 +3,8 @@ Contributors: shohei.tanaka, artisan-workshop-1
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=info@artws.info&item_name=Donation+for+Artisan&currency_code=JPY
 Tags: woocommerce, ecommerce, japanese, payment, paidy
 Requires at least: 5.0
-Tested up to: 6.8.2
-Stable tag: 1.5.1
+Tested up to: 6.8.3
+Stable tag: 1.5.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -68,6 +68,9 @@ A: No, after application, it becomes available after providing information such 
 
 
 == Changelog ==
+
+= 1.5.2 - 2025-11-04 =
+* Fixed - Some bugs Fixed.
 
 = 1.5.1 - 2025-08-06 =
 * Tweak - Code tweaks for integration with Japanized for WooCommerce.
