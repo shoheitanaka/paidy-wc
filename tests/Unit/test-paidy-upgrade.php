@@ -109,6 +109,18 @@ class WC_Paidy_Upgrade_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A downgrade records the version without firing the action.
+	 */
+	public function test_does_not_fire_on_a_downgrade() {
+		update_option( 'paidy_wc_version', '99.0.0' );
+
+		paidy_wc_check_version();
+
+		$this->assertSame( 0, $this->fired );
+		$this->assertSame( WC_PAIDY_VERSION, get_option( 'paidy_wc_version' ) );
+	}
+
+	/**
 	 * The upgrade redacts the secret keys a pre-1.6.0 callback stored in plaintext.
 	 */
 	public function test_upgrade_redacts_plaintext_secrets() {
