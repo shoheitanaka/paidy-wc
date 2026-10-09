@@ -536,6 +536,7 @@ class WC_Paidy_Webhook_Permission_Test extends WP_UnitTestCase {
 
 		$result = $endpoint->paidy_check_webhook( $this->make_request( $this->payload_for( $order ) ) );
 
+		$this->assertSame( array( 'GET' ), $this->requested_methods, 'The payment should have been looked up once.' );
 		$this->assert_wp_error_with_status( $result, 'paidy_verification_failed', 403 );
 		$this->assertSame( 'pending', wc_get_order( $order->get_id() )->get_status() );
 	}
