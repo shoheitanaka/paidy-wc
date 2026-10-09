@@ -139,7 +139,14 @@ install_woocommerce() {
 	fi
 
 	mkdir -p $WP_CORE_DIR/wp-content/plugins
-	download "$WC_URL" $TMPDIR/woocommerce.zip
+	# latest-stable.zip answers with a redirect to the versioned file, so follow
+	# redirects (-L) and fail on HTTP errors (-f) instead of saving an HTML body.
+	if [ `which curl` ]; then
+		curl -fsSL "$WC_URL" -o $TMPDIR/woocommerce.zip
+	else
+		wget -nv --max-redirect=5 -O $TMPDIR/woocommerce.zip "$WC_URL"
+	fi
+	unzip -tq $TMPDIR/woocommerce.zip > /dev/null
 	unzip -q $TMPDIR/woocommerce.zip -d $WP_CORE_DIR/wp-content/plugins/
 	rm -f $TMPDIR/woocommerce.zip
 }
