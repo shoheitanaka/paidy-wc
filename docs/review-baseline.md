@@ -36,11 +36,11 @@
 - `X-Forwarded-For` を既定で使わず、`paidy_trust_proxy_headers` フィルタでの明示的なオプトインに限ること
 - 受信エンドポイント（`paidy-receiver/v1/receive`）に nonce / `current_user_can()` を要求しない。呼び出し元は申込仲介サーバーで、
   ウィザードが発行した state token か、`paidy_site_hash` を鍵にした body の HMAC 署名で認証する（JP4WC 2.9.16 と同じ。Phase 1-2）。
-  `GET` も残しているのは state token だけで認証する旧形式のコールバックのため
+  ルートが `GET, POST` なのは元からの定義（JP4WC も同じ）。body の無い `GET` は state token でしか通らない（空 body の署名は信用しない）
 - 受信エンドポイントと `uninstall.php` の `$wpdb` 直接クエリ（`LIKE` + `esc_like()`）。state token と claim は接尾辞がランダム・ハッシュの
   option 行で、core API では列挙できない（JP4WC と同じ。`phpcs:disable` の理由もコード内にある）
 - `paidy_wc_check_version()` が、版の記録が無いとき（新規インストール、1.5.2 以前からの更新）にも `paidy_wc_updated` を発火すること。
-  1.5.2 以前は版を記録していないので区別できない。リスナー（秘密鍵の伏せ字）は冪等
+  1.5.2 以前は版を記録していないので区別できない。リスナー（秘密鍵の伏せ字）は冪等。ダウングレードでは版を記録するだけで発火しない
 - 受信エンドポイントのフィルタ名が `wc4jp_paidy_*` であること（JP4WC から verbatim。同期差分を増やさないため改名しない）
 - 受信エンドポイントで `base64_decode()` + `openssl_decrypt()` を使うこと（仲介サーバーが AES-256-CBC で鍵を暗号化して送る）
 - Paidy API の認証に秘密鍵を `Authorization` ヘッダーで送ること（Paidy API の仕様）

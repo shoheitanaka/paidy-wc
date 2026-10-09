@@ -87,7 +87,10 @@ Paidy API は `https://api.paidy.com/`、認証は `Authorization: Bearer <secre
   `add_option()` で claim してリプレイと二重処理を防ぎ、処理が失敗したら claim を外す。値は署名された body からだけ読む。
   成功時に state token を消費し、`paidy_received_data` と応答からは秘密鍵を除く（JP4WC 2.9.16 と同じ。Phase 1-2）
 - `POST /wp-json/paidy/v1/check` は仲介サーバーからの Webhook 登録確認用（状態を変えない）
-- `wizard=false` で手動設定フィールドへ切替（`WC_Paidy_Settings_Controller` が `admin/paidy.js` で UI を制御）
+- `wizard=false` で手動設定フィールドへ切替: `paidy_handle_wizard_false_redirect()` がユーザー単位の transient
+  `paidy_manual_settings_<user_id>`（15 分）を立てて `wizard` を外した URL へリダイレクトし、その間は
+  `paidy_method_description()` が申込 UI の wrapper を出さずにゲートウェイの設定欄をそのまま表示する
+  （それ以外の決済設定画面の UI は `WC_Paidy_Settings_Controller` が `admin/paidy.js` で制御）
 
 ## REST ルート
 
@@ -107,8 +110,10 @@ Paidy API は `https://api.paidy.com/`、認証は `Authorization: Bearer <secre
 | option | `paidy_received_data` | 最後に受信した申込結果（non-autoload。秘密鍵は `[redacted]`。1.5.2 以前の平文は `paidy_wc_updated` で伏せ字に） |
 | option | `paidy_application_id` | 仲介サーバーが返した申込 ID（non-autoload。これと違う申込のコールバックは拒否） |
 | option | `paidy_onboarding_state_<token>` | 申込の state token（値は発行時刻、non-autoload、90 日） |
-| option | `paidy_receiver_sig_<署名>` / `paidy_receiver_event_<hash>` | 受信コールバックの claim（リプレイ・二重処理防止。20 分で掃除） |
+| option | `paidy_receiver_sig_<署名>` / `paidy_receiver_event_<hash>` | 受信コールバックの claim（リプレイ・二重処理防止）。20 分（署名の許容ずれの 2 倍）を過ぎた行は、次のコールバックの claim のときに消す |
 | option | `paidy_wc_version` | 最後に動いたプラグインの版（`paidy_wc_check_version()` が記録） |
+| transient | `paidy_manual_settings_<user_id>` | `wizard=false` の後、15 分間ゲートウェイの設定欄をそのまま表示する |
+| transient | `paidy_receiver_sig_warned` | 署名不正の警告ログの間引き（10 分に 1 回） |
 | option | `paidy_do_activation_redirect` | 有効化直後のリダイレクトフラグ |
 | option | `wc_paidy_show_ssl_notice` `wc_paidy_show_curl_notice` `wc_paidy_show_pr_notice` `wc_paidy_apply_notice_{2,3,99}` | 通知の非表示 |
 | order meta | `_transaction_id` | Paidy `payment_id`（`pay_...`） |
@@ -130,7 +135,7 @@ Paidy API は `https://api.paidy.com/`、認証は `Authorization: Bearer <secre
 | `wc_paidy_payment_icons` | filter | ブロックチェックアウトのアイコン |
 | `wc_paidy_apply_enabled` | filter | 申込促進通知の有効/無効 |
 | `paidy_application_approved` / `paidy_application_rejected` | action | 申込結果受信時 |
-| `paidy_wc_updated` | action | プラグインの版が変わった最初のリクエスト（`init` 5）。引数は前の版（記録が無ければ `false`） |
+| `paidy_wc_updated` | action | インストール・アップデート後の最初のリクエスト（`init` 5。ダウングレードでは発火しない）。引数は前の版（記録が無ければ `false`） |
 | `wc4jp_paidy_onboarding_state_ttl` / `wc4jp_paidy_receiver_signature_tolerance` | filter | state token の有効期間（既定 90 日）/ 署名時刻の許容ずれ（既定 10 分） |
 | `wc_jp4wc_logging` | filter | フレームワークのログ出力可否 |
 

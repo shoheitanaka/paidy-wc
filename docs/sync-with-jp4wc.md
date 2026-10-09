@@ -47,16 +47,17 @@
    新規メソッドの DocBlock に `@since`。ゲートウェイの `$jp4wc_framework` の `@var` を `stdClass` から `Framework\JP4WC_Framework` に
    （PHPStan baseline の削減）。テスト `test-paidy-payment-id-format.php` の「issue #223」は「Japanized for WooCommerce issue #223」。
    receiver / wizard の `@since 2.9.16` は `@since 1.6.0` に、`@since` の無い state token 系メソッドには `@since 1.6.0` を足す。
-   コメント中の「before 2.9.16」のような JP4WC の版は paidy-wc の版（1.6.0）に。移植テストの「issue #210」も同様に書き換え、
+   コメント中の「before 2.9.16」「2.9.13–2.9.14 の 2 日 transient」のような JP4WC の版の話は paidy-wc の版（1.6.0 より前は state token
+   なし）に（receiver の `SIGNATURE_HEADER` の DocBlock と署名経路のコメント、wizard の `plugin_version` のコメント）。移植テストの「issue #210」も同様に書き換え、
    `test-paidy-receiver-signature.php` の tearDown の LIKE 削除は `$wpdb->prepare()` + `esc_like()` に（PHPCS エラー）
 9. **アップグレード処理**（`class-wc-paidy-apply-receiver.php` 末尾、`paidy-wc.php`）: JP4WC は `JP4WC_Install` の `jp4wc_updated` で
    `redact_stored_secrets_on_upgrade()` を呼ぶが、paidy-wc にはバージョン検出が無い。paidy-wc は `paidy-wc.php` の
    `paidy_wc_check_version()`（`init` 5、option `paidy_wc_version`）が版の変化で `paidy_wc_updated` を発火し、receiver はそれにつなぐ。
-   1.5.2 以前は版を記録していないので、版の記録が無い場合も発火する（新規インストールと区別しない）。
+   1.5.2 以前は版を記録していないので、版の記録が無い場合も発火する（新規インストールと区別しない）。ダウングレードでは発火しない。
    receiver を取り込むときは末尾の `add_action( 'jp4wc_updated', … )` と DocBlock の `JP4WC_Install` 言及を毎回書き換える。
    回帰テスト: `test-paidy-upgrade.php`、`test-paidy-receiver-signature.php` の `…_is_registered_at_file_load`
 10. **申込送信の `plugin_version`**（`class-wc-paidy-admin-wizard.php`）: JP4WC は `JP4WC_VERSION`（paidy-wc では未定義で常に空）。
-    paidy-wc は `WC_PAIDY_VERSION`（JP4WC の review-backlog R1-L2 の提案どおり）
+    paidy-wc は `WC_PAIDY_VERSION`（JP4WC の review-backlog R1-L2 の提案どおり）。回帰テスト: `test-paidy-wizard-apply.php`
 11. **wizard のコンストラクタと `paidyForWcSettings`**（`class-wc-paidy-admin-wizard.php`）: JP4WC `a417036`（2026-02）はメニュー・
     スクリプト・説明文フィルタの登録を API キー有無の条件から外し、JS に `hasApiKeys` を渡して JS 側でリダイレクトする。
     paidy-wc は JS（`src/`）を同期していないので、条件付き登録・`$plugin_name = 'Paidy for WooCommerce'`・`hasApiKeys` なしのまま
