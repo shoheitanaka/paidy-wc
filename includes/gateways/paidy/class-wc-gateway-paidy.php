@@ -334,7 +334,18 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		} else {
 			$paidy_explanation = $this->paidy_description;
 		}
-		$allowed_html = array(
+		echo wp_kses( force_balance_tags( $paidy_explanation ), $this->paidy_description_allowed_html() );
+	}
+
+	/**
+	 * Allowed HTML tags for the Paidy description output.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @return array Allowed HTML for wp_kses().
+	 */
+	private function paidy_description_allowed_html() {
+		return array(
 			'a'      => array(
 				'href'   => array(),
 				'target' => array(),
@@ -346,7 +357,26 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			'ul'     => array(),
 			'li'     => array(),
 		);
-		echo wp_kses( $paidy_explanation, $allowed_html );
+	}
+
+	/**
+	 * Validate the Paidy description field on save.
+	 *
+	 * The wp_kses() function does not fix unbalanced tags, and a stray closing tag saved in
+	 * this field escapes the payment box when the classic checkout payment
+	 * fragment is re-rendered, leaving an orphaned place-order row behind on
+	 * every update_order_review call (duplicated order buttons). Balance the
+	 * tags before saving so broken markup never reaches the checkout.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param string      $key   Field key.
+	 * @param string|null $value Posted value.
+	 * @return string Sanitized value with balanced tags.
+	 */
+	public function validate_paidy_description_field( $key, $value ) {
+		$value = is_null( $value ) ? '' : trim( wp_unslash( $value ) );
+		return wp_kses( force_balance_tags( $value ), $this->paidy_description_allowed_html() );
 	}
 
 	/**
@@ -426,13 +456,13 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		$paidy_amount = 0;
 		foreach ( $order_items as $key => $item ) {
 			if ( $item->get_product_id() ) {
-				$item_name     = str_replace( '"', '\"', $item->get_name() );
+				$item_name     = esc_js( $item->get_name() );
 				$unit_price    = round( $item->get_subtotal() / $item->get_quantity(), 0 );
 				$items        .= '{
-                    "id":"' . $item->get_product_id() . '",
-                    "quantity":' . $item->get_quantity() . ',
+                    "id":"' . esc_js( $item->get_product_id() ) . '",
+                    "quantity":' . (int) $item->get_quantity() . ',
                     "title":"' . $item_name . '",
-                    "unit_price":' . $unit_price;
+                    "unit_price":' . (float) $unit_price;
 				$paidy_amount += $item->get_quantity() * $unit_price;
 			}
 			if ( end( $order_items ) === $item && ( ! isset( $fees ) ) ) {
@@ -447,10 +477,10 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		foreach ( $order_coupons as $key => $coupon ) {
 			if ( $coupon->get_discount() ) {
 				$items        .= '{
-                    "id":"' . $coupon->get_code() . '",
+                    "id":"' . esc_js( $coupon->get_code() ) . '",
                     "quantity":1,
-                    "title":"' . $coupon->get_name() . '",
-                    "unit_price":-' . $coupon->get_discount();
+                    "title":"' . esc_js( $coupon->get_name() ) . '",
+                    "unit_price":-' . (float) $coupon->get_discount();
 				$paidy_amount -= $coupon->get_discount();
 			}
 			if ( end( $order_items ) === $coupon && ( ! isset( $fees ) ) ) {
@@ -508,37 +538,79 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			}
 		}
 
-		// Get the latest order.
-		$args               = array(
-			'customer_id' => $user_id,
-			'status'      => 'completed',
-			'orderby'     => 'date',
-			'order'       => 'DESC',
-		);
-		$orders             = wc_get_orders( $args );
-		$total_order_amount = 0;
-		$order_count        = 0;
-		foreach ( $orders as $each_order ) {
-			if ( $each_order->get_payment_method() !== $this->id ) {
-				$selected_orders[]   = $each_order;
-				$total_order_amount += $each_order->get_total();
-				++$order_count;
-			}
+		// Get the latest order. This page reloads on every retry of the
+		// Paidy widget, so cache the per-customer risk-signal values
+		// briefly — a few minutes of staleness doesn't affect the values
+		// sent to Paidy below, but avoids refetching and re-hydrating the
+		// customer's full completed-order history on every reload. Only
+		// scalar values are cached (never WC_Order objects — they aren't
+		// safe/meaningful to serialize into a transient).
+		//
+		// Guest checkouts have no numeric $user_id (it's 'guest-paidy' .
+		// order ID here, not a real customer identity) — wc_get_orders()
+		// would coerce that non-numeric string to customer_id 0, which
+		// doesn't mean "this guest" but "no assigned customer", pulling in
+		// unrelated guests' orders. There's no real order history to look
+		// up for a guest, so skip the query entirely.
+		if ( ! is_user_logged_in() ) {
+			$order_history = array(
+				'total_order_amount' => 0,
+				'order_count'        => 0,
+				'latest_order_total' => null,
+				'latest_order_date'  => null,
+			);
+		} else {
+			$order_history_cache_key = 'jp4wc_paidy_order_history_' . $user_id;
+			$order_history           = get_transient( $order_history_cache_key );
 		}
-		if ( isset( $selected_orders[1] ) ) {
-			foreach ( $selected_orders as $each_order ) {
-				if ( end( $selected_orders ) === $each_order ) {
-					$latest_order = $each_order;
+		if ( false === $order_history ) {
+			$args   = array(
+				'customer_id' => $user_id,
+				'status'      => 'completed',
+				'orderby'     => 'date',
+				'order'       => 'DESC',
+			);
+			$orders = wc_get_orders( $args );
+
+			$total_order_amount = 0;
+			$order_count        = 0;
+			$selected_orders    = array();
+			foreach ( $orders as $each_order ) {
+				if ( $each_order->get_payment_method() !== $this->id ) {
+					$selected_orders[]   = $each_order;
+					$total_order_amount += $each_order->get_total();
+					++$order_count;
 				}
 			}
-		} elseif ( isset( $selected_orders ) ) {
-			$latest_order = $selected_orders[0];
-		} else {
-			$latest_order = null;
+			if ( isset( $selected_orders[1] ) ) {
+				$latest_order = end( $selected_orders );
+			} elseif ( isset( $selected_orders[0] ) ) {
+				$latest_order = $selected_orders[0];
+			} else {
+				$latest_order = null;
+			}
+			if ( isset( $latest_order ) ) {
+				$latest_order_total = $latest_order->get_total();
+				$latest_order_date  = $latest_order->get_date_created()->date( 'Y-m-d H:i:s' );
+			} else {
+				$latest_order_total = null;
+				$latest_order_date  = null;
+			}
+
+			$order_history = array(
+				'total_order_amount' => $total_order_amount,
+				'order_count'        => $order_count,
+				'latest_order_total' => $latest_order_total,
+				'latest_order_date'  => $latest_order_date,
+			);
+			set_transient( $order_history_cache_key, $order_history, 5 * MINUTE_IN_SECONDS );
 		}
-		if ( isset( $latest_order ) ) {
-			$last_order_amount = $latest_order->get_total();
-			$day1              = strtotime( $latest_order->get_date_created() );
+		$total_order_amount = $order_history['total_order_amount'];
+		$order_count        = $order_history['order_count'];
+
+		if ( null !== $order_history['latest_order_date'] ) {
+			$last_order_amount = $order_history['latest_order_total'];
+			$day1              = strtotime( $order_history['latest_order_date'] );
 			$day2              = strtotime( date_i18n( 'Y-m-d H:i:s' ) );
 			$diff_day          = floor( ( $day2 - $day1 ) / ( 60 * 60 * 24 ) );
 			if ( $diff_day <= 0 ) {
@@ -605,7 +677,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 						},
 						"order": {
 							"items": [
-						<?php echo $items;// phpcs:ignore ?>
+						<?php echo $items; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $items is JSON for a JS array; string values are escaped with esc_js() during construction above. ?>
 							],
 							"order_ref": "<?php echo esc_js( $paidy_order_ref ); ?>",
 					<?php
@@ -733,14 +805,33 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * @param string $order_id Order ID.
 	 */
 	public function thankyou_completed( $order_id ) {
-		$order          = wc_get_order( $order_id );
+		$order = wc_get_order( $order_id );
+		if ( ! $order ) {
+			return;
+		}
 		$current_status = $order->get_status();
-		if ( 'pending' === $current_status || 'cancelled' === $current_status ) {
+		// Idempotency: skip if payment_complete() was already called (transaction_id already set).
+		if ( ( 'pending' === $current_status || 'cancelled' === $current_status ) && empty( $order->get_transaction_id() ) ) {
+			$transaction_id = isset( $_GET['transaction_id'] ) ? sanitize_text_field( wp_unslash( $_GET['transaction_id'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+			// Verify the payment with Paidy server-side before completing the order. The
+			// transaction id comes from the (buyer-controllable) return URL, so it must not
+			// be trusted on its own: confirm the payment belongs to this order, is authorized,
+			// and matches the order total before reducing stock and completing payment.
+			if ( ! $this->paidy_verify_payment_for_order( $order, $transaction_id ) ) {
+				$this->jp4wc_framework->jp4wc_debug_log(
+					'Paidy thank-you completion blocked: payment verification failed for order ' . $order_id,
+					$this->debug,
+					'paidy-wc'
+				);
+				return;
+			}
+
 			// Reduce stock levels.
 			wc_reduce_stock_levels( $order_id );
-			$order->payment_complete( $_GET['transaction_id'] );// phpcs:ignore
+			$order->payment_complete( $transaction_id );
 			$message  = __( 'Paidy Payment succeeds to authorize and move to thank you page. Get data is following.', 'paidy-wc' ) . "\n";
-			$message .= $this->jp4wc_framework->jp4wc_array_to_message( $_GET ); // phpcs:ignore
+			$message .= $this->jp4wc_framework->jp4wc_array_to_message( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
 		}
 	}
@@ -887,6 +978,11 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		$order                = wc_get_order( $order_id );
 		$order_payment_method = $order->get_payment_method();
 		if ( $order_payment_method === $this->id ) {
+			// Prevent duplicate capture calls when the action fires multiple times
+			// (e.g. when WooCommerce instantiates the gateway class more than once).
+			if ( $order->get_meta( 'paidy_capture_id' ) ) {
+				return true;
+			}
 			$transaction_id = $order->get_transaction_id();
 			$send_url       = 'https://api.paidy.com/payments/' . $transaction_id . '/captures';
 			$args           = array(
@@ -913,7 +1009,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 					$order->update_meta_data( 'paidy_capture_id', $capture_array['captures'][0]['id'] );
 					$order->save_meta_data();
 				}
-				if ( (float) $capture_array['amount'] === $order->get_total() && $transaction_id === $capture_array['id'] ) {
+				if ( (float) $capture_array['amount'] === (float) $order->get_total() && $transaction_id === $capture_array['id'] ) {
 					$order->add_order_note( __( 'In the payment completion process, the amount and ID match were confirmed.', 'paidy-wc' ) );
 					return true;
 				} else {
@@ -923,7 +1019,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				$message = $capture->get_error_message();
 				$order->add_order_note( $message );
 			} else {
-				$message = $this->jp4wc_framework->jp4wc_array_to_message( $capture_array ) . 'This is capture data.';
+				$message = $this->jp4wc_framework->jp4wc_array_to_message( $capture_array ) . __( 'This is capture data.', 'paidy-wc' );
 				$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
 
 				if ( isset( $capture_array['status'] ) ) {
@@ -946,27 +1042,29 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	/**
 	 * Check the response status from Paidy and add an order note if there is an error.
 	 *
-	 * @param int      $status The response status code.
+	 * @param string   $status The response status code.
 	 * @param WC_Order $order The WooCommerce order object.
 	 */
 	public function paidy_check_response( $status, $order ) {
-		if ( 403 === $status ) {// Forbidden.
+		if ( '403' === $status ) {// Forbidden.
 			$message = __( 'You have made a forbidden request.', 'paidy-wc' ) . __( 'Please go to your Paidy dashboard and check.', 'paidy-wc' );
 			$order->add_order_note( $message );
-		} elseif ( 401 === $status ) {// Unauthorized.
+		} elseif ( '401' === $status ) {// Unauthorized.
 			$message = __( 'You have made an unauthorized request.', 'paidy-wc' ) . __( 'Please go to your Paidy dashboard and check.', 'paidy-wc' );
 			$order->add_order_note( $message );
-		} elseif ( 409 === $status ) {// Conflict.
+		} elseif ( '409' === $status ) {// Conflict.
 			$message = __( 'You have made a conflict request.', 'paidy-wc' ) . __( 'Please go to your Paidy dashboard and check.', 'paidy-wc' );
 			$order->add_order_note( $message );
-		} elseif ( 404 === $status ) {// Not Found.
+		} elseif ( '404' === $status ) {// Not Found.
 			$message = __( 'The requested resource could not be found.', 'paidy-wc' ) . __( 'Please go to your Paidy dashboard and check.', 'paidy-wc' );
 			$order->add_order_note( $message );
-		} elseif ( 400 === $status ) {// Bad Request.
+		} elseif ( '400' === $status ) {// Bad Request.
 			$message = __( 'The request failed.', 'paidy-wc' ) . __( 'Please go to your Paidy dashboard and check.', 'paidy-wc' );
 			$order->add_order_note( $message );
+		} elseif ( '200' === $status ) {// Good Request.
+			$order->add_order_note( __( 'I received a notification from Paidy and the status was successful.', 'paidy-wc' ) );
 		} else {
-			$order->add_order_note( __( 'I received a notification from Paidy stating that the status was unexpected.', 'paidy-wc' ) );
+			$order->add_order_note( __( 'I received a notification from Paidy stating that the status was unexpected.', 'paidy-wc' ) . ' Status:' . $status );
 		}
 	}
 
@@ -1022,12 +1120,12 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 				$order->add_order_note( __( 'Completion refunding has been completed at Paidy.', 'paidy-wc' ) );
 				return true;
 			} else {
-				$message = $this->jp4wc_framework->jp4wc_array_to_message( $refund_array ) . 'This is refund data.';
+				$message = $this->jp4wc_framework->jp4wc_array_to_message( $refund_array ) . __( 'This is refund data.', 'paidy-wc' );
 				$this->jp4wc_framework->jp4wc_debug_log( $message, $this->debug, 'paidy-wc' );
 
 				if ( isset( $refund_array['status'] ) ) {
 					$this->paidy_check_response( $refund_array['status'], $order );
-					if ( 403 === $refund_array['status'] ) {
+					if ( '403' === $refund_array['status'] ) {
 						$paidy_info = $this->paidy_get_payment_data( $transaction_id );
 						if ( isset( $paidy_info ) && isset( $paidy_info['refund'] ) ) {
 							return true;

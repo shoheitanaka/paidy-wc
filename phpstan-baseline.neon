@@ -69,12 +69,6 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$text of function esc_js expects string, float\|int given\.$#'
 			identifier: argument.type
-			count: 3
-			path: includes/gateways/paidy/class-wc-gateway-paidy.php
-
-		-
-			message: '#^Parameter \#1 \$text of function esc_js expects string, int\<0, max\> given\.$#'
-			identifier: argument.type
 			count: 1
 			path: includes/gateways/paidy/class-wc-gateway-paidy.php
 
