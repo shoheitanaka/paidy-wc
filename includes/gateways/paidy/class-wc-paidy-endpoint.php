@@ -22,6 +22,8 @@ class WC_Paidy_Endpoint {
 	 * x-paidy-signature header. Operators can extend or override this list via the
 	 * `paidy_webhook_allowed_ips` filter. Provided by Paidy.
 	 *
+	 * @since 1.6.0
+	 *
 	 * @var string[]
 	 */
 	const PAIDY_WEBHOOK_IPS = array(

@@ -55,11 +55,32 @@ class WC_Paidy_Webhook_Permission_Test extends WP_UnitTestCase {
 	private $requested_urls = array();
 
 	/**
+	 * HTTP methods of the requests made through the WP HTTP API during a test.
+	 *
+	 * @var string[]
+	 */
+	private $requested_methods = array();
+
+	/**
 	 * Payment object the mocked Paidy API returns, or null for an empty body.
 	 *
 	 * @var array|null
 	 */
 	private $mock_payment = null;
+
+	/**
+	 * HTTP status code the mocked Paidy API answers with.
+	 *
+	 * @var int
+	 */
+	private $mock_status = 200;
+
+	/**
+	 * Transport error the mocked Paidy API fails with instead of answering, if any.
+	 *
+	 * @var WP_Error|null
+	 */
+	private $mock_error = null;
 
 	/**
 	 * Set up test environment before each test.
@@ -78,8 +99,11 @@ class WC_Paidy_Webhook_Permission_Test extends WP_UnitTestCase {
 		$_SERVER['REMOTE_ADDR'] = self::OTHER_IP;
 		unset( $_SERVER['HTTP_X_FORWARDED_FOR'] );
 
-		$this->requested_urls = array();
-		$this->mock_payment   = null;
+		$this->requested_urls    = array();
+		$this->requested_methods = array();
+		$this->mock_payment      = null;
+		$this->mock_status       = 200;
+		$this->mock_error        = null;
 		add_filter( 'pre_http_request', array( $this, 'mock_paidy_api' ), 10, 3 );
 	}
 
@@ -106,17 +130,22 @@ class WC_Paidy_Webhook_Permission_Test extends WP_UnitTestCase {
 	 * @param false|array|WP_Error $preempt     Whether to preempt the request.
 	 * @param array                $parsed_args Request arguments.
 	 * @param string               $url         Request URL.
-	 * @return array Mocked HTTP response.
+	 * @return array|WP_Error Mocked HTTP response.
 	 */
 	public function mock_paidy_api( $preempt, $parsed_args, $url ) {
-		$this->requested_urls[] = $url;
+		$this->requested_urls[]    = $url;
+		$this->requested_methods[] = isset( $parsed_args['method'] ) ? $parsed_args['method'] : '';
+
+		if ( null !== $this->mock_error ) {
+			return $this->mock_error;
+		}
 
 		return array(
 			'headers'  => array(),
 			'body'     => null === $this->mock_payment ? '' : wp_json_encode( $this->mock_payment ),
 			'response' => array(
-				'code'    => 200,
-				'message' => 'OK',
+				'code'    => $this->mock_status,
+				'message' => get_status_header_desc( $this->mock_status ),
 			),
 			'cookies'  => array(),
 			'filename' => null,
@@ -383,6 +412,7 @@ class WC_Paidy_Webhook_Permission_Test extends WP_UnitTestCase {
 		$response = rest_do_request( $this->make_request( $this->payload_for( $order ) ) );
 
 		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( 'paidy_unauthorized', $response->get_data()['code'], 'The permission callback, not the handler, should reject the request.' );
 		$this->assertSame( 'pending', wc_get_order( $order->get_id() )->get_status() );
 		$this->assertSame( array(), $this->requested_urls, 'The Paidy API must not be queried for a rejected request.' );
 	}
@@ -414,6 +444,7 @@ class WC_Paidy_Webhook_Permission_Test extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'WP_REST_Response', $result );
 		$this->assertSame( 200, $result->get_status() );
 		$this->assertSame( array( 'https://api.paidy.com/payments/' . self::PAYMENT_ID ), $this->requested_urls );
+		$this->assertSame( array( 'GET' ), $this->requested_methods, 'GET /payments/{id} must not be called with POST (it answers 404).' );
 
 		$order = wc_get_order( $order->get_id() );
 		$this->assertSame( 'processing', $order->get_status() );
@@ -455,9 +486,65 @@ class WC_Paidy_Webhook_Permission_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A repeated authorize_success does not query Paidy or complete the order again.
+	 * Paidy API failures that must make the payment lookup return null.
+	 *
+	 * @return array[]
 	 */
-	public function test_repeated_authorize_success_is_idempotent() {
+	public function failed_lookup_provider() {
+		return array(
+			'not found'       => array( 404, null ),
+			'server error'    => array( 500, null ),
+			'transport error' => array( 200, new WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' ) ),
+		);
+	}
+
+	/**
+	 * A failed payment lookup returns null instead of the error body.
+	 *
+	 * @dataProvider failed_lookup_provider
+	 *
+	 * @param int           $status HTTP status code of the mocked answer.
+	 * @param WP_Error|null $error  Transport error of the mocked request, if any.
+	 */
+	public function test_failed_payment_lookup_returns_null( $status, $error ) {
+		$endpoint           = $this->make_endpoint();
+		$this->mock_status  = $status;
+		$this->mock_error   = $error;
+		$this->mock_payment = array(
+			'id'     => self::PAYMENT_ID,
+			'status' => 'authorized',
+		);
+
+		$this->assertNull( $endpoint->paidy->paidy_get_payment_data( self::PAYMENT_ID ) );
+		$this->assertSame( array( 'GET' ), $this->requested_methods );
+	}
+
+	/**
+	 * When the Paidy API cannot confirm the payment, authorize_success leaves the order pending.
+	 *
+	 * @dataProvider failed_lookup_provider
+	 *
+	 * @param int           $status HTTP status code of the mocked answer.
+	 * @param WP_Error|null $error  Transport error of the mocked request, if any.
+	 */
+	public function test_authorize_success_with_failed_lookup_does_not_complete_the_order( $status, $error ) {
+		$endpoint           = $this->make_endpoint();
+		$order              = $this->create_order();
+		$this->mock_status  = $status;
+		$this->mock_error   = $error;
+		$this->mock_payment = $this->payment_for( $order );
+
+		$result = $endpoint->paidy_check_webhook( $this->make_request( $this->payload_for( $order ) ) );
+
+		$this->assert_wp_error_with_status( $result, 'paidy_verification_failed', 403 );
+		$this->assertSame( 'pending', wc_get_order( $order->get_id() )->get_status() );
+	}
+
+	/**
+	 * A repeated authorize_success for an order that is already processing only adds a note:
+	 * it does not query Paidy or complete the order again.
+	 */
+	public function test_repeated_authorize_success_for_processing_order_is_not_reapplied() {
 		$endpoint           = $this->make_endpoint();
 		$order              = $this->create_order();
 		$this->mock_payment = $this->payment_for( $order );
