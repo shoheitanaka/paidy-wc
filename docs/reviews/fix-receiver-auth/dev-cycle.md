@@ -3,7 +3,7 @@
 - 開始: 2026-10-10
 - オプション: auto-commit（確認ゲートなし）
 - PR: 未作成
-- 現在のステップ: 2（実装中）
+- 現在のステップ: 4（push・PR 作成）
 - Copilot: 依頼 0 回 / 未収束
 - Codex: 未接続（CLAUDE.md。ゲート対象外）
 
@@ -21,3 +21,5 @@
 | 2026-10-10 00:20 | 1 | 計画承認 |
 | 2026-10-10 00:28 | 2 | ブランチ `fix/receiver-auth` 作成（base b422b00）。JP4WC は 10d2d4e（2.9.16） |
 | 2026-10-10 00:55 | 2 | 実装コミット 5 件（dd482bf / 6da05a8 / 0e562ef / 5703740 / e0aa8d9）+ docs。composer check green（PHPCS エラー 0・警告 9→2、PHPStan エラー 0・baseline 39→38、PHPUnit 119 件） |
+| 2026-10-10 | 3 | review-loop R1: Critical/High 0、Medium 1（R1-1 テスト追加）、Low 6（差分内の R1-2〜R1-5・R1-8 を修正、R1-6・R1-7 → B-27・B-28）、対象外 3（X1 High → B-26、X2・X3 → B-29・B-30） |
+| 2026-10-10 | 3 | review-loop R2: APPROVE（R1 全解消。R1-1・R1-2 はミューテーションで実測。R2-1 Low は差分 8 に明記）。PHPUnit 123 件 |
