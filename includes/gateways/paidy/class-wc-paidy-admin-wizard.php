@@ -254,6 +254,21 @@ class WC_Paidy_Admin_Wizard {
 				'sanitize_callback' => array( $this, 'paidy_sanitize_on_boarding_settings' ),
 			)
 		);
+
+		// Application ID assigned by the intermediary, read by the wizard UI so
+		// the merchant can see it on the "under review" screen. Kept outside
+		// woocommerce_paidy_on_boarding_settings because that option's sanitizer
+		// whitelists form fields and would strip it on the next save.
+		register_setting(
+			'options',
+			'paidy_application_id',
+			array(
+				'type'              => 'string',
+				'default'           => '',
+				'show_in_rest'      => true,
+				'sanitize_callback' => array( __CLASS__, 'sanitize_application_id' ),
+			)
+		);
 	}
 
 	/**
@@ -362,27 +377,48 @@ class WC_Paidy_Admin_Wizard {
 			$average_flag = 1;
 		}
 
+		// Generate a one-time state token so the receiver endpoint can verify the
+		// callback originates from an active onboarding session (not a forged request).
+		// Tokens are stored keyed by their own value so parallel or retried
+		// onboarding sessions do not overwrite each other's tokens. Storage is a
+		// non-autoloaded option (not a transient) because the Paidy review can take
+		// weeks and the callback must still verify when it finally arrives.
+		$state_token = wp_generate_password( 32, false );
+		$state_saved = WC_Paidy_Apply_Receiver::store_state_token( $state_token );
+		if ( ! $state_saved ) {
+			wc_get_logger()->error(
+				'Paidy onboarding: failed to store state token option. The onboarding callback will be rejected. Check your DB.',
+				array( 'source' => 'paidy-wc' )
+			);
+			return false;
+		}
+
 		$data_array = array(
-			'site_name'    => $value['siteName'],
-			'site_url'     => $value['storeUrl'],
-			'trade_name'   => $value['storeName'],
-			'site_hash'    => $site_hash,
-			'email'        => $value['registEmail'],
-			'phone'        => $value['contactPhone'],
-			'ceo'          => $value['representativeLastName'] . ' ' . $value['representativeFirstName'],
-			'ceo_kana'     => $value['representativeLastNameKana'] . ' ' . $value['representativeFirstNameKana'],
-			'ceo_birthday' => $value['representativeDateOfBirth'],
-			'gmv_flag'     => $gmv_flag,
-			'average_flag' => $average_flag,
-			'survey01'     => $value['securitySurvey01RadioControl'],
-			'survey02'     => $value['securitySurvey01TextControl'],
-			'survey03'     => $value['securitySurvey11CheckControl'],
-			'survey04'     => $value['securitySurvey12CheckControl'],
-			'survey05'     => $value['securitySurvey13CheckControl'],
-			'survey06'     => $value['securitySurvey14CheckControl'],
-			'survey07'     => $value['securitySurvey10TextAreaControl'],
-			'survey08'     => $value['securitySurvey08RadioControl'],
-			'survey09'     => $value['securitySurvey09RadioControl'],
+			'site_name'      => $value['siteName'],
+			'site_url'       => $value['storeUrl'],
+			'trade_name'     => $value['storeName'],
+			'site_hash'      => $site_hash,
+			'email'          => $value['registEmail'],
+			'phone'          => $value['contactPhone'],
+			'ceo'            => $value['representativeLastName'] . ' ' . $value['representativeFirstName'],
+			'ceo_kana'       => $value['representativeLastNameKana'] . ' ' . $value['representativeFirstNameKana'],
+			'ceo_birthday'   => $value['representativeDateOfBirth'],
+			'gmv_flag'       => $gmv_flag,
+			'average_flag'   => $average_flag,
+			'survey01'       => $value['securitySurvey01RadioControl'],
+			'survey02'       => $value['securitySurvey01TextControl'],
+			'survey03'       => $value['securitySurvey11CheckControl'],
+			'survey04'       => $value['securitySurvey12CheckControl'],
+			'survey05'       => $value['securitySurvey13CheckControl'],
+			'survey06'       => $value['securitySurvey14CheckControl'],
+			'survey07'       => $value['securitySurvey10TextAreaControl'],
+			'survey08'       => $value['securitySurvey08RadioControl'],
+			'survey09'       => $value['securitySurvey09RadioControl'],
+			'state'          => $state_token,
+			// Sent for support diagnostics only: the intermediary records which
+			// plugin version submitted the application (state-token handling
+			// differs by version, see WC_Paidy_Apply_Receiver::SIGNATURE_HEADER).
+			'plugin_version' => defined( 'WC_PAIDY_VERSION' ) ? WC_PAIDY_VERSION : '',
 		);
 		$args       = array(
 			'method'      => 'POST',
@@ -394,15 +430,21 @@ class WC_Paidy_Admin_Wizard {
 		);
 		$response   = wp_remote_post( $wcartws_api_url, $args );
 
-		$result = true;
 		if ( is_wp_error( $response ) ) {
 			$error_message = $response->get_error_message();
 			wc_get_logger()->error(
 				'Paidy On Boarding API Error: ' . $error_message,
 				array( 'source' => 'paidy-wc' )
 			);
-			$result = false;
+			// Clean up the state token: the POST never reached the intermediary,
+			// so the receiver callback will never arrive to consume it.
+			WC_Paidy_Apply_Receiver::consume_state_token( $state_token );
+			return false;
 		}
+
+		// wp_remote_retrieve_response_code() returns '' for a WP_Error, which the
+		// case above already returned on — a raw response array is guaranteed here.
+		$result        = true;
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ( 403 === $response_code || $response_code < 200 || $response_code >= 300 ) {
 			wc_get_logger()->error(
@@ -412,10 +454,67 @@ class WC_Paidy_Admin_Wizard {
 					'response' => $response,
 				)
 			);
+			// Clean up the orphaned state token on HTTP-level failures as well.
+			WC_Paidy_Apply_Receiver::consume_state_token( $state_token );
 			$result = false;
 		}
 
+		if ( $result ) {
+			$this->store_application_id( wp_remote_retrieve_body( $response ) );
+		}
+
 		return $result;
+	}
+
+	/**
+	 * Persist the application ID returned by the intermediary.
+	 *
+	 * The ID is shown on the "under review" screen so a merchant can quote it
+	 * to support, and logged so the site's own WooCommerce log ties the wizard
+	 * submission to the intermediary's record.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param string $response_body Raw JSON body of the application POST response.
+	 * @return void
+	 */
+	private function store_application_id( $response_body ) {
+		$body = json_decode( (string) $response_body, true );
+		if ( ! is_array( $body ) || empty( $body['application_id'] ) ) {
+			return;
+		}
+
+		$application_id = self::sanitize_application_id( $body['application_id'] );
+		if ( '' === $application_id ) {
+			return;
+		}
+
+		update_option( 'paidy_application_id', $application_id, false );
+		wc_get_logger()->info(
+			'Paidy onboarding application accepted by the intermediary. Application ID: ' . $application_id,
+			array( 'source' => 'paidy-wc' )
+		);
+	}
+
+	/**
+	 * Sanitize an application ID (e.g. WC000000571).
+	 *
+	 * Used both for the intermediary response and as the REST sanitize
+	 * callback of the `paidy_application_id` setting.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string Sanitized ID, or empty string if invalid.
+	 */
+	public static function sanitize_application_id( $value ) {
+		if ( ! is_string( $value ) ) {
+			return '';
+		}
+		// Strict allow-list on the raw (trimmed) value: reject rather than
+		// strip, so markup or separators never collapse into a "valid" ID.
+		$value = trim( $value );
+		return 1 === preg_match( '/^[A-Za-z0-9_\-]{1,32}$/', $value ) ? $value : '';
 	}
 
 	/**
@@ -494,6 +593,11 @@ class WC_Paidy_Admin_Wizard {
 	 */
 	public function paidy_method_description( $description, $payment_object ) {
 		if ( $payment_object->id === $this->id ) {
+			// Manual entry requested via wizard=false: render the gateway
+			// fields as-is instead of the onboarding UI that hides them.
+			if ( $this->is_manual_settings_requested() ) {
+				return $description;
+			}
 			if ( isset( $this->paidy_settings['api_public_key'] )
 			&& isset( $this->paidy_settings['test_api_public_key'] )
 			&& ( ! empty( $this->paidy_settings['api_public_key'] ) || ! empty( $this->paidy_settings['test_api_public_key'] ) )
@@ -513,6 +617,10 @@ class WC_Paidy_Admin_Wizard {
 	public function paidy_after_settings_checkout() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['section'] ) && $_GET['section'] === $this->id ) {
+			// No wrapper was opened in paidy_method_description() for manual entry.
+			if ( $this->is_manual_settings_requested() ) {
+				return;
+			}
 			if ( isset( $this->paidy_settings['api_public_key'] ) && isset( $this->paidy_settings['test_api_public_key'] ) ) {
 				return;
 			} else {
@@ -522,8 +630,37 @@ class WC_Paidy_Admin_Wizard {
 	}
 
 	/**
+	 * Lifetime of the per-user "show manual settings" flag, in seconds.
+	 *
+	 * @since 1.6.0
+	 */
+	const MANUAL_SETTINGS_TTL = 15 * MINUTE_IN_SECONDS;
+
+	/**
+	 * Transient key of the per-user "show manual settings" flag.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @return string
+	 */
+	public static function manual_settings_transient_key() {
+		return 'paidy_manual_settings_' . get_current_user_id();
+	}
+
+	/**
+	 * Whether the current user asked for the plain gateway fields (wizard=false).
+	 *
+	 * @since 1.6.0
+	 *
+	 * @return bool
+	 */
+	public function is_manual_settings_requested() {
+		return false !== get_transient( self::manual_settings_transient_key() );
+	}
+
+	/**
 	 * Handles redirect when wizard=false parameter is present.
-	 * Updates test_api_public_key with pk_test_ prefix and redirects to Paidy settings page.
+	 * Redirects to Paidy settings page.
 	 */
 	public function paidy_handle_wizard_false_redirect() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -551,27 +688,11 @@ class WC_Paidy_Admin_Wizard {
 			return;
 		}
 
-		// Update test_api_public_key with pk_test_ prefix if not already present.
-		$paidy_settings = get_option( 'woocommerce_' . $this->id . '_settings' );
-
-		if ( ! is_array( $paidy_settings ) ) {
-			$paidy_settings = array();
-		}
-
-		// If test_api_public_key exists, add pk_test_ prefix if not already present.
-		if ( isset( $paidy_settings['test_api_public_key'] ) ) {
-			$current_key = $paidy_settings['test_api_public_key'];
-
-			// Add prefix if not already present.
-			if ( 0 !== strpos( $current_key, 'pk_test_' ) ) {
-				$paidy_settings['test_api_public_key'] = 'pk_test_' . $current_key;
-				update_option( 'woocommerce_' . $this->id . '_settings', $paidy_settings );
-			}
-		} else {
-			// If test_api_public_key does not exist, set it to pk_test_.
-			$paidy_settings['test_api_public_key'] = 'pk_test_';
-			update_option( 'woocommerce_' . $this->id . '_settings', $paidy_settings );
-		}
+		// Remember the request so the settings page renders the plain gateway
+		// fields after the redirect below strips wizard=false. Without this
+		// the page would show the onboarding/under-review UI again and keep
+		// #paidy-payment-settings hidden, so manual key entry was impossible.
+		set_transient( self::manual_settings_transient_key(), 1, self::MANUAL_SETTINGS_TTL );
 
 		// Redirect to Paidy settings page (remove wizard=false parameter).
 		$redirect_url = add_query_arg(
