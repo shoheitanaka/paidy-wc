@@ -18,7 +18,7 @@
 ## 品質ツールの例外
 
 - `.phpcs.xml.dist` の一時除外（`paidy-wc.php` の `NonPrefixedFunctionFound` / `NonPrefixedHooknameFound`）— backlog B-1 の解消まで
-- `phpstan-baseline.neon` の 38 件（PR #38 時点は 56 件）— レガシー専用。増やす変更は指摘対象、減らす変更は歓迎
+- `phpstan-baseline.neon` の 35 件（PR #38 時点は 56 件）— レガシー専用。増やす変更は指摘対象、減らす変更は歓迎
 - `composer phpstan:baseline` が baseline を include したまま同じファイルへ再生成すること — PHPStan は生成先と同じパスを
   include から除外するので既存の抑制は失われない（PR #38 で検証: 再生成前後で同一・56 件維持、続く `composer phpstan` は No errors）。
   「既存 baseline を無視して上書きする」という指摘は誤検知

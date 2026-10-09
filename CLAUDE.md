@@ -50,7 +50,7 @@ composer check       # 上の 3 つをまとめて実行
 ```
 
 - PHPCS の警告（フレームワークの `base64_*` 2 件）は `docs/review-baseline.md` で把握済み。**新しい警告は増やさない**
-- PHPStan の baseline（38 件）はレガシーコード専用。新規コードのエラーを baseline に追加しない。
+- PHPStan の baseline（35 件）はレガシーコード専用。新規コードのエラーを baseline に追加しない。
   JP4WC からファイルを同期したら、**再生成の前に** `composer phpstan` で `Ignored error pattern …` 以外のエラーが 0 件であることを
   確かめてから `composer phpstan:baseline` で再生成し、件数が減ったことを確認する（再生成は新しいエラーも吸収して exit 0 になる。PR #40 で実測）。
   baseline を include したまま同じファイルへ再生成してよい（PHPStan は生成先を include から除外する。PR #38 で検証済み。
@@ -119,15 +119,18 @@ composer check       # 上の 3 つをまとめて実行
 
 ## セキュリティ上の現状（最重要・Phase 1）
 
-JP4WC 2.9.13〜2.9.16 で入った Paidy の修正のうち、次がまだ**このリポジトリには未反映**（`docs/DEVELOPMENT_PLAN.md` Phase 1）:
-
-- サンクスページ（`thankyou_completed()`）が `?transaction_id=` を Paidy に裏取りせず `payment_complete()` する（1-3）
+JP4WC 2.9.0〜2.9.16 で入った Paidy のセキュリティ修正は 1-1〜1-3 で取り込み済み。Phase 1 の残りは 1-4（ブロック対応の fatal 回避）と
+1-5（1.6.0 リリース）（`docs/DEVELOPMENT_PLAN.md`）。
 
 取り込み済み（1-1）: `paidy/v1/order` の HMAC 署名 + IP 許可リスト認証・決済方法確認・冪等性・Paidy API での裏取り、
 `paidy_get_payment_data()` の GET 化・`payment_id` 形式検証・`rawurlencode()`。`paidy/v1/check` は JP4WC と同じく `__return_true`（状態を変えない）
 
 取り込み済み（1-2）: `paidy-receiver/v1/receive` の state token / body の HMAC 署名（`x-paidy-receiver-signature`）認証・リプレイ防止・
 application_id 一致確認・body のみから値を読む・秘密鍵の伏せ字。JP4WC の `jp4wc_updated` は `paidy_wc_updated`（`paidy-wc.php`）に置き換え
+
+取り込み済み（1-3）: ゲートウェイを JP4WC 版に置換。サンクスページ（`thankyou_completed()`）は `?transaction_id=` を
+`paidy_verify_payment_for_order()` で裏取りしてから `payment_complete()`、`paidy_capture_id` による再キャプチャ防止、説明文の `force_balance_tags()`。
+JP4WC の返金の `paidy_refund_id` ガードとリダイレクト URL の `esc_url()` は取り込まない（`docs/sync-with-jp4wc.md` の意図的な差分 12・13）
 
 これらに触る変更では JP4WC 側の実装（HMAC 署名 + IP 許可リスト、state token + 署名、`^pay_[A-Za-z0-9_-]+$/D`）をそのまま取り込むこと。
 独自実装で再発明しない。
