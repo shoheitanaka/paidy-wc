@@ -109,16 +109,18 @@ sed -i '' -e "s/'woocommerce-for-japan'/'paidy-wc'/g" -e "s/@package Japanized_F
 grep -rn "woocommerce-for-japan" includes src tests paidy-wc.php class-wc-paidy.php   # 0 件
 php .claude/skills/sync-from-jp4wc/check-setting-keys.php                         # unknown 0 件（本体 + tests）
 composer lint
-composer phpstan:baseline && composer phpstan     # 置換したファイルの baseline を作り直す。件数が減ること
-git diff -U0 phpstan-baseline.neon | grep '^+.*message:'   # 新しく baseline に入ったエラー。0 行であること
+composer phpstan                                  # baseline を作り直す前に。「Ignored error pattern …」以外のエラーが 0 件であること
+composer phpstan:baseline && composer phpstan     # 直って消えた分を baseline から落とす。件数が減ること
 composer test                                      # 事前に composer test:db && composer test:install
 npm run build                                      # src/ を触った場合
 git diff --stat
 ```
 
-- baseline の件数が**増えた**ら（上の `git diff` に行が出たら）、新しいコードのエラーなので baseline に入れず直す（JP4WC 側のバグなら JP4WC にも報告）。
-  `phpstan:baseline` は新しいエラーも baseline に吸収して exit 0 にするので、件数の確認を飛ばさない。
-  `Access to an undefined property WC_Gateway_Paidy::$…`（`property.notFound`）は存在しない設定をプロパティで読んでいる可能性がある
+- 作り直す前の `composer phpstan` で出る通常のエラーは、新しいコードのエラー。baseline に入れず直す（JP4WC 側のバグなら JP4WC にも報告）。
+  既存エントリと同じエラーが増えた場合も、`… is expected to occur 1 time, but occurred 2 times` と本体のエラーが出る。
+  `Ignored error pattern … was not matched` / `… but occurred only …` は直って消えた・減った分なので、そのまま再生成してよい。
+  `phpstan:baseline` は新しいエラーも吸収して exit 0 にするので、この順番を飛ばさない
+- `Access to an undefined property WC_Gateway_Paidy::$…`（`property.notFound`）は存在しない設定をプロパティで読んでいる可能性がある
 - `.phpcs.xml.dist` の一時除外（B-1）が不要になっていたら消す
 - 文字列が増えていれば `update-i18n` スキルで `i18n/paidy-wc.pot`（JS なら JSON も）を更新する
 

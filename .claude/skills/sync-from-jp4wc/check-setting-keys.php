@@ -64,7 +64,7 @@ function paidy_fail( $message ) {
  * @return array<int, array{0: int|string, 1: string, 2: int}> Tokens as [id, text, line].
  */
 function paidy_tokens( $file ) {
-	$code = file_get_contents( $file );
+	$code = is_file( $file ) && is_readable( $file ) ? file_get_contents( $file ) : false;
 	if ( false === $code ) {
 		paidy_fail( "cannot read $file" );
 	}
@@ -105,7 +105,7 @@ function paidy_literal( $token ) {
  * @return int 1 for an opening bracket, -1 for a closing one, 0 otherwise.
  */
 function paidy_bracket( $token ) {
-	if ( in_array( $token[0], array( '(', '[', '{', T_CURLY_OPEN, T_DOLLAR_OPEN_CURLY_BRACES ), true ) ) {
+	if ( in_array( $token[0], array( '(', '[', '{', T_ATTRIBUTE, T_CURLY_OPEN, T_DOLLAR_OPEN_CURLY_BRACES ), true ) ) {
 		return 1;
 	}
 	return in_array( $token[0], array( ')', ']', '}' ), true ) ? -1 : 0;
@@ -279,7 +279,8 @@ function paidy_setting_references( $file ) {
  * Expand files and directories into a sorted list of PHP files.
  *
  * Built assets (assets/), vendor/ and node_modules/ below a given directory are
- * skipped. Finding no file at all is an error, so a wrong path cannot pass.
+ * skipped. A directory without any PHP file to check is an error, so a wrong
+ * path cannot pass silently next to the other arguments.
  *
  * @param string[] $paths Paths.
  * @return string[] PHP files.
@@ -295,17 +296,19 @@ function paidy_php_files( array $paths ) {
 			paidy_fail( "no such file or directory: $path" );
 		}
 		$root     = rtrim( $path, '/' );
+		$found    = 0;
 		$iterator = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $path, FilesystemIterator::SKIP_DOTS ) );
 		foreach ( $iterator as $entry ) {
 			$file = $entry->getPathname();
 			// Match below the given directory only: a checkout under ~/vendor/ is still scanned.
 			if ( 'php' === $entry->getExtension() && ! preg_match( '#/(assets|vendor|node_modules)/#', substr( $file, strlen( $root ) ) ) ) {
 				$files[] = $file;
+				++$found;
 			}
 		}
-	}
-	if ( ! $files ) {
-		paidy_fail( 'no PHP files to check in: ' . implode( ' ', $paths ) );
+		if ( 0 === $found ) {
+			paidy_fail( "no PHP files to check in: $path" );
+		}
 	}
 	sort( $files );
 	return array_values( array_unique( $files ) );
@@ -333,6 +336,9 @@ if ( ! $paidy_paths ) {
 	}
 }
 
+if ( '' === $paidy_gateway ) {
+	paidy_fail( '--gateway needs a file' );
+}
 $paidy_keys    = paidy_setting_keys( $paidy_gateway );
 $paidy_files   = paidy_php_files( $paidy_paths );
 $paidy_checked = 0;
