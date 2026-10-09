@@ -55,7 +55,7 @@ Paidy のテスト鍵は wp-admin の WooCommerce → 設定 → 決済 → Paid
 
 - `phpstan.neon.dist`: level 5、`szepeviktor/phpstan-wordpress` + `php-stubs/woocommerce-stubs`、
   実行時定数は `phpstan-bootstrap.php` で定義（`dynamicConstantNames` でリテラル扱いを防ぐ）
-- `phpstan-baseline.neon`: レガシー 56 件。新規エラーは baseline に入れず直す。
+- `phpstan-baseline.neon`: レガシー 39 件。新規エラーは baseline に入れず直す。
   JP4WC から同期してファイルが入れ替わったら `composer phpstan:baseline` で再生成し、減ったことを確認する
 
 ### PHPUnit（`composer test`）

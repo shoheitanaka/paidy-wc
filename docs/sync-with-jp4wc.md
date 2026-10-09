@@ -38,6 +38,13 @@
 5. **`class-wc-paidy.php`**: paidy-wc 版は `load_plugin_textdomain()` と `wc_paidy_blocks_support()` を持つ（JP4WC 版は本体側が担う）
 6. **JP4WC 固有機能への参照**: 読み仮名（`_billing_yomigana_*`）は「あれば使う」実装なので残してよい。
    `JP4WC_` クラス・`wc4jp-` オプションへの新しい依存が入っていたら、単体で動くように条件分岐するか外す
+7. **Webhook 署名の鍵選択**（`class-wc-paidy-endpoint.php` の `paidy_webhook_permission_check()`）: JP4WC は
+   `'yes' === $this->paidy->get_option( 'testmode' )` だが、ゲートウェイに `testmode` 設定は無く、sandbox でも本番鍵で検証してしまう。
+   paidy-wc は `'live' !== $this->paidy->get_option( 'environment' )`（`set_api_secret_key()` と同じ判定）。JP4WC が直したらこの項目を消す。
+   回帰テスト: `test-paidy-webhook-permission.php` の `test_signature_made_with_*`
+8. **WPCS 由来の書き換え**（ロジックは不変）: endpoint の `$order->get_payment_method() !== 'paidy'` を Yoda 条件に、
+   新規メソッドの DocBlock に `@since`。ゲートウェイの `$jp4wc_framework` の `@var` を `stdClass` から `Framework\JP4WC_Framework` に
+   （PHPStan baseline の削減）。テスト `test-paidy-payment-id-format.php` の「issue #223」は「Japanized for WooCommerce issue #223」
 
 ## 差分の取り方
 
@@ -59,21 +66,29 @@ awk '/^== Changelog ==/{f=1} f' "$J/readme.txt" | grep -iE "^= [0-9]|paidy"
 git -C "$J" log --oneline -- includes/gateways/paidy tests/Unit/test-paidy-*.php | head -40
 ```
 
-## 2026-10-09 時点の未取り込み（JP4WC changelog より。詳細は DEVELOPMENT_PLAN.md Phase 1）
+## 未取り込み（JP4WC changelog より。詳細は DEVELOPMENT_PLAN.md Phase 1）
+
+2026-10-09 時点の一覧から、Phase 1-1（ブランチ `fix/webhook-auth`）で取り込んだ分を除いたもの。
 
 | JP4WC 版 | 内容 | 対象ファイル |
 |---------|------|------------|
-| 2.9.0 | `WC_Paidy_Endpoint` を `init` 11 に遅延、`paidy_capture_id` による再キャプチャ防止 | class-wc-paidy.php, gateway |
+| 2.9.0 | `paidy_capture_id` による再キャプチャ防止 | gateway |
 | 2.9.5 | ゲートウェイ未登録時のブロック対応 fatal 回避、wp-env 等の非標準パスでの `WC_Gateway_Paidy not found` 修正 | blocks-support, loader |
-| 2.9.6 | Webhook 署名検証の修正（署名ヘッダー無しの通知を拒否しない、`api_secret_key` / `test_api_secret_key` を使う） | endpoint |
-| 2.9.13 | **Broken Access Control 修正**: receiver に state token、`paidy/v1/*` に HMAC or IP 許可リスト、復号失敗の翻訳可能化、鍵フィールドの補完 | endpoint, receiver |
-| 2.9.14 | `GET /payments/{id}` を `wp_safe_remote_get()` に、`payment_id` の形式検証 + `rawurlencode()` | gateway |
+| 2.9.13 | **Broken Access Control 修正**（receiver 側）: state token、復号失敗の翻訳可能化、鍵フィールドの補完 | receiver |
+| 2.9.14 | サンクスページでの裏取り（`thankyou_completed()` から `paidy_verify_payment_for_order()`） | gateway |
 | 2.9.15 | 説明文の `force_balance_tags()`、state token を non-autoload option に、`pk_test_` 書き換えの廃止 | gateway, receiver, wizard |
 | 2.9.16 | receiver の HMAC 署名フォールバック、リプレイ防止、body のみから認証、application_id 一致確認、`paidy_received_data` から秘密鍵除外、`wizard=false` 修正、`wp_remote_post()` 失敗時の二重ログ修正 | receiver, wizard |
-| #223 | `payment_id` の `-` 許容（`^pay_[A-Za-z0-9_-]+$`） | gateway, tests |
 
-付随テスト（JP4WC `tests/Unit/`）: `test-paidy-receiver-signature.php` `test-paidy-payment-id-format.php` `test-paidy-application-id.php`
+付随テスト（JP4WC `tests/Unit/`）: `test-paidy-receiver-signature.php` `test-paidy-application-id.php`
 `test-paidy-manual-settings.php` `test-paidy-onboarding-state.php` `test-paidy-description-balance.php` `test-paidy-guest-order-history.php`
+
+### 取り込み済み
+
+| Phase | JP4WC 版 | 内容 |
+|-------|---------|------|
+| 1-1 | 2.9.0 | `WC_Paidy_Endpoint` を `init` 11 に遅延 |
+| 1-1 | 2.9.6 / 2.9.13 | `paidy/v1/order` の HMAC 署名 or IP 許可リスト認証（署名なしの通知を拒否しない）、決済方法確認、冪等性、Paidy API での裏取り。`paidy/v1/check` は JP4WC 同様 `__return_true` |
+| 1-1 | 2.9.14 / #223 | `paidy_get_payment_data()` の `wp_safe_remote_get()` 化、`^pay_[A-Za-z0-9_-]+$/D` 検証 + `rawurlencode()`、`paidy_verify_payment_for_order()`。テスト `test-paidy-payment-id-format.php` |
 
 ## 同期後のチェック
 

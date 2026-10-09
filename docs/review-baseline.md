@@ -18,7 +18,7 @@
 ## 品質ツールの例外
 
 - `.phpcs.xml.dist` の一時除外（`paidy-wc.php` の `NonPrefixedFunctionFound` / `NonPrefixedHooknameFound`）— backlog B-1 の解消まで
-- `phpstan-baseline.neon` の 56 件 — レガシー専用。増やす変更は指摘対象、減らす変更は歓迎
+- `phpstan-baseline.neon` の 39 件（PR #38 時点は 56 件）— レガシー専用。増やす変更は指摘対象、減らす変更は歓迎
 - `composer phpstan:baseline` が baseline を include したまま同じファイルへ再生成すること — PHPStan は生成先と同じパスを
   include から除外するので既存の抑制は失われない（PR #38 で検証: 再生成前後で同一・56 件維持、続く `composer phpstan` は No errors）。
   「既存 baseline を無視して上書きする」という指摘は誤検知
@@ -28,7 +28,12 @@
 ## 設計上の判断
 
 - Webhook（`paidy/v1/order`）に nonce / `current_user_can()` を要求しない。サーバー間通信なので署名（HMAC）と IP 許可リストで認証する
-  （JP4WC `SECURITY-FIX-PAIDY.md` の判断。現状の `__return_true` 自体は backlog ではなく Phase 1 の修正対象）
+  （JP4WC `SECURITY-FIX-PAIDY.md` の判断。Phase 1-1 で取り込み済み）
+- `paidy/v1/check` の `permission_callback` が `__return_true` であること。呼び出し元は Paidy ではなく paidy.artws.info で、
+  Paidy の署名・IP では認証できず、受け取った値を返すだけで状態を変えない（JP4WC も同じ。コード内にも理由のコメントがある）
+- `paidy_webhook_allowed_ips` フィルタで許可リストを空にすると署名なしの Webhook を通すこと（運用者が明示的に選ぶオプトアウト。
+  既定は Paidy 公式 IP。JP4WC 2.9.6 で「署名なしの通知を全部拒否して注文が自動キャンセルされた」障害の対策として残している）
+- `X-Forwarded-For` を既定で使わず、`paidy_trust_proxy_headers` フィルタでの明示的なオプトインに限ること
 - 受信エンドポイントで `base64_decode()` + `openssl_decrypt()` を使うこと（仲介サーバーが AES-256-CBC で鍵を暗号化して送る）
 - Paidy API の認証に秘密鍵を `Authorization` ヘッダーで送ること（Paidy API の仕様）
 - `apps.paidy.com` の JS を CDN から読み込むこと（Paidy Checkout の仕様。PCI の観点でも同梱しない）
