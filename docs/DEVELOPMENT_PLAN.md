@@ -10,7 +10,7 @@
 - セキュリティ修正（Phase 1）を他のすべてに優先し、1.6.0 としてリリースする
 - 1 PR = 1 フェーズの 1 ステップ。品質ツール（`composer check`）が緑であることを PR の前提にする
 
-## Phase 0 — 開発基盤（PR: `chore/dev-infrastructure`）
+## Phase 0 — 開発基盤（PR #38、2026-10-09 マージ）
 
 - [x] `composer.json` を刷新（PHPCS / PHPStan / PHPUnit、`platform.php` 8.1）
 - [x] `.phpcs.xml.dist`（WordPress 標準、エラーのみ fail）、`phpstan.neon.dist` + baseline（56 件）

@@ -45,13 +45,15 @@ Paidy 決済モジュールを切り出したもので、**JP4WC 側が常に最
 ```bash
 composer lint        # PHPCS（エラー 0 件必須。警告は表示されるが exit code には影響しない）
 composer phpstan     # PHPStan level 5（phpstan-baseline.neon 差分でエラー 0 件必須）
-composer test        # PHPUnit（事前に composer test:db && composer test:install）
+composer test        # PHPUnit（事前に composer test:install。Docker MySQL の起動も含む）
 composer check       # 上の 3 つをまとめて実行
 ```
 
 - PHPCS の警告（`base64_decode` / 非 strict `in_array` など 9 件）は `docs/review-backlog.md` B-2 で把握済み。**新しい警告は増やさない**
 - PHPStan の baseline（56 件）はレガシーコード専用。新規コードのエラーを baseline に追加しない。
-  JP4WC からファイルを同期したら `composer phpstan:baseline` で再生成し、件数が減ったことを確認する
+  JP4WC からファイルを同期したら `composer phpstan:baseline` で再生成し、件数が減ったことを確認する。
+  baseline を include したまま同じファイルへ再生成してよい（PHPStan は生成先を include から除外する。PR #38 で検証済み。
+  Copilot が「既存 56 件を無視して上書きする」と指摘するのは誤検知 → `docs/review-baseline.md`）
 - `.phpcs.xml.dist` の `paidy-wc.php` 向け一時除外（`NonPrefixedFunctionFound` / `NonPrefixedHooknameFound`）は B-1 の解消時に消す
 - `src/` を変えたら `npm run build` して成果物もコミット対象にする（CI の `build-js` はビルド成功だけを見る）
 - PHP ファイルを編集したら上記に加えて手動セルフレビュー: ABSPATH ガード / DocBlock（`@since` は次リリース版）/ i18n ドメイン `paidy-wc` /
@@ -129,3 +131,7 @@ JP4WC 2.9.13〜2.9.16 で入った Paidy の修正が**このリポジトリに�
 - 翻訳 JSON のファイル名はビルド済みスクリプトのプラグイン相対パスの md5（`includes/gateways/paidy/assets/js/wizard/paidy.js` → `12e0aa1e…`）。
   出力パスを変えると JSON を作り直す必要がある（`update-i18n` スキル）
 - 変更 PR で `i18n/*.po` を `msgmerge` しない（`.po` / `.mo` は gitignore 済み。PHP の翻訳は WordPress.org 言語パック、JS は同梱 JSON）
+- `bin/` のシェルスクリプトで `set -x` を使わない。`sed s/yourpasswordhere/…/` や `mysqladmin --password=` が echo されて
+  DB パスワードが CI ログに出る（PR #38 の実例）。進行表示は明示的な `echo` で。接続設定は `bin/test-db.sh` の 1 か所に置く
+- `downloads.wordpress.org/plugin/<slug>.latest-stable.zip` は版付き URL への 302。スクリプトでは `<slug>.zip`（版なし・200 で直接配信）
+  を使うか `curl -fsSL` で追従し、展開前に `unzip -tq` で検証する（`curl -s` だとリダイレクト本文を zip として保存して失敗する）
