@@ -50,7 +50,7 @@ composer check       # 上の 3 つをまとめて実行
 ```
 
 - PHPCS の警告（`base64_decode` / 非 strict `in_array` など 9 件）は `docs/review-backlog.md` B-2 で把握済み。**新しい警告は増やさない**
-- PHPStan の baseline（56 件）はレガシーコード専用。新規コードのエラーを baseline に追加しない。
+- PHPStan の baseline（39 件）はレガシーコード専用。新規コードのエラーを baseline に追加しない。
   JP4WC からファイルを同期したら `composer phpstan:baseline` で再生成し、件数が減ったことを確認する。
   baseline を include したまま同じファイルへ再生成してよい（PHPStan は生成先を include から除外する。PR #38 で検証済み。
   Copilot が「既存 56 件を無視して上書きする」と指摘するのは誤検知 → `docs/review-baseline.md`）
@@ -112,11 +112,13 @@ composer check       # 上の 3 つをまとめて実行
 
 ## セキュリティ上の現状（最重要・Phase 1）
 
-JP4WC 2.9.13〜2.9.16 で入った Paidy の修正が**このリポジトリには未反映**（`docs/DEVELOPMENT_PLAN.md` Phase 1）:
+JP4WC 2.9.13〜2.9.16 で入った Paidy の修正のうち、次がまだ**このリポジトリには未反映**（`docs/DEVELOPMENT_PLAN.md` Phase 1）:
 
-- `paidy/v1/order` と `paidy/v1/check` の `permission_callback` が `__return_true`（未認証で注文ステータスを操作できる。Wordfence 報告の脆弱性）
-- `paidy-receiver/v1/receive` の `check_permissions()` が無条件 `return true`（API キー・申込ステータスを外部から上書きできる）
-- `payment_id` の形式検証・`rawurlencode()` なしで API URL に埋め込んでいる、`GET /payments/{id}` を POST で呼んでいる（検証が常に 404）
+- `paidy-receiver/v1/receive` の `check_permissions()` が無条件 `return true`（API キー・申込ステータスを外部から上書きできる。1-2）
+- サンクスページ（`thankyou_completed()`）が `?transaction_id=` を Paidy に裏取りせず `payment_complete()` する（1-3）
+
+取り込み済み（1-1）: `paidy/v1/order` の HMAC 署名 + IP 許可リスト認証・決済方法確認・冪等性・Paidy API での裏取り、
+`paidy_get_payment_data()` の GET 化・`payment_id` 形式検証・`rawurlencode()`。`paidy/v1/check` は JP4WC と同じく `__return_true`（状態を変えない）
 
 これらに触る変更では JP4WC 側の実装（HMAC 署名 + IP 許可リスト、state token + 署名、`^pay_[A-Za-z0-9_-]+$/D`）をそのまま取り込むこと。
 独自実装で再発明しない。
@@ -127,8 +129,10 @@ JP4WC 2.9.13〜2.9.16 で入った Paidy の修正が**このリポジトリに�
   （`_` と `-` の見落としで実決済が止まった実例が 2 回）。PCRE の `$` は末尾 `\n` を許すので `/D` か `\z` を使う
 - `WP_REST_Request::get_body()` は body が無いと `null`（`''` ではない）。`empty()` で判定する
 - `get_params()` はクエリ文字列が body を上書きする。署名検証する値は `get_json_params()` / `get_body_params()` からだけ読む
-- `WC_Gateway_Paidy` を `init` より前に生成すると `_load_textdomain_just_in_time` 警告（WP 6.7+）。現状 `WC_Paidy::includes()` が
-  `plugins_loaded` で `WC_Paidy_Endpoint` → ゲートウェイを生成している（backlog B-9。JP4WC は `init` 11 に遅延）
+- `WC_Gateway_Paidy` を `init` より前に生成すると `_load_textdomain_just_in_time` 警告（WP 6.7+）。`WC_Paidy_Endpoint` は
+  コンストラクタでゲートウェイを作るので `init` 11 で生成している（`class-wc-paidy.php`）。`plugins_loaded` で生成する処理を足さない
+- JP4WC のコードにもバグはある。Webhook 署名の鍵選択が存在しない `testmode` 設定を見ていた（実際は `environment`）。
+  取り込むときは設定名・プロパティ名が paidy-wc のゲートウェイに実在するかを確かめ、直したら `docs/sync-with-jp4wc.md` の「意図的な差分」に書く
 - `class_exists()` は `use` エイリアスを解決しない。常に完全修飾名を渡す
 - 管理者が入力した説明文 HTML は `wp_kses( force_balance_tags( $html ), $allowed )` で出力（閉じタグ漏れで注文ボタンが重複した実例）
 - `stripslashes()` ではなく `wp_unslash()`。`json_encode()` ではなく `wp_json_encode()`
