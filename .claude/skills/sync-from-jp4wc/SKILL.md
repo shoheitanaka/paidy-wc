@@ -77,8 +77,18 @@ php .claude/skills/sync-from-jp4wc/check-setting-keys.php "$J/includes/gateways/
 cp "$J/$f" "$f"
 sed -i '' "s/'woocommerce-for-japan'/'paidy-wc'/g" "$f"
 grep -n "woocommerce-for-japan\|assets/js/build\|JP4WC_\|wc4jp-" "$f"   # 残りは手で判断
+grep -nE "@since[[:space:]]+2\.|(PR|issue) #[0-9]+" "$f"                # JP4WC の版・PR 番号
+# JP4WC だけが発火するフックへのリスナー（paidy-wc では一度も呼ばれない）
+for h in $(grep -oE "add_(action|filter)\([[:space:]]*'(jp4wc|wc4jp)[a-z0-9_]*'" "$f" | grep -oE "'[^']+'" | tr -d "'" | sort -u); do
+  grep -rqE "(do_action|apply_filters)\([[:space:]]*'$h'" --include='*.php' includes class-wc-paidy.php paidy-wc.php || echo "never fired in paidy-wc: $h"
+done
 ```
 
+- `never fired in paidy-wc` が出たら、paidy-wc 側の対応するフックに付け替える。`jp4wc_updated`（JP4WC の `JP4WC_Install` が発火）は
+  `paidy_wc_updated`（`paidy_wc_check_version()` が発火。意図的な差分 9）。付け替えないとエラーも警告も出ず、処理が黙って動かない
+- `JP4WC_VERSION` は `WC_PAIDY_VERSION` に（意図的な差分 10。`defined()` でガードされているので PHPStan は何も言わない）
+- `@since 2.x` は次の paidy-wc の版（現行 Stable tag + 1）に、コメント中の JP4WC の版（「2.9.15 で」など）も paidy-wc の版に直す。
+  `PR #213` / `issue #210` は paidy-wc の番号と紛れるので「Japanized for WooCommerce PR #213」と書く
 - `assets/js/build/paidy/` の直書きがあれば `WC_PAIDY_BLOCKS_URL` / `WC_PAIDY_ASSETS_ABSPATH` 定数に置き換える
 - `JP4WC_*` クラスや `wc4jp-*` オプションへの新しい依存は、単体で動くよう `class_exists()` / `get_option()` でガードするか外す
 - paidy-wc 側だけにあった修正（手順 2 で特定）を再適用する
@@ -101,6 +111,8 @@ sed -i '' -e "s/'woocommerce-for-japan'/'paidy-wc'/g" -e "s/@package Japanized_F
 
 - `require_once dirname( __DIR__, 2 ) . '/includes/gateways/paidy/...'` はディレクトリ構成が同じなのでそのまま動く
 - JP4WC 固有（`JP4WC_` クラス、`wc4jp-` オプション）に依存するテストケースは外すか paidy-wc 向けに書き換える
+- 手順 3 (a) の 2 つ目以降の確認（版・PR 番号・フック）をテストにも流す。`has_action( 'jp4wc_updated', … )` を確かめるテストは、
+  フックが paidy-wc で発火しなくても通るので、paidy-wc のフック名に書き換える
 - `markTestSkipped()` は使わない（クラスが無ければ `require_once` + `assertTrue( class_exists() )`）
 
 ### 5. 検証
@@ -142,4 +154,5 @@ git diff --stat
 | PHPStan baseline の行が「存在しないエラー」で失敗する | 置換で行がずれた。`composer phpstan:baseline` で作り直す |
 | テストが `WC_Gateway_Paidy` の `__()` で textdomain 警告 | `init` 前にゲートウェイを生成している（B-9）。JP4WC の遅延ロジックを先に移植 |
 | paidy-wc 側だけの修正が消えた | 手順 2 を飛ばしてコピーした。`git diff` で復元 |
+| アップグレード時の処理（`paidy_received_data` の秘密鍵の伏せ字など）が動かない | JP4WC の `jp4wc_updated` に登録したまま。paidy-wc では発火しない。手順 3 (a) の `never fired` 確認 |
 | sandbox なのに本番鍵で検証される・設定を変えても挙動が変わらない | 取り込んだコードが paidy-wc に無い設定名を読んでいる（JP4WC の `testmode`）。`check-setting-keys.php` で照合 |
