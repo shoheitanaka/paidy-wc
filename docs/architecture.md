@@ -32,7 +32,8 @@ JP4WC との配置の違いは [sync-with-jp4wc.md](sync-with-jp4wc.md) の対�
 1. `paidy-wc.php` 読み込み: `register_activation_hook` / `register_deactivation_hook`、`WC_PAIDY_VERSION` 定義、
    `require class-wc-paidy.php`、`woocommerce_payment_gateways` に `WC_Gateway_Paidy` を追加、
    **`new WC_Paidy_Admin_Wizard()`**（即時）、`is_admin()` なら `WC_Paidy_Settings_Controller` と `WC_Paidy_Admin_Notices` を生成、
-   `admin_init` → 有効化直後のウィザードへのリダイレクト、`init` → `WC_Paidy_Apply_Receiver`、
+   `admin_init` → 有効化直後のウィザードへのリダイレクト、`init`(5) → `paidy_wc_check_version()`（版が変わったら `paidy_wc_updated`）、
+   `init` → `WC_Paidy_Apply_Receiver`、
    `woocommerce_available_payment_gateways` → JPY 以外 / 鍵未設定なら Paidy を外す、
    `before_woocommerce_init` → `FeaturesUtil::declare_compatibility( 'custom_order_tables' )`
 2. `plugins_loaded`(0) `wc_paidy_plugin()`: `active_plugins` に WooCommerce があれば `WC_Paidy::get_instance()`、無ければ管理画面に通知
@@ -76,13 +77,20 @@ Paidy API は `https://api.paidy.com/`、認証は `Authorization: Bearer <secre
 - `WC_Paidy_Admin_Wizard` が wc-admin に `/paidy-on-boarding` ページを登録し、`src/wizard` の React アプリを表示
 - 申込フォームの保存（`woocommerce_paidy_on_boarding_settings` の `add_option` / `updated_option`）をトリガに
   `send_apply_data_to_wcartws()` が `https://paidy.artws.info/api/applications/` へ `wp_remote_post()`。
-  このとき `paidy_site_hash`（16 文字ランダム）を生成・送信する
+  このとき `paidy_site_hash`（16 文字ランダム）と、1 回限りの state token（32 文字。`paidy_onboarding_state_<token>` に
+  発行時刻を non-autoload で保存、有効 90 日）を生成・送信する。応答の申込 ID は `paidy_application_id` に保存
 - 審査結果と API 鍵は仲介サーバーから `POST /wp-json/paidy-receiver/v1/receive` で届く。
   鍵は `site_hash` 派生鍵の AES-256-CBC で暗号化されており、復号して `woocommerce_paidy_settings` に書き込む。
-  **現状 `check_permissions()` は無条件 true**（→ JP4WC は state token + `x-paidy-receiver-signature` HMAC、
-  application_id の一致確認、リプレイ防止、受信データから秘密鍵の平文を除外）
+  `check_permissions()` は、`paidy_application_id` と一致しない申込を拒否したうえで、有効な state token か、
+  `x-paidy-receiver-signature`（`<timestamp>.<body>` の HMAC-SHA256、鍵は `paidy_site_hash`、時刻のずれ 10 分まで）を要求する。
+  署名と「同じ決定」（application_id・status・暗号化された鍵 4 つのハッシュ）を `paidy_receiver_sig_*` / `paidy_receiver_event_*` に
+  `add_option()` で claim してリプレイと二重処理を防ぎ、処理が失敗したら claim を外す。値は署名された body からだけ読む。
+  成功時に state token を消費し、`paidy_received_data` と応答からは秘密鍵を除く（JP4WC 2.9.16 と同じ。Phase 1-2）
 - `POST /wp-json/paidy/v1/check` は仲介サーバーからの Webhook 登録確認用（状態を変えない）
-- `wizard=false` で手動設定フィールドへ切替（`WC_Paidy_Settings_Controller` が `admin/paidy.js` で UI を制御）
+- `wizard=false` で手動設定フィールドへ切替: `paidy_handle_wizard_false_redirect()` がユーザー単位の transient
+  `paidy_manual_settings_<user_id>`（15 分）を立てて `wizard` を外した URL へリダイレクトし、その間は
+  `paidy_method_description()` が申込 UI の wrapper を出さずにゲートウェイの設定欄をそのまま表示する
+  （それ以外の決済設定画面の UI は `WC_Paidy_Settings_Controller` が `admin/paidy.js` で制御）
 
 ## REST ルート
 
@@ -90,7 +98,7 @@ Paidy API は `https://api.paidy.com/`、認証は `Authorization: Bearer <secre
 |--------|--------|---------------------|------|
 | `POST paidy/v1/order` | `WC_Paidy_Endpoint::paidy_check_webhook` | HMAC 署名 or IP 許可リスト（`paidy_webhook_permission_check`。JP4WC と同じ） | Paidy Webhook |
 | `POST paidy/v1/check` | `WC_Paidy_Endpoint::paidy_regist_webhook` | `__return_true`（JP4WC も同じ。呼び出し元は paidy.artws.info で状態を変えない） | Webhook 登録確認 |
-| `POST paidy-receiver/v1/receive` | `WC_Paidy_Apply_Receiver::handle_receive_data` | `return true` → state token + 署名 | 申込結果・鍵配信 |
+| `GET, POST paidy-receiver/v1/receive` | `WC_Paidy_Apply_Receiver::handle_receive_data` | state token か body の HMAC 署名 + application_id 一致（`check_permissions`。JP4WC と同じ） | 申込結果・鍵配信 |
 
 ## オプション・メタ
 
@@ -99,15 +107,22 @@ Paidy API は `https://api.paidy.com/`、認証は `Authorization: Bearer <secre
 | option | `woocommerce_paidy_settings` | ゲートウェイ設定（`enabled` `title` `description` `environment` `api_public_key` `api_secret_key` `test_api_public_key` `test_api_secret_key` `store_name` `logo_image_url` `debug` `notice_email` ...） |
 | option | `woocommerce_paidy_on_boarding_settings` | 申込ウィザードの入力・ステータス |
 | option | `paidy_site_hash` | 仲介サーバーとの共有シークレット（autoload） |
-| option | `paidy_received_data` | 最後に受信した申込結果（non-autoload。→ JP4WC は秘密鍵を除外） |
+| option | `paidy_received_data` | 最後に受信した申込結果（non-autoload。秘密鍵は `[redacted]`。1.5.2 以前の平文は `paidy_wc_updated` で伏せ字に） |
+| option | `paidy_application_id` | 仲介サーバーが返した申込 ID（non-autoload。これと違う申込のコールバックは拒否） |
+| option | `paidy_onboarding_state_<token>` | 申込の state token（値は発行時刻、non-autoload、90 日） |
+| option | `paidy_receiver_sig_<署名>` / `paidy_receiver_event_<hash>` | 受信コールバックの claim（リプレイ・二重処理防止）。20 分（署名の許容ずれの 2 倍）を過ぎた行は、次のコールバックの claim のときに消す |
+| option | `paidy_wc_version` | 最後に動いたプラグインの版（`paidy_wc_check_version()` が記録） |
+| transient | `paidy_manual_settings_<user_id>` | `wizard=false` の後、15 分間ゲートウェイの設定欄をそのまま表示する |
+| transient | `paidy_receiver_sig_warned` | 署名不正の警告ログの間引き（10 分に 1 回） |
 | option | `paidy_do_activation_redirect` | 有効化直後のリダイレクトフラグ |
 | option | `wc_paidy_show_ssl_notice` `wc_paidy_show_curl_notice` `wc_paidy_show_pr_notice` `wc_paidy_apply_notice_{2,3,99}` | 通知の非表示 |
 | order meta | `_transaction_id` | Paidy `payment_id`（`pay_...`） |
 | order meta | `paidy_capture_id` | `cap_...`（キャプチャ済みの印） |
 | order meta | `paidy_refund_id` | `ref_...` の配列 |
 
-`uninstall.php` は `woocommerce_paidy_*` と `wc-paidy-*` 接頭辞のオプションと `wc_paidy_show_pr_notice` を削除する
-（`paidy_site_hash` `paidy_received_data` `wc_paidy_show_ssl_notice` 等は残る → backlog B-2）。
+`uninstall.php` は `woocommerce_paidy_*` と `wc-paidy-*` 接頭辞のオプション、`wc_paidy_show_pr_notice`、`paidy_application_id`、
+`paidy_wc_version`、state token と claim の行を削除する（`paidy_site_hash` は再インストール後のコールバックのため意図的に残す。
+`paidy_received_data` `wc_paidy_show_ssl_notice` 等は残る → backlog B-2）。
 
 ## フック（公開 API）
 
@@ -120,6 +135,8 @@ Paidy API は `https://api.paidy.com/`、認証は `Authorization: Bearer <secre
 | `wc_paidy_payment_icons` | filter | ブロックチェックアウトのアイコン |
 | `wc_paidy_apply_enabled` | filter | 申込促進通知の有効/無効 |
 | `paidy_application_approved` / `paidy_application_rejected` | action | 申込結果受信時 |
+| `paidy_wc_updated` | action | インストール・アップデート後の最初のリクエスト（`init` 5。ダウングレードでは発火しない）。引数は前の版（記録が無ければ `false`） |
+| `wc4jp_paidy_onboarding_state_ttl` / `wc4jp_paidy_receiver_signature_tolerance` | filter | state token の有効期間（既定 90 日）/ 署名時刻の許容ずれ（既定 10 分） |
 | `wc_jp4wc_logging` | filter | フレームワークのログ出力可否 |
 
 ## JS アプリ

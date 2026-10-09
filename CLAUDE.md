@@ -49,8 +49,8 @@ composer test        # PHPUnit（事前に composer test:install。Docker MySQL 
 composer check       # 上の 3 つをまとめて実行
 ```
 
-- PHPCS の警告（`base64_decode` / 非 strict `in_array` など 9 件）は `docs/review-backlog.md` B-2 で把握済み。**新しい警告は増やさない**
-- PHPStan の baseline（39 件）はレガシーコード専用。新規コードのエラーを baseline に追加しない。
+- PHPCS の警告（フレームワークの `base64_*` 2 件）は `docs/review-baseline.md` で把握済み。**新しい警告は増やさない**
+- PHPStan の baseline（38 件）はレガシーコード専用。新規コードのエラーを baseline に追加しない。
   JP4WC からファイルを同期したら、**再生成の前に** `composer phpstan` で `Ignored error pattern …` 以外のエラーが 0 件であることを
   確かめてから `composer phpstan:baseline` で再生成し、件数が減ったことを確認する（再生成は新しいエラーも吸収して exit 0 になる。PR #40 で実測）。
   baseline を include したまま同じファイルへ再生成してよい（PHPStan は生成先を include から除外する。PR #38 で検証済み。
@@ -109,7 +109,8 @@ composer check       # 上の 3 つをまとめて実行
 - 外部サービス: `api.paidy.com`（決済 API・Basic 認証 = 秘密鍵）、`apps.paidy.com`（チェックアウト JS）、
   `paidy.artws.info`（Artisan Workshop の加盟店申込仲介。`readme.txt` の External Services 開示が未記載 → backlog B-6）
 - オプション: ゲートウェイ設定 `woocommerce_paidy_settings`、オンボーディング `woocommerce_paidy_on_boarding_settings`、
-  `paidy_site_hash`、`paidy_received_data`、通知制御 `wc_paidy_show_*` / `wc_paidy_apply_notice_*`。
+  `paidy_site_hash`、`paidy_received_data`（秘密鍵は伏せ字）、`paidy_application_id`、`paidy_wc_version`（`paidy_wc_check_version()` が記録）、
+  state token / claim 行 `paidy_onboarding_state_*` `paidy_receiver_sig_*` `paidy_receiver_event_*`、通知制御 `wc_paidy_show_*` / `wc_paidy_apply_notice_*`。
   **`paidy_*` / `wc_paidy_*` / `woocommerce_paidy_*` の 3 系統が混在しているのは既存の命名**（統一は backlog）
 - 注文メタ: `_transaction_id`（Paidy payment_id `pay_...`）、`paidy_capture_id`、`paidy_refund_id`
 
@@ -117,11 +118,13 @@ composer check       # 上の 3 つをまとめて実行
 
 JP4WC 2.9.13〜2.9.16 で入った Paidy の修正のうち、次がまだ**このリポジトリには未反映**（`docs/DEVELOPMENT_PLAN.md` Phase 1）:
 
-- `paidy-receiver/v1/receive` の `check_permissions()` が無条件 `return true`（API キー・申込ステータスを外部から上書きできる。1-2）
 - サンクスページ（`thankyou_completed()`）が `?transaction_id=` を Paidy に裏取りせず `payment_complete()` する（1-3）
 
 取り込み済み（1-1）: `paidy/v1/order` の HMAC 署名 + IP 許可リスト認証・決済方法確認・冪等性・Paidy API での裏取り、
 `paidy_get_payment_data()` の GET 化・`payment_id` 形式検証・`rawurlencode()`。`paidy/v1/check` は JP4WC と同じく `__return_true`（状態を変えない）
+
+取り込み済み（1-2）: `paidy-receiver/v1/receive` の state token / body の HMAC 署名（`x-paidy-receiver-signature`）認証・リプレイ防止・
+application_id 一致確認・body のみから値を読む・秘密鍵の伏せ字。JP4WC の `jp4wc_updated` は `paidy_wc_updated`（`paidy-wc.php`）に置き換え
 
 これらに触る変更では JP4WC 側の実装（HMAC 署名 + IP 許可リスト、state token + 署名、`^pay_[A-Za-z0-9_-]+$/D`）をそのまま取り込むこと。
 独自実装で再発明しない。
