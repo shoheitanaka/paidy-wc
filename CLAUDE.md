@@ -13,7 +13,7 @@ Paidy 決済モジュールを切り出したもので、**JP4WC 側が常に最
 | 動作要件 | PHP 8.1+（ヘッダー）/ CI は WP 6.7+ / WC 10.2+ で検証（`.github/workflows/ci.yml`） |
 | メインファイル | `paidy-wc.php`（エントリ・フック登録）、`class-wc-paidy.php`（`WC_Paidy` シングルトン・定数・読み込み） |
 | 配布 | WordPress.org（タグ push → `deploy-on-pushing-a-new-tag-...yml` が SVN デプロイ + GitHub Release） |
-| Git | `origin` = shoheitanaka/paidy-wc（フォーク）、`upstream` = SoftStepsEC/paidy-wc（正・PR 先・`gh` の既定） |
+| Git | `origin` = shoheitanaka/paidy-wc（フォーク）、`upstream` = SoftStepsEC/paidy-wc（正・PR 先。`gh` の既定はクローンごとに `gh repo set-default SoftStepsEC/paidy-wc`） |
 | 上流（コードの元） | `~/Dev/Japanized-for-WooCommerce`（`includes/gateways/paidy/` が Paidy モジュール） |
 
 詳細は `docs/` を読む（必要時に Read）:
@@ -64,6 +64,7 @@ composer check       # 上の 3 つをまとめて実行
 | 用途 | 値 |
 |------|-----|
 | wp-env 開発サイト / テストサイト | http://localhost:10150 / http://localhost:10151（`npm run env:start`） |
+| 動作確認 | wp-env では paidy-wc 本体が起動しない（B-13。直したらこの行を消す）。REST / Webhook は PHPUnit の `rest_do_request()` で、実 Webhook は外部から届くステージングで確かめる |
 | phpMyAdmin（dev / tests） | 10152 / 10153 |
 | PHPUnit 用 MySQL（Docker） | 127.0.0.1:10154（`composer test:db` / `composer test:db:stop`） |
 | ポート台帳 | `~/.claude/skills/dev-env/ports.json` のスロット 15。変更は `dev-env` スキルで |

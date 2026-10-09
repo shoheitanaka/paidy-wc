@@ -39,6 +39,8 @@ npm run env:stop
 ```
 
 同梱プラグイン: WooCommerce 最新、WP Mail Logging、Plugin Check、Query Monitor。`WPLANG` は `ja`。
+**現状 paidy-wc 本体が起動しない**（backlog B-13: WooCommerce が `woocommerce.latest-stable/` に展開され、`wc_paidy_plugin()` の判定が偽になる）。
+REST / Webhook の確認は PHPUnit の `rest_do_request()` で代替し、実 Webhook は外部から届くステージングで確かめる。
 Paidy のテスト鍵は wp-admin の WooCommerce → 設定 → 決済 → Paidy で入力する（リポジトリに資格情報を書かない）。
 
 ## 品質チェック
@@ -88,7 +90,10 @@ composer test:db:stop     # コンテナ削除
   `unzip` が失敗する（PR #38 の CI で発生）。取得は `curl -fsSL` + `unzip -tq` で検証してから展開する
 - HTTP を伴うコードは `pre_http_request` フィルタでモックする（JP4WC の `tests/Unit/test-paidy-payment-id-format.php` 参照）。
   テストから実 Paidy API を呼ばない
-- Paidy の REST ルートは `rest_get_server()->dispatch()` で実際に叩ける（ノンス不要の公開ルート）
+- Paidy の REST ルートは `rest_do_request()` で実際に叩ける（ノンス不要）。`paidy/v1/order` は署名か Paidy の IP が要るので、
+  `x-paidy-signature` を付けるか `$_SERVER['REMOTE_ADDR']` を設定し、tearDown で戻す（`test-paidy-webhook-permission.php`）
+- 注文を `payment_complete()` するテストは物理商品で注文を作る。仮想かつダウンロード商品だけの注文は completed になり、
+  completed 遷移のキャプチャフックが Paidy API を呼ぶ
 
 ### JS
 
