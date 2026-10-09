@@ -88,6 +88,14 @@ composer check       # 上の 3 つをまとめて実行
 
 共有スキルは `~/.claude/skills/`（元本は `~/Dev/claude-skills`）。このリポジトリの `.claude/skills/` にはプロジェクト固有の 2 つだけを置く。
 
+## レビュー Bot（dev-cycle / fix-copilot-review のゲート設定）
+
+- **Copilot のみ**。依頼は `gh pr edit <N> --repo SoftStepsEC/paidy-wc --add-reviewer @copilot`
+- **Codex は未接続**（PR #38 で push しても `@codex review` でも反応なし。2026-10-09 時点）。dev-cycle のゲートで Codex を待たない
+  （`request-gate-review.sh ... --copilot-only`）。接続したらこの行を更新する
+- Copilot は「Needs a closer look・0 findings」でも総評文に実在する問題を書くことがある（PR #38 で 2 件とも実在）。
+  総評は読み飛ばさず調査対象にする。`docs/review-baseline.md` / `review-backlog.md` に載っている事項は再対応しない
+
 ## アーキテクチャ要約（詳細は docs/architecture.md）
 
 - 起動: `paidy-wc.php` 読み込み時に `WC_Paidy_Admin_Wizard` 生成・`admin` なら設定コントローラ/通知を生成 → `plugins_loaded`(0) で
