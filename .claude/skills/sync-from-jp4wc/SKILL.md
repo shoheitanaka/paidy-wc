@@ -1,6 +1,6 @@
 ---
 name: sync-from-jp4wc
-description: Japanized for WooCommerce（JP4WC）の Paidy モジュールの変更を、この単体プラグイン（paidy-wc）へ取り込む。「JP4WC の変更を取り込んで」「JP4WC と同期して」「JP4WC 2.9.x の Paidy 修正を反映して」「Webhook 署名検証を JP4WC から持ってきて」などと言われたら使う。ファイル対応表・テキストドメイン置換・意図的な差分の再適用・テスト移植・検証までを行う。
+description: Japanized for WooCommerce（JP4WC）の Paidy モジュールの変更を、この単体プラグイン（paidy-wc）へ取り込む。「JP4WC の変更を取り込んで」「JP4WC と同期して」「JP4WC 2.9.x の Paidy 修正を反映して」「Webhook 署名検証を JP4WC から持ってきて」などと言われたら使う。ファイル対応表・テキストドメイン置換・意図的な差分の再適用・設定名の照合・テスト移植・検証までを行う。
 ---
 
 # JP4WC からの同期スキル（paidy-wc）
@@ -39,6 +39,33 @@ diff <(sed "s/woocommerce-for-japan/paidy-wc/g" "$J/$f") "$f"
 全ファイルの差分行数を一覧するには `docs/sync-with-jp4wc.md` の for ループ。
 **差分の中に paidy-wc 側だけの変更（JP4WC に無い修正）があれば必ず残す**。見分けがつかないときは
 `git -C ~/Dev/paidy-wc log -p -- $f` で paidy-wc 側の履歴を確認する。
+
+取り込むコードが読むゲートウェイ設定名を、paidy-wc のゲートウェイ設定（`init_form_fields()` のキー）と機械的に照合する:
+
+```bash
+cd ~/Dev/paidy-wc && J=~/Dev/Japanized-for-WooCommerce
+php .claude/skills/sync-from-jp4wc/check-setting-keys.php "$J/includes/gateways/paidy" "$J"/tests/Unit/test-paidy-*.php
+```
+
+- `unknown gateway setting 'xxx'` が出た行は、paidy-wc では存在しない設定を読んでいる（`get_option()` は空文字を返すだけで
+  エラーにならない）。実例: JP4WC の Webhook 署名検証は `get_option( 'testmode' )` で鍵を選ぶが、paidy-wc にあるのは
+  `environment` だけで、sandbox の Webhook を本番鍵で検証していた。paidy-wc に実在する設定へ直し、
+  `docs/sync-with-jp4wc.md` の「意図的な差分」に書き、回帰テストを足す
+- **既知の 1 件**: JP4WC が直すまでは `class-wc-paidy-endpoint.php` の `testmode` が必ず出る（exit 1）。「意図的な差分」7 と
+  `test-paidy-webhook-permission.php` で対応済みなので、endpoint を取り込むときは差分 7 を再適用するだけでよい（記録やテストを重ねない）
+- JP4WC がゲートウェイに設定を新しく足した変更では、`--gateway="$J/includes/gateways/paidy/class-wc-gateway-paidy.php"` を付けて
+  JP4WC 側の設定と照合する（付けないと新しい設定も unknown と出る。ゲートウェイを取り込んだ後の手順 5 では付けずに 0 件になればよい）
+- 照合する書き方（キーは文字列リテラル）: `->get_option()` / `->update_option()` / `->get_setting()`、名前が `settings` か `options` で
+  終わる変数・プロパティの `['key']`、名前が `settings` で終わる変数・プロパティへの配列リテラルの代入（テストの
+  `$this->wizard->paidy_settings = array( … )` など）、`get_option( <設定オプション> )['key']`、`update_option()` / `add_option()` の値の配列キー。
+  設定オプション名は `'woocommerce_paidy_settings'` と `'woocommerce_' . $this->id . '_settings'` を認識する。名前に `on_boarding` を含むもの
+  （別オプションの申込設定）は除外
+- 照合しないもの（目で確かめる）:
+  - `$gateway->testmode` のようなプロパティ読み。PHPStan が `property.notFound` を出すが、型が分かる本体コードだけで、`tests/` は解析対象外（手順 5）
+  - 別の名前の変数（`$opts['key']`、単数形の `$setting['key']`）や `wp_parse_args()` の既定値で読む設定
+  - JS（`src/`）。`grep -rn woocommerce_paidy_settings src` で読んでいる箇所を探す（例: `src/main-hooks/form-info.jsx` の `environment`）
+  - select 設定の比較値（`environment` は `live` / `sandbox`）と checkbox の値（`yes` / `no`）。`'yes' === $this->get_option( 'environment' )` のような比較
+- `--list` を付けると、拾えた参照すべてと参照 0 件のファイルを表示する。設定を読んでいるはずのファイルが 0 件なら、照合しない書き方なので差分を目で読む
 
 ### 3. ファイルを取り込む
 
@@ -80,14 +107,18 @@ sed -i '' -e "s/'woocommerce-for-japan'/'paidy-wc'/g" -e "s/@package Japanized_F
 
 ```bash
 grep -rn "woocommerce-for-japan" includes src tests paidy-wc.php class-wc-paidy.php   # 0 件
+php .claude/skills/sync-from-jp4wc/check-setting-keys.php                         # unknown 0 件（本体 + tests）
 composer lint
 composer phpstan:baseline && composer phpstan     # 置換したファイルの baseline を作り直す。件数が減ること
+git diff -U0 phpstan-baseline.neon | grep '^+.*message:'   # 新しく baseline に入ったエラー。0 行であること
 composer test                                      # 事前に composer test:db && composer test:install
 npm run build                                      # src/ を触った場合
 git diff --stat
 ```
 
-- baseline の件数が**増えた**ら、新しいコードのエラーなので baseline に入れず直す（JP4WC 側のバグなら JP4WC にも報告）
+- baseline の件数が**増えた**ら（上の `git diff` に行が出たら）、新しいコードのエラーなので baseline に入れず直す（JP4WC 側のバグなら JP4WC にも報告）。
+  `phpstan:baseline` は新しいエラーも baseline に吸収して exit 0 にするので、件数の確認を飛ばさない。
+  `Access to an undefined property WC_Gateway_Paidy::$…`（`property.notFound`）は存在しない設定をプロパティで読んでいる可能性がある
 - `.phpcs.xml.dist` の一時除外（B-1）が不要になっていたら消す
 - 文字列が増えていれば `update-i18n` スキルで `i18n/paidy-wc.pot`（JS なら JSON も）を更新する
 
@@ -109,3 +140,4 @@ git diff --stat
 | PHPStan baseline の行が「存在しないエラー」で失敗する | 置換で行がずれた。`composer phpstan:baseline` で作り直す |
 | テストが `WC_Gateway_Paidy` の `__()` で textdomain 警告 | `init` 前にゲートウェイを生成している（B-9）。JP4WC の遅延ロジックを先に移植 |
 | paidy-wc 側だけの修正が消えた | 手順 2 を飛ばしてコピーした。`git diff` で復元 |
+| sandbox なのに本番鍵で検証される・設定を変えても挙動が変わらない | 取り込んだコードが paidy-wc に無い設定名を読んでいる（JP4WC の `testmode`）。`check-setting-keys.php` で照合 |
