@@ -1,0 +1,164 @@
+# Continuous integration for pull requests and pushes to main.
+#
+#   phpcs    - WordPress Coding Standards (errors fail the job; warnings are reported only)
+#   phpstan  - static analysis, level 5, against phpstan-baseline.neon
+#   phpunit  - WordPress + WooCommerce integration tests on a 3-job diagonal:
+#              oldest supported PHP/WP/WC -> newest. Pinned WC versions are the
+#              latest patch of the minor that was current ~6 and ~12 months ago;
+#              refresh them about every 6 months (see docs/development.md).
+#   build-js - the webpack build of src/ still succeeds
+#
+# The WordPress.org deploy lives in a separate tag-triggered workflow.
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.claude/**'
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.claude/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  phpcs:
+    name: PHPCS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer:v2
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+        with:
+          composer-options: '--prefer-dist --no-progress'
+
+      - name: Run PHPCS
+        run: composer lint -- --report=full --report-checkstyle=phpcs-report.xml
+
+      - name: Annotate PHPCS findings
+        if: always()
+        run: |
+          if [ -f phpcs-report.xml ]; then
+            php -r '
+              $xml = @simplexml_load_file("phpcs-report.xml");
+              if (!$xml) { exit(0); }
+              foreach ($xml->file as $file) {
+                foreach ($file->error as $e) {
+                  $level = ((string) $e["severity"] === "error") ? "error" : "warning";
+                  printf("::%s file=%s,line=%s,col=%s::%s (%s)\n", $level, $file["name"], $e["line"], $e["column"], $e["message"], $e["source"]);
+                }
+              }
+            '
+          fi
+
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer:v2
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+        with:
+          composer-options: '--prefer-dist --no-progress'
+
+      - name: Run PHPStan
+        run: composer phpstan -- --error-format=github --no-progress
+
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php }} / WP ${{ matrix.wp }} / WC ${{ matrix.wc }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Oldest supported: "Requires PHP: 8.1" in paidy-wc.php; WC 10.2 requires WP 6.7.
+          - { php: '8.1', wp: '6.7', wc: '10.2.2' }
+          - { php: '8.3', wp: '6.9', wc: '10.6.2' }
+          - { php: '8.5', wp: 'latest', wc: 'latest' }
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: wordpress_test
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -uroot -proot --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=6
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+          extensions: mysqli, mbstring, intl, zip
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+        with:
+          composer-options: '--prefer-dist --no-progress'
+
+      - name: Install Subversion
+        run: sudo apt-get update && sudo apt-get install -y subversion
+
+      - name: Install WordPress, WooCommerce and the test library
+        env:
+          WC_VERSION: ${{ matrix.wc }}
+        run: bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1:3306 ${{ matrix.wp }} true
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
+
+  build-js:
+    name: JS build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # package-lock.json is not tracked (see .gitignore), so npm ci is unavailable.
+      - name: Install npm dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build
+        run: npx wp-scripts build

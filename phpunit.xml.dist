@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<phpunit
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	convertDeprecationsToExceptions="false"
+	>
+	<testsuites>
+		<testsuite name="unit">
+			<directory prefix="test-" suffix=".php">./tests/Unit/</directory>
+		</testsuite>
+	</testsuites>
+
+	<coverage>
+		<include>
+			<file>paidy-wc.php</file>
+			<file>class-wc-paidy.php</file>
+			<file>uninstall.php</file>
+			<directory suffix=".php">includes/</directory>
+		</include>
+		<exclude>
+			<directory>includes/gateways/paidy/assets/</directory>
+		</exclude>
+	</coverage>
+</phpunit>

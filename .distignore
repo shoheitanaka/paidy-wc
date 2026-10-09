@@ -1,20 +1,42 @@
+# Files and directories excluded from the WordPress.org / GitHub Release ZIP.
+# The deploy workflow copies the tree with rsync --exclude-from=.distignore, so
+# anything gitignored but present locally (dist/, vendor/) must ALSO be listed here.
+
 # Directories
-/.wordpress-org
-/.vscode
+/.claude
 /.git
 /.github
+/.vscode
+/.wordpress-org
 /bin
+/dist
+/docs
 /node_modules
-/vendor
 /src
+/tests
+/vendor
 
 # Files
-.wp-env.json
-.gitattributes
+.DS_Store
 .distignore
+.gitattributes
 .gitignore
-composer.lock
-package-lock.json
-*.js.map
+.phpcs.xml.dist
+.phpunit.result.cache
+.wp-env.json
+.wp-env.override.json
+AGENTS.md
+CLAUDE.md
 LICENSE
 README.md
+composer.json
+composer.lock
+package-lock.json
+package.json
+phpstan-baseline.neon
+phpstan-bootstrap.php
+phpstan.neon.dist
+phpunit.xml.dist
+webpack.config.js
+*.js.map
+*.css.map

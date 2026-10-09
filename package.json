@@ -1,12 +1,16 @@
 {
 	"name": "paidy-wc",
 	"title": "Paidy for WooCommerce",
-	"version": "1.4.0",
+	"version": "1.5.2",
 	"license": "GPL-3.0",
 	"homepage": "https://wordpress.org/plugins/paidy-wc/",
 	"repository": {
 		"type": "github",
 		"url": "https://github.com/SoftStepsEC/paidy-wc.git"
+	},
+	"engines": {
+		"node": ">=20.0.0",
+		"npm": ">=10.0.0"
 	},
 	"dependencies": {
 		"lru-cache": "^7.0.0",
@@ -14,13 +18,20 @@
 	},
 	"devDependencies": {
 		"@woocommerce/dependency-extraction-webpack-plugin": "3.1.0",
+		"@wordpress/env": "^10.0.0",
 		"@wordpress/scripts": "^30.7.0",
 		"cross-env": "^7.0.3",
 		"webpack-cli": "^6.0.1"
 	},
 	"scripts": {
-		"start": "wp-scripts start && wp-env logs",
-		"build": "wp-scripts build && npm run i18n:build",
+		"env:start": "wp-env start",
+		"env:stop": "wp-env stop",
+		"env:cli": "wp-env run cli wp",
+		"start": "wp-scripts start",
+		"build": "wp-scripts build",
+		"lint:js": "wp-scripts lint-js src",
+		"lint:css": "wp-scripts lint-style 'src/**/*.scss'",
+		"format:js": "wp-scripts format src",
 		"i18n": "npm run i18n:build",
 		"i18n:build": "npm run i18n:pot && ./bin/build_i18n.sh",
 		"i18n:pot": "php -d xdebug.max_nesting_level=512 $(which wp) i18n make-pot --exclude=\"node_modules/,languages/,assets/\" --headers='{\"Report-Msgid-Bugs-To\":\"https://woocommerce.com/my-account/create-a-ticket/\", \"language-team\":\"LANGUAGE <EMAIL@ADDRESS>\"}' . i18n/paidy-wc.pot",
