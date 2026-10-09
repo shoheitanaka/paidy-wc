@@ -3,8 +3,8 @@
 - 開始: 2026-10-09
 - オプション: auto-commit（確認ゲートなし）
 - PR: #39 https://github.com/SoftStepsEC/paidy-wc/pull/39
-- 現在のステップ: 6（Copilot 依頼 G2）
-- Copilot: 依頼 1 回 / 未収束
+- 現在のステップ: 8（完了）
+- Copilot: 依頼 2 回 / 収束（G2 で新規指摘なし）
 - Codex: 未接続（CLAUDE.md。ゲート対象外）
 
 ## 承認された計画の要判断事項
@@ -25,3 +25,6 @@
 | 2026-10-09 20:13 | 4 | 初回 push（HEAD 21726f1、T=2026-10-09T11:13:54Z）、PR #39 作成（gh の既定リポジトリを SoftStepsEC/paidy-wc に設定） |
 | 2026-10-09 20:20 | 6 | CI green（6 checks）、Copilot G1 依頼・応答（21726f1） |
 | 2026-10-09 | 7 | G1: Copilot 新規 2 件、修正 0 / 保留 2（G1-1 → B-21、G1-2 → B-22）。auto-commit のため確認ゲートなし |
+| 2026-10-09 20:30 | 6 | CI green、Copilot G2 依頼・応答（350c5f0） |
+| 2026-10-09 | 7 | G2: 新規スレッド 0、本文は既出 2 件 + 対応済みの確認事項 1 件 → 収束 |
+| 2026-10-09 | 8 | 最終報告（final-report.md） |
