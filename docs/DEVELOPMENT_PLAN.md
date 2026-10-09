@@ -1,6 +1,6 @@
 # 開発計画
 
-最終更新: 2026-10-09。各フェーズは 1 つ以上の PR。PR はブランチを切って `upstream`（SoftStepsEC/paidy-wc）`main` へ。
+最終更新: 2026-10-10。各フェーズは 1 つ以上の PR。PR はブランチを切って `upstream`（SoftStepsEC/paidy-wc）`main` へ。
 タスク完了時はチェックボックスを更新する。
 
 ## 方針
@@ -25,7 +25,7 @@
 
 JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、依存順）:
 
-- [x] **1-1 Webhook 認証**（`class-wc-paidy-endpoint.php`、ブランチ `fix/webhook-auth`）: `paidy/v1/order` の `permission_callback` を
+- [x] **1-1 Webhook 認証**（`class-wc-paidy-endpoint.php`、ブランチ `fix/webhook-auth`、PR #39、2026-10-09 マージ）: `paidy/v1/order` の `permission_callback` を
       JP4WC の `paidy_webhook_permission_check()`（`x-paidy-signature` HMAC-SHA256 + `paidy_webhook_allowed_ips` IP 許可リスト、
       注文の `payment_method === 'paidy'` 確認）に置換。`paidy/v1/check` は JP4WC と同じく `__return_true` のまま（呼び出し元は
       paidy.artws.info で状態を変えない）。`WC_Paidy_Endpoint` の生成を `init` 11 に遅延（B-9）。
