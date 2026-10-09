@@ -23,9 +23,12 @@ MYSQL_IMAGE=${PAIDY_WC_TEST_DB_IMAGE:-mysql:8.0}
 start() {
 	if docker ps --format '{{.Names}}' | grep -qx "${CONTAINER_NAME}"; then
 		echo "MySQL container '${CONTAINER_NAME}' is already running on 127.0.0.1:${DB_PORT}."
+	elif docker ps -a --format '{{.Names}}' | grep -qx "${CONTAINER_NAME}"; then
+		# Left over from a Docker restart or `docker stop`: resume it instead of recreating.
+		echo "Starting the existing (stopped) MySQL container '${CONTAINER_NAME}'..."
+		docker start "${CONTAINER_NAME}" >/dev/null
 	else
-		docker rm -f "${CONTAINER_NAME}" >/dev/null 2>&1 || true
-		echo "Starting MySQL container '${CONTAINER_NAME}' on 127.0.0.1:${DB_PORT}..."
+		echo "Creating MySQL container '${CONTAINER_NAME}' on 127.0.0.1:${DB_PORT}..."
 		docker run -d \
 			--name "${CONTAINER_NAME}" \
 			-e MYSQL_ROOT_PASSWORD="${DB_PASS}" \

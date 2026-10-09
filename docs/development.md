@@ -73,6 +73,11 @@ composer test:db:stop     # コンテナ削除
   WooCommerce の版を変えたいときは `WC_VERSION=10.6.2 bash bin/install-wp-tests.sh ...` の前に
   `$TMPDIR/wordpress/wp-content/plugins/woocommerce` を消す。macOS は temp を定期的に消すので、
   `Could not find .../functions.php` が出たら `composer test:install` をやり直す
+- `composer test:install` は何度実行しても安全。「インストール済み」の判定はディレクトリではなく実ファイル
+  （`wp-includes/version.php` / `woocommerce.php` / `includes/functions.php`）で行うので、途中で失敗した展開は再実行で補完される。
+  `wp-tests-config.php` は毎回作り直す（DB の接続先を変えたら再実行だけでよい）。スクリプトは `set -x` を使わないので
+  DB パスワードがログに出ることはない
+- `composer test:db` は停止中のコンテナが残っていれば `docker start` で再開する（Docker Desktop 再起動後など）
 - `bin/install-wp-tests.sh` の WooCommerce 最新版は `downloads.wordpress.org/plugin/woocommerce.zip`（版なし。200 で直接配信）から取る。
   `woocommerce.latest-stable.zip` は版付き URL への 302 を返すので、`-L` 無しの `curl` だとリダイレクト本文が保存されて
   `unzip` が失敗する（PR #38 の CI で発生）。取得は `curl -fsSL` + `unzip -tq` で検証してから展開する

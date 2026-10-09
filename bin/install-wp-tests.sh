@@ -79,14 +79,24 @@ else
 	fi
 	WP_TESTS_TAG="tags/$LATEST_VERSION"
 fi
-set -ex
+# -e only: with -x every command would be echoed, including the sed/mysqladmin
+# lines that carry $DB_PASS, so the database password would end up in CI logs.
+set -e
+
+log() {
+	echo "[install-wp-tests] $*"
+}
 
 install_wp() {
 
-	if [ -d $WP_CORE_DIR ]; then
+	# Check for a real install, not just the directory: a download or extraction
+	# that failed half-way must be completed by simply re-running the script.
+	if [ -f "$WP_CORE_DIR/wp-includes/version.php" ]; then
+		log "WordPress already installed in $WP_CORE_DIR (remove the directory to reinstall)"
 		return;
 	fi
 
+	log "Installing WordPress ($WP_VERSION) into $WP_CORE_DIR"
 	mkdir -p $WP_CORE_DIR
 
 	if [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
@@ -127,10 +137,19 @@ install_wp() {
 install_woocommerce() {
 	local WC_DIR=$WP_CORE_DIR/wp-content/plugins/woocommerce
 
-	if [ -d $WC_DIR ]; then
-		echo "WooCommerce already installed in $WC_DIR (set WC_VERSION and remove the directory to change it)"
+	if [ -f "$WC_DIR/woocommerce.php" ]; then
+		log "WooCommerce already installed in $WC_DIR (set WC_VERSION and remove the directory to change it)"
 		return;
 	fi
+
+	if [ -d "$WC_DIR" ]; then
+		# A previous extraction was interrupted. Without this, unzip would stop to
+		# ask about overwriting files and abort when there is no terminal.
+		log "Removing incomplete WooCommerce install in $WC_DIR"
+		rm -rf "$WC_DIR"
+	fi
+
+	log "Installing WooCommerce ($WC_VERSION) into $WC_DIR"
 
 	# woocommerce.zip (no version) is served directly with the current stable
 	# release; woocommerce.latest-stable.zip would answer with a 302 instead.
@@ -149,7 +168,7 @@ install_woocommerce() {
 		wget -nv --max-redirect=5 -O $TMPDIR/woocommerce.zip "$WC_URL"
 	fi
 	unzip -tq $TMPDIR/woocommerce.zip > /dev/null
-	unzip -q $TMPDIR/woocommerce.zip -d $WP_CORE_DIR/wp-content/plugins/
+	unzip -oq $TMPDIR/woocommerce.zip -d $WP_CORE_DIR/wp-content/plugins/
 	rm -f $TMPDIR/woocommerce.zip
 }
 
@@ -161,27 +180,33 @@ install_test_suite() {
 		local ioption='-i'
 	fi
 
-	# set up testing suite if it doesn't yet exist
-	if [ ! -d $WP_TESTS_DIR ]; then
-		# set up testing suite
+	# Set up the test library unless a complete copy is already there. Checking
+	# for functions.php (not the directory) lets a re-run finish an export that
+	# was interrupted.
+	if [ ! -f "$WP_TESTS_DIR/includes/functions.php" ]; then
+		log "Installing the WordPress test library (${WP_TESTS_TAG}) into $WP_TESTS_DIR"
 		mkdir -p $WP_TESTS_DIR
 		rm -rf $WP_TESTS_DIR/{includes,data}
         check_svn_installed
 		svn export --quiet --ignore-externals https://develop.svn.wordpress.org/${WP_TESTS_TAG}/tests/phpunit/includes/ $WP_TESTS_DIR/includes
 		svn export --quiet --ignore-externals https://develop.svn.wordpress.org/${WP_TESTS_TAG}/tests/phpunit/data/ $WP_TESTS_DIR/data
+	else
+		log "WordPress test library already installed in $WP_TESTS_DIR"
 	fi
 
-	if [ ! -f wp-tests-config.php ]; then
-		download https://develop.svn.wordpress.org/${WP_TESTS_TAG}/wp-tests-config-sample.php "$WP_TESTS_DIR"/wp-tests-config.php
-		# remove all forward slashes in the end
-		WP_CORE_DIR=$(echo $WP_CORE_DIR | sed "s:/\+$::")
-		sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR/':" "$WP_TESTS_DIR"/wp-tests-config.php
-		sed $ioption "s:__DIR__ . '/src/':'$WP_CORE_DIR/':" "$WP_TESTS_DIR"/wp-tests-config.php
-		sed $ioption "s/youremptytestdbnamehere/$DB_NAME/" "$WP_TESTS_DIR"/wp-tests-config.php
-		sed $ioption "s/yourusernamehere/$DB_USER/" "$WP_TESTS_DIR"/wp-tests-config.php
-		sed $ioption "s/yourpasswordhere/$DB_PASS/" "$WP_TESTS_DIR"/wp-tests-config.php
-		sed $ioption "s|localhost|${DB_HOST}|" "$WP_TESTS_DIR"/wp-tests-config.php
-	fi
+	# Always (re)generate wp-tests-config.php so that re-running with different
+	# database arguments (local Docker vs CI service) takes effect.
+	log "Writing $WP_TESTS_DIR/wp-tests-config.php (DB $DB_NAME on $DB_HOST)"
+	download https://develop.svn.wordpress.org/${WP_TESTS_TAG}/wp-tests-config-sample.php "$WP_TESTS_DIR"/wp-tests-config.php
+	# remove all forward slashes in the end
+	WP_CORE_DIR=$(echo $WP_CORE_DIR | sed "s:/\+$::")
+	sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR/':" "$WP_TESTS_DIR"/wp-tests-config.php
+	sed $ioption "s:__DIR__ . '/src/':'$WP_CORE_DIR/':" "$WP_TESTS_DIR"/wp-tests-config.php
+	sed $ioption "s/youremptytestdbnamehere/$DB_NAME/" "$WP_TESTS_DIR"/wp-tests-config.php
+	sed $ioption "s/yourusernamehere/$DB_USER/" "$WP_TESTS_DIR"/wp-tests-config.php
+	sed $ioption "s/yourpasswordhere/$DB_PASS/" "$WP_TESTS_DIR"/wp-tests-config.php
+	sed $ioption "s|localhost|${DB_HOST}|" "$WP_TESTS_DIR"/wp-tests-config.php
+	rm -f "$WP_TESTS_DIR"/wp-tests-config.php.bak
 
 }
 
@@ -205,6 +230,7 @@ create_db() {
 install_db() {
 
 	if [ ${SKIP_DB_CREATE} = "true" ]; then
+		log "Skipping database creation (expected to exist already, e.g. created by the MySQL container)"
 		return 0
 	fi
 
@@ -239,3 +265,4 @@ install_wp
 install_woocommerce
 install_test_suite
 install_db
+log "Done. Run: vendor/bin/phpunit"
