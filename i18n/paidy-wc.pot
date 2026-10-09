@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-09T10:55:31+00:00\n"
+"POT-Creation-Date: 2026-10-09T15:33:10+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: paidy-wc\n"
@@ -404,91 +404,127 @@ msgstr ""
 msgid "Paidy On Boarding"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:108
+#: includes/gateways/paidy/class-wc-paidy-apply-receiver.php:618
+msgid "Paidy onboarding is not configured."
+msgstr ""
+
+#: includes/gateways/paidy/class-wc-paidy-apply-receiver.php:628
+msgid "Invalid application ID format."
+msgstr ""
+
+#: includes/gateways/paidy/class-wc-paidy-apply-receiver.php:648
+msgid "This callback is for an application that is no longer the current one."
+msgstr ""
+
+#: includes/gateways/paidy/class-wc-paidy-apply-receiver.php:692
+#: includes/gateways/paidy/class-wc-paidy-apply-receiver.php:709
+#: includes/gateways/paidy/class-wc-paidy-apply-receiver.php:776
+msgid "Invalid or missing state token or signature for Paidy onboarding."
+msgstr ""
+
+#. translators: %s: API key field name
+#: includes/gateways/paidy/class-wc-paidy-apply-receiver.php:881
+#, php-format
+msgid "Invalid base64 encoding for field: %s"
+msgstr ""
+
+#. translators: %s: API key field name
+#: includes/gateways/paidy/class-wc-paidy-apply-receiver.php:894
+#, php-format
+msgid "Decryption failed for field: %s"
+msgstr ""
+
+#. translators: %s: API key field name
+#: includes/gateways/paidy/class-wc-paidy-apply-receiver.php:933
+#, php-format
+msgid "Approved response is missing a required API key field: %s"
+msgstr ""
+
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:110
 msgid "Paidy secret key is not configured."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:119
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:121
 msgid "Invalid signature for Paidy webhook."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:139
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:141
 msgid "Unauthorized access to Paidy webhook."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:201
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:203
 msgid "Paidy Webhook received. "
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:211
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:213
 msgid "This notification is a test request from Paidy."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:215
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:217
 msgid "Exist [payment_id] and [order_ref]"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:221
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:223
 msgid "The order with this order number does not exist in the store."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:228
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:230
 msgid "Order payment method is not Paidy. Possible unauthorized access attempt."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:232
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:234
 msgid "Invalid payment method for this order."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:251
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:253
 msgid "Paidy webhook payment verification failed. Order not completed."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:255
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:257
 msgid "Paidy payment could not be verified for this order."
 msgstr ""
 
 #. translators: %s: status of the order.
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:270
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:281
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:290
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:299
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:308
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:272
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:283
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:292
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:301
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:310
 #, php-format
 msgid "It succeeded to check the %s of the order in Paidy Webhook."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:271
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:273
 msgid "authorization"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:275
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:277
 msgid "This order status is processing, this site received authorize_success from the Paidy webhook."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:282
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:284
 msgid "completed"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:291
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:293
 msgid "cancelled"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:300
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:302
 msgid "close"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:309
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:311
 msgid "refunded"
 msgstr ""
 
 #. translators: %s: status of the order.
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:314
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:316
 #, php-format
 msgid "The system received a notification for order %s via Paidy Webhook."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-paidy-endpoint.php:319
+#: includes/gateways/paidy/class-wc-paidy-endpoint.php:321
 msgid "Payment_id exist but order_id. Payment_id : "
 msgstr ""
 
