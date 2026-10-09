@@ -220,7 +220,7 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 	/**
 	 * Declare plugin compatibility with WooCommerce HPOS.
 	 *
-	 * @since 2.6.0
+	 * @since 1.5.0
 	 */
 	add_action(
 		'before_woocommerce_init',
