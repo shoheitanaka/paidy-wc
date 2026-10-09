@@ -416,8 +416,8 @@ class WC_Paidy_Admin_Wizard {
 			'survey09'       => $value['securitySurvey09RadioControl'],
 			'state'          => $state_token,
 			// Sent for support diagnostics only: the intermediary records which
-			// plugin version submitted the application (state-token handling
-			// differs by version, see WC_Paidy_Apply_Receiver::SIGNATURE_HEADER).
+			// plugin version submitted the application (versions before 1.6.0
+			// sent no state token, see WC_Paidy_Apply_Receiver::SIGNATURE_HEADER).
 			'plugin_version' => defined( 'WC_PAIDY_VERSION' ) ? WC_PAIDY_VERSION : '',
 		);
 		$args       = array(

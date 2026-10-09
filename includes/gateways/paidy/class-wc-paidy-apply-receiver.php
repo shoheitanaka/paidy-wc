@@ -38,8 +38,7 @@ class WC_Paidy_Apply_Receiver {
 	 * The intermediary signs `<timestamp>.<raw JSON body>` with the site hash
 	 * shared at application time, so a callback can be authenticated even when
 	 * the one-time state token has expired or was never issued (applications
-	 * submitted from plugin versions before 2.9.13 sent no state at all, and
-	 * 2.9.13–2.9.14 kept it in a 2-day transient that never outlived the review).
+	 * submitted from plugin versions before 1.6.0 sent no state at all).
 	 *
 	 * @since 1.6.0
 	 */
@@ -716,8 +715,8 @@ class WC_Paidy_Apply_Receiver {
 		// No usable state token. Fall back to the signed-callback path: the
 		// intermediary signs the raw body with the site hash it received at
 		// application time, so the callback can still be authenticated when the
-		// token expired (2.9.13–2.9.14 stored it in a 2-day transient), was
-		// never issued (pre-2.9.13 applications), or was lost to a reinstall.
+		// token expired, was never issued (pre-1.6.0 applications), or was
+		// lost to a reinstall.
 		$signature = $request->get_header( self::SIGNATURE_HEADER );
 		$timestamp = $request->get_header( self::TIMESTAMP_HEADER );
 		$body      = $request->get_body();
