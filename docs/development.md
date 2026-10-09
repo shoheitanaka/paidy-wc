@@ -73,8 +73,9 @@ composer test:db:stop     # コンテナ削除
   WooCommerce の版を変えたいときは `WC_VERSION=10.6.2 bash bin/install-wp-tests.sh ...` の前に
   `$TMPDIR/wordpress/wp-content/plugins/woocommerce` を消す。macOS は temp を定期的に消すので、
   `Could not find .../functions.php` が出たら `composer test:install` をやり直す
-- `bin/install-wp-tests.sh` の WooCommerce 取得は `curl -fsSL`。`downloads.wordpress.org/plugin/woocommerce.latest-stable.zip` は
-  版付き URL へのリダイレクトを返すので、`-L` 無しだとリダイレクト本文が保存されて `unzip` が失敗する（PR #38 の CI で発生）
+- `bin/install-wp-tests.sh` の WooCommerce 最新版は `downloads.wordpress.org/plugin/woocommerce.zip`（版なし。200 で直接配信）から取る。
+  `woocommerce.latest-stable.zip` は版付き URL への 302 を返すので、`-L` 無しの `curl` だとリダイレクト本文が保存されて
+  `unzip` が失敗する（PR #38 の CI で発生）。取得は `curl -fsSL` + `unzip -tq` で検証してから展開する
 - HTTP を伴うコードは `pre_http_request` フィルタでモックする（JP4WC の `tests/Unit/test-paidy-payment-id-format.php` 参照）。
   テストから実 Paidy API を呼ばない
 - Paidy の REST ルートは `rest_get_server()->dispatch()` で実際に叩ける（ノンス不要の公開ルート）

@@ -132,15 +132,17 @@ install_woocommerce() {
 		return;
 	fi
 
+	# woocommerce.zip (no version) is served directly with the current stable
+	# release; woocommerce.latest-stable.zip would answer with a 302 instead.
 	if [ "$WC_VERSION" = 'latest' ]; then
-		local WC_URL="https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip"
+		local WC_URL="https://downloads.wordpress.org/plugin/woocommerce.zip"
 	else
 		local WC_URL="https://downloads.wordpress.org/plugin/woocommerce.${WC_VERSION}.zip"
 	fi
 
 	mkdir -p $WP_CORE_DIR/wp-content/plugins
-	# latest-stable.zip answers with a redirect to the versioned file, so follow
-	# redirects (-L) and fail on HTTP errors (-f) instead of saving an HTML body.
+	# Follow redirects (-L) and fail on HTTP errors (-f) so a non-zip body is
+	# never saved; verify the archive before extracting.
 	if [ `which curl` ]; then
 		curl -fsSL "$WC_URL" -o $TMPDIR/woocommerce.zip
 	else
