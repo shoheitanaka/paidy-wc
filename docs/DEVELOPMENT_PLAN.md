@@ -32,11 +32,14 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
       Webhook の裏取りに必要な `paidy_get_payment_data()`（GET 化・形式検証・`rawurlencode()`）と `paidy_verify_payment_for_order()` を
       1-3 から前倒しで移植。JP4WC の `get_option( 'testmode' )`（存在しない設定）は `environment` 判定に直して取り込み（意図的な差分）。
       テスト: `test-paidy-webhook-permission.php`（新規）、`test-paidy-payment-id-format.php`（移植）
-- [ ] **1-2 受信エンドポイント認証**（`class-wc-paidy-apply-receiver.php`、`class-wc-paidy-admin-wizard.php`）: JP4WC 版に置換
-      （state token を non-autoload option に、`x-paidy-receiver-signature` / `x-paidy-receiver-timestamp` の HMAC フォールバック、
-      リプレイ防止、body のみから認証、application_id 一致確認、`paidy_received_data` から秘密鍵除外、鍵フィールド補完、
-      `wizard=false` 修正）。テスト: `test-paidy-receiver-signature.php` `test-paidy-application-id.php`
-      `test-paidy-manual-settings.php` `test-paidy-onboarding-state.php` を移植。B-2 の大半が同時に解消
+- [x] **1-2 受信エンドポイント認証**（`class-wc-paidy-apply-receiver.php`、`class-wc-paidy-admin-wizard.php`、ブランチ `fix/receiver-auth`）:
+      JP4WC 2.9.16 版に置換（state token を non-autoload option に、`x-paidy-receiver-signature` / `x-paidy-receiver-timestamp` の
+      HMAC フォールバック、リプレイ防止、body のみから認証、application_id 一致確認、`paidy_received_data` から秘密鍵除外、
+      鍵フィールド補完、`wizard=false` 修正、`pk_test_` 書き換えの廃止）。JP4WC の `jp4wc_updated` の代わりに
+      `paidy_wc_check_version()`（`paidy-wc.php`、option `paidy_wc_version`、action `paidy_wc_updated`）を足し、既存の平文秘密鍵を
+      アップグレード時に 1 回だけ伏せ字にする。`uninstall.php` に新しい option と claim 行の削除を追加。
+      テスト: `test-paidy-receiver-signature.php` `test-paidy-application-id.php` `test-paidy-manual-settings.php`
+      `test-paidy-onboarding-state.php` を移植、`test-paidy-upgrade.php`（新規）。B-2 の receiver 分が解消
 - [ ] **1-3 決済照会の修正**（`class-wc-gateway-paidy.php`）: サンクスページでの裏取り（`thankyou_completed()` から
       `paidy_verify_payment_for_order()` を呼ぶ）、`paidy_capture_id` による再キャプチャ防止、
       説明文の `force_balance_tags()` + 保存時検証、ゲスト注文履歴の扱い。
