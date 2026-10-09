@@ -89,11 +89,22 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 			require_once __DIR__ . '/includes/gateways/paidy/class-wc-gateway-paidy.php';
 
 			// Endpoints.
+			// Instantiated at init priority 11 (after load_plugin_textdomain at priority 10)
+			// to avoid _load_textdomain_just_in_time warning from WC_Gateway_Paidy::__construct().
 			if ( ! class_exists( 'WC_Paidy_Endpoint' ) ) {
 				require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-endpoint.php';
-				new WC_Paidy_Endpoint();
+				if ( did_action( 'init' ) || doing_action( 'init' ) ) {
+					new WC_Paidy_Endpoint();
+				} else {
+					add_action(
+						'init',
+						function () {
+							new WC_Paidy_Endpoint();
+						},
+						11
+					);
+				}
 			}
-			require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-endpoint.php';
 
 			// Admin dashboard.
 			if ( ! class_exists( 'WC_Paidy_Apply_Admin_Dashboard' ) ) {
