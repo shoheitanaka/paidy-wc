@@ -41,9 +41,6 @@
   option 行で、core API では列挙できない（JP4WC と同じ。`phpcs:disable` の理由もコード内にある）
 - `paidy_wc_check_version()` が、版の記録が無いとき（新規インストール、1.5.2 以前からの更新）にも `paidy_wc_updated` を発火すること。
   1.5.2 以前は版を記録していないので区別できない。リスナー（秘密鍵の伏せ字）は冪等。ダウングレードでは版を記録するだけで発火しない
-- 受信エンドポイントの `check_permissions()` が `application_id` / `state` を `get_param()` で読むこと。`get_param()` は JSON → POST（body）→ GET（クエリ）の順に
-  最初に見つかった値を返すので、署名された body の値をクエリで上書きすることはできない（WordPress core `WP_REST_Request::get_parameter_order()`）。
-  body に無いキーをクエリで補っても、処理本体は body のみ（`get_body_only_params()`）を読む。配列値の `TypeError` は backlog B-31
 - 受信エンドポイントのフィルタ名が `wc4jp_paidy_*` であること（JP4WC から verbatim。同期差分を増やさないため改名しない）
 - 受信エンドポイントで `base64_decode()` + `openssl_decrypt()` を使うこと（仲介サーバーが AES-256-CBC で鍵を暗号化して送る）
 - Paidy API の認証に秘密鍵を `Authorization` ヘッダーで送ること（Paidy API の仕様）

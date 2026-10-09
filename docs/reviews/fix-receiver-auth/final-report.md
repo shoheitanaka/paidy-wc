@@ -46,7 +46,7 @@ Codex は未接続（CLAUDE.md）。
 ### 修正しなかった指摘（PR 上で未解決のまま残してある）
 | ID | bot | 重大度 | 理由 | スレッド |
 |---|---|---|---|---|
-| G1-1 | Copilot | Low | クエリでの上書きは誤り（`get_param()` は JSON → POST → GET）。配列の `TypeError` は JP4WC 由来 → B-31 | https://github.com/SoftStepsEC/paidy-wc/pull/41#discussion_r4232057442 |
+| G1-1 | Copilot | Low | クエリでの上書きは誤り（`get_param()` は JSON → POST → GET）。配列の `TypeError` は JP4WC 由来 → B-31（2026-10-10 訂正: `GET` + form-encoded の body ではクエリが勝つ。B-31 に統合） | https://github.com/SoftStepsEC/paidy-wc/pull/41#discussion_r4232057442 |
 | G1-2 | Copilot | Low | 副作用後の保存失敗で claim を解放するのは JP4WC の設計。DB 失敗時のみ → B-32 | https://github.com/SoftStepsEC/paidy-wc/pull/41#discussion_r4232057519 |
 | G2-1 | Copilot | Low | 伏せ字の失敗時に再試行しない。JP4WC の `check_version()` も同じ順序 → B-33 | https://github.com/SoftStepsEC/paidy-wc/pull/41#discussion_r4232127589 |
 | G2-2 | Copilot | Low | タイムアウトでも state token を破棄（署名経路で通る）。JP4WC の設計 → B-34 | （本文のみ） |

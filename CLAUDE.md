@@ -98,6 +98,9 @@ composer check       # 上の 3 つをまとめて実行
 - `.claude/**` / `docs/**` / `*.md` だけの PR は CI が走らない（`ci.yml` の `paths-ignore`）。`request-gate-review.sh` に `--wait-ci` を付けない
 - Copilot は「Needs a closer look・0 findings」でも総評文に実在する問題を書くことがある（PR #38 で 2 件とも実在）。
   総評は読み飛ばさず調査対象にする。`docs/review-baseline.md` / `review-backlog.md` に載っている事項は再対応しない
+- JP4WC から同期したコードへの指摘で JP4WC でも再現するものは、paidy-wc では直さず backlog（JP4WC へ PR）に送り、JP4WC で直してから同期する。
+  スレッドは理由を返信して未解決のまま残す（PR #41 の B-31〜B-34）。WordPress core の挙動を根拠に誤検知と判定するときは、
+  method・Content-Type ごとの分岐まで core のソースで確かめる（PR #41 G1-1 を誤検知と判定し、後で訂正）
 
 ## アーキテクチャ要約（詳細は docs/architecture.md）
 
@@ -134,7 +137,8 @@ application_id 一致確認・body のみから値を読む・秘密鍵の伏せ
 - Paidy の ID（`pay_` / `cap_` / `ref_`）は base64url（英数 + `_` + `-`）。形式ガードは `^pay_[A-Za-z0-9_-]+$/D` より厳しくしない
   （`_` と `-` の見落としで実決済が止まった実例が 2 回）。PCRE の `$` は末尾 `\n` を許すので `/D` か `\z` を使う
 - `WP_REST_Request::get_body()` は body が無いと `null`（`''` ではない）。`empty()` で判定する
-- `get_params()` はクエリ文字列が body を上書きする。署名検証する値は `get_json_params()` / `get_body_params()` からだけ読む
+- `get_param()` / `get_params()` の優先順は JSON（Content-Type が JSON のときだけ）→ POST（POST/PUT/PATCH/DELETE のときだけ）→ クエリ。
+  `GET` に form-encoded の body を付けるとクエリが body に勝つ。署名検証する値は `get_json_params()` / `get_body_params()` からだけ読む
 - `WC_Gateway_Paidy` を `init` より前に生成すると `_load_textdomain_just_in_time` 警告（WP 6.7+）。`WC_Paidy_Endpoint` は
   コンストラクタでゲートウェイを作るので `init` 11 で生成している（`class-wc-paidy.php`）。`plugins_loaded` で生成する処理を足さない
 - JP4WC のコードにもバグはある。Webhook 署名の鍵選択が存在しない `testmode` 設定を見ていた（実際は `environment`）。

@@ -32,7 +32,7 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
       Webhook の裏取りに必要な `paidy_get_payment_data()`（GET 化・形式検証・`rawurlencode()`）と `paidy_verify_payment_for_order()` を
       1-3 から前倒しで移植。JP4WC の `get_option( 'testmode' )`（存在しない設定）は `environment` 判定に直して取り込み（意図的な差分）。
       テスト: `test-paidy-webhook-permission.php`（新規）、`test-paidy-payment-id-format.php`（移植）
-- [x] **1-2 受信エンドポイント認証**（`class-wc-paidy-apply-receiver.php`、`class-wc-paidy-admin-wizard.php`、ブランチ `fix/receiver-auth`）:
+- [x] **1-2 受信エンドポイント認証**（`class-wc-paidy-apply-receiver.php`、`class-wc-paidy-admin-wizard.php`、ブランチ `fix/receiver-auth`、PR #41、2026-10-10 マージ）:
       JP4WC 2.9.16 版に置換（state token を non-autoload option に、`x-paidy-receiver-signature` / `x-paidy-receiver-timestamp` の
       HMAC フォールバック、リプレイ防止、body のみから認証、application_id 一致確認、`paidy_received_data` から秘密鍵除外、
       鍵フィールド補完、`wizard=false` 修正、`pk_test_` 書き換えの廃止）。JP4WC の `jp4wc_updated` の代わりに
@@ -47,7 +47,10 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
       （`paidy_get_payment_data()` の GET 化・形式検証と `test-paidy-payment-id-format.php` は 1-1 で取り込み済み）
 - [ ] **1-4 ブロック対応の fatal 回避**（`class-wc-payments-paidy-blocks-support.php`、2.9.5）
 - [ ] **1-5 リリース 1.6.0**: `release-bump` スキル。changelog は JP4WC の Security 行を流用。`readme.txt` に External Services（B-6）を
-      この時点で入れてもよい
+      この時点で入れてもよい。
+      リリース前に: B-26（再申込時に `site_hash` が未定義、High）を JP4WC で直して同期する。仲介サーバー（paidy.artws.info）が
+      paidy-wc のサイトへ署名付き（`x-paidy-receiver-signature`）でコールバックを送ることを確かめる（1.5.2 から出した審査中の申込は
+      state token を持たず、署名経路でしか通らない）
 
 ## Phase 2 — クリーンアップ
 
