@@ -62,10 +62,15 @@ Paidy のテスト鍵は wp-admin の WooCommerce → 設定 → 決済 → Paid
 
 ```bash
 composer test:db          # Docker で mysql:8.0 を 127.0.0.1:10154 に起動（コンテナ名 paidy-wc-mysql-test）
-composer test:install     # WordPress latest + WooCommerce latest + テストライブラリを $TMPDIR に展開
+composer test:install     # = bin/test-db.sh install: コンテナ起動 + WordPress latest / WooCommerce latest / テストライブラリを $TMPDIR に展開
 composer test             # vendor/bin/phpunit
 composer test:db:stop     # コンテナ削除
 ```
+
+- テスト DB の接続設定（ポート・DB 名・パスワード・コンテナ名・イメージ）は `bin/test-db.sh` の `PAIDY_WC_TEST_DB_*` 環境変数が唯一の出どころ。
+  `test:install` は同じ値を `bin/install-wp-tests.sh` に渡すので、変数を変えてもコンテナと `wp-tests-config.php` が食い違わない。
+  既存コンテナのポートが設定と違えば `start` が止まる（`composer test:db:stop` してから起動し直す）。
+  WordPress の版は `bash bin/test-db.sh install 6.9`、WooCommerce は `WC_VERSION=10.6.2 composer test:install`
 
 - `tests/bootstrap.php` が WooCommerce を読み込み・インストールし、`paidy-wc.php` を読み込む。テストは `WP_UnitTestCase` を継承し
   `tests/Unit/test-*.php` に置く（ファイル名 `test-`、クラス名 `*_Test`）

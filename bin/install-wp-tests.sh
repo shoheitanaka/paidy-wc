@@ -12,9 +12,10 @@
 #   WP_CORE_DIR   where WordPress core goes        (default: $TMPDIR/wordpress)
 #   WC_VERSION    WooCommerce version to install   (default: latest; e.g. 10.6.2)
 #
-# Local use (Docker MySQL from bin/test-db.sh, database already created by the container):
-#   composer test:db
-#   composer test:install        # = bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1:10154 latest true
+# Local use: do not call this directly - `composer test:install` runs
+# `bin/test-db.sh install`, which starts the Docker MySQL container and passes
+# its own connection settings (PAIDY_WC_TEST_DB_*) to this script, so the two
+# never disagree. CI calls this script directly against its service container.
 
 if [ $# -lt 3 ]; then
 	echo "usage: $0 <db-name> <db-user> <db-pass> [db-host] [wp-version] [skip-database-creation]"

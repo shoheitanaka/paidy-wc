@@ -38,7 +38,7 @@
 		"phpstan": "phpstan analyse --memory-limit=1G",
 		"phpstan:baseline": "phpstan analyse --memory-limit=1G --generate-baseline phpstan-baseline.neon --allow-empty-baseline",
 		"test": "phpunit",
-		"test:install": "bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1:10154 latest true",
+		"test:install": "bash bin/test-db.sh install",
 		"test:db": "bash bin/test-db.sh start",
 		"test:db:stop": "bash bin/test-db.sh stop",
 		"check": [
