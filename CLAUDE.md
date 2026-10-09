@@ -51,7 +51,8 @@ composer check       # 上の 3 つをまとめて実行
 
 - PHPCS の警告（`base64_decode` / 非 strict `in_array` など 9 件）は `docs/review-backlog.md` B-2 で把握済み。**新しい警告は増やさない**
 - PHPStan の baseline（39 件）はレガシーコード専用。新規コードのエラーを baseline に追加しない。
-  JP4WC からファイルを同期したら `composer phpstan:baseline` で再生成し、件数が減ったことを確認する。
+  JP4WC からファイルを同期したら、**再生成の前に** `composer phpstan` で `Ignored error pattern …` 以外のエラーが 0 件であることを
+  確かめてから `composer phpstan:baseline` で再生成し、件数が減ったことを確認する（再生成は新しいエラーも吸収して exit 0 になる。PR #40 で実測）。
   baseline を include したまま同じファイルへ再生成してよい（PHPStan は生成先を include から除外する。PR #38 で検証済み。
   Copilot が「既存 56 件を無視して上書きする」と指摘するのは誤検知 → `docs/review-baseline.md`）
 - `.phpcs.xml.dist` の `paidy-wc.php` 向け一時除外（`NonPrefixedFunctionFound` / `NonPrefixedHooknameFound`）は B-1 の解消時に消す
@@ -92,8 +93,9 @@ composer check       # 上の 3 つをまとめて実行
 ## レビュー Bot（dev-cycle / fix-copilot-review のゲート設定）
 
 - **Copilot のみ**。依頼は `gh pr edit <N> --repo SoftStepsEC/paidy-wc --add-reviewer @copilot`
-- **Codex は未接続**（PR #38 で push しても `@codex review` でも反応なし。2026-10-09 時点）。dev-cycle のゲートで Codex を待たない
+- **Codex は未接続**（PR #38・#40 で push しても `@codex review` でも反応なし。2026-10-09 時点）。dev-cycle のゲートで Codex を待たない
   （`request-gate-review.sh ... --copilot-only`）。接続したらこの行を更新する
+- `.claude/**` / `docs/**` / `*.md` だけの PR は CI が走らない（`ci.yml` の `paths-ignore`）。`request-gate-review.sh` に `--wait-ci` を付けない
 - Copilot は「Needs a closer look・0 findings」でも総評文に実在する問題を書くことがある（PR #38 で 2 件とも実在）。
   総評は読み飛ばさず調査対象にする。`docs/review-baseline.md` / `review-backlog.md` に載っている事項は再対応しない
 
@@ -133,7 +135,8 @@ JP4WC 2.9.13〜2.9.16 で入った Paidy の修正のうち、次がまだ**こ�
 - `WC_Gateway_Paidy` を `init` より前に生成すると `_load_textdomain_just_in_time` 警告（WP 6.7+）。`WC_Paidy_Endpoint` は
   コンストラクタでゲートウェイを作るので `init` 11 で生成している（`class-wc-paidy.php`）。`plugins_loaded` で生成する処理を足さない
 - JP4WC のコードにもバグはある。Webhook 署名の鍵選択が存在しない `testmode` 設定を見ていた（実際は `environment`）。
-  取り込むときは設定名・プロパティ名が paidy-wc のゲートウェイに実在するかを確かめ、直したら `docs/sync-with-jp4wc.md` の「意図的な差分」に書く
+  取り込むときは設定名・プロパティ名が paidy-wc のゲートウェイに実在するかを確かめ（`sync-from-jp4wc` 同梱の `check-setting-keys.php` で照合できる）、
+  直したら `docs/sync-with-jp4wc.md` の「意図的な差分」に書く
 - `class_exists()` は `use` エイリアスを解決しない。常に完全修飾名を渡す
 - 管理者が入力した説明文 HTML は `wp_kses( force_balance_tags( $html ), $allowed )` で出力（閉じタグ漏れで注文ボタンが重複した実例）
 - `stripslashes()` ではなく `wp_unslash()`。`json_encode()` ではなく `wp_json_encode()`

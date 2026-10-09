@@ -95,7 +95,8 @@ git -C "$J" log --oneline -- includes/gateways/paidy tests/Unit/test-paidy-*.php
 - [ ] `grep -rn "woocommerce-for-japan" includes src tests` が 0 件
 - [ ] `php .claude/skills/sync-from-jp4wc/check-setting-keys.php` が unknown 0 件（取り込んだコードが読む設定名がゲートウェイに実在する。
       「意図的な差分」7 の `testmode` のような取り違えを検出する）
-- [ ] `composer check`（lint / phpstan / test）が通る。PHPStan baseline を再生成して件数が減っている
+- [ ] `composer check`（lint / phpstan / test）が通る。PHPStan baseline は、再生成の前の `composer phpstan` で新しいエラーが無いことを
+      確かめてから再生成し、件数が減っている
 - [ ] `npm run build` して成果物を更新（`src/` を同期した場合）
 - [ ] wp-env でクラシック / ブロック両チェックアウトに Paidy が出る（JPY・テスト鍵）
 - [ ] 文字列が増えていれば `update-i18n` スキルで POT / JSON を更新
