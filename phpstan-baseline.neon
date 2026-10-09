@@ -121,12 +121,6 @@ parameters:
 			path: includes/gateways/paidy/class-wc-paidy-admin-wizard.php
 
 		-
-			message: '#^Function wc_get_logger invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: includes/gateways/paidy/class-wc-paidy-apply-receiver.php
-
-		-
 			message: '#^Parameter \#4 \$autoload of function add_option expects bool\|null, string given\.$#'
 			identifier: argument.type
 			count: 1
