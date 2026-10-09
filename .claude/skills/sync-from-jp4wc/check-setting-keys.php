@@ -85,17 +85,24 @@ function paidy_tokens( $file ) {
 }
 
 /**
- * Return the value of a quoted literal made of letters, digits, "_" and "-".
+ * Return the value of a quoted string literal without interpolation.
+ *
+ * Every literal counts: WooCommerce does not restrict the characters of a
+ * setting key, so skipping unusual ones would let an unknown key pass.
  *
  * @param array $token Token.
- * @return string|null The identifier, or null when the token is not such a literal.
+ * @return string|null The value, or null when the token is not such a literal.
  */
 function paidy_literal( $token ) {
 	if ( T_CONSTANT_ENCAPSED_STRING !== $token[0] ) {
 		return null;
 	}
-	$value = substr( $token[1], 1, -1 );
-	return preg_match( '/^[A-Za-z0-9_-]+$/D', $value ) ? $value : null;
+	$text = ltrim( $token[1], 'bB' );
+	$body = substr( $text, 1, -1 );
+	if ( '"' === $text[0] ) {
+		return stripcslashes( $body );
+	}
+	return strtr( $body, array( '\\\\' => '\\', "\\'" => "'" ) );
 }
 
 /**
