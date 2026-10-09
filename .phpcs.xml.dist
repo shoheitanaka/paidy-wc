@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<ruleset name="Paidy for WooCommerce Coding Standards">
+	<description>WordPress Coding Standards ruleset for the Paidy for WooCommerce plugin.</description>
+
+	<!-- What to scan -->
+	<file>paidy-wc.php</file>
+	<file>class-wc-paidy.php</file>
+	<file>uninstall.php</file>
+	<file>includes</file>
+	<file>phpstan-bootstrap.php</file>
+	<file>tests</file>
+	<exclude-pattern>/vendor/</exclude-pattern>
+	<exclude-pattern>/node_modules/</exclude-pattern>
+	<!-- Built assets (webpack output, *.asset.php manifests). -->
+	<exclude-pattern>/includes/gateways/paidy/assets/</exclude-pattern>
+
+	<!-- How to scan -->
+	<arg value="sp"/>
+	<arg name="basepath" value="./"/>
+	<arg name="colors"/>
+	<arg name="extensions" value="php"/>
+	<arg name="parallel" value="8"/>
+	<!--
+		Errors fail the run (CI is red); warnings are reported but do not change
+		the exit code. Keep warnings visible and fix them when touching the file.
+	-->
+	<config name="ignore_warnings_on_exit" value="1"/>
+
+	<!-- PHP version compatibility: matches "Requires PHP" in paidy-wc.php. -->
+	<config name="testVersion" value="8.1-"/>
+	<rule ref="PHPCompatibilityWP"/>
+
+	<!-- WordPress Coding Standards -->
+	<config name="minimum_supported_wp_version" value="6.7"/>
+	<rule ref="WordPress"/>
+
+	<!--
+		Global prefixes used by this plugin.
+		paidy_ / wc_paidy_ / WC_Paidy / WC_PAIDY_ are the plugin's own prefixes.
+		jp4wc_ / JP4WC_ / wc4jp_ / ArtisanWorkshop are inherited from Japanized for
+		WooCommerce, which this gateway is extracted from and kept in sync with
+		(see docs/sync-with-jp4wc.md). Do not add new jp4wc_/wc4jp_ globals.
+	-->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="paidy_"/>
+				<element value="wc_paidy_"/>
+				<element value="WC_Paidy"/>
+				<element value="WC_PAIDY_"/>
+				<element value="jp4wc_"/>
+				<element value="JP4WC_"/>
+				<element value="wc4jp_"/>
+				<element value="ArtisanWorkshop"/>
+			</property>
+		</properties>
+		<!--
+			WooCommerce payment gateway classes intentionally follow WooCommerce
+			conventions (WC_Gateway_Paidy, WC_Payments_Paidy_Blocks_Support) and
+			hook into WooCommerce-namespaced filters (woocommerce_paidy_icon).
+			includes/jp4wc-framework/ is shared code copied verbatim from Japanized
+			for WooCommerce (hooks such as wc_jp4wc_logging); do not edit it here.
+		-->
+		<exclude-pattern>/includes/gateways/</exclude-pattern>
+		<exclude-pattern>/includes/jp4wc-framework/</exclude-pattern>
+	</rule>
+	<!--
+		TEMPORARY BASELINE (remove with docs/review-backlog.md B-1):
+		paidy-wc.php still declares the legacy, unprefixed functions
+		on_deactivation(), add_wc4jp_paidy_gateway() and init_paidy_receiver(),
+		and applies the WordPress core filter "active_plugins". Renaming them is a
+		behaviour-neutral change scheduled for the first cleanup PR; until then the
+		two sniffs are silenced for this one file only so CI reflects new issues.
+	-->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound">
+		<exclude-pattern>/paidy-wc\.php$</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound">
+		<exclude-pattern>/paidy-wc\.php$</exclude-pattern>
+	</rule>
+
+	<!--
+		Hook names: gateway files fire WooCommerce-namespaced hooks
+		(woocommerce_paidy_icon) and the shared framework fires wc_jp4wc_logging.
+	-->
+	<rule ref="WordPress.NamingConventions.ValidHookName">
+		<exclude-pattern>/includes/gateways/</exclude-pattern>
+		<exclude-pattern>/includes/jp4wc-framework/</exclude-pattern>
+	</rule>
+
+	<!-- Text domain -->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="paidy-wc"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!--
+		Tests: files are named test-*.php with *_Test classes (WordPress core
+		convention), which the WP file-name sniff does not recognise.
+	-->
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>/tests/</exclude-pattern>
+	</rule>
+
+	<!-- WooCommerce capabilities are valid custom capabilities. -->
+	<rule ref="WordPress.WP.Capabilities">
+		<properties>
+			<property name="custom_capabilities" type="array">
+				<element value="manage_woocommerce"/>
+				<element value="edit_shop_orders"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

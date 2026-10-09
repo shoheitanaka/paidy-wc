@@ -1,0 +1,36 @@
+includes:
+	- vendor/szepeviktor/phpstan-wordpress/extension.neon
+	- phpstan-baseline.neon
+
+parameters:
+	level: 5
+	phpVersion: 80100
+	# Stubs declare runtime constants (WC_VERSION etc.) with placeholder values;
+	# without this PHPStan treats them as compile-time literals and flags our own
+	# version gates as always-true/unreachable (recommended by phpstan-wordpress).
+	treatPhpDocTypesAsCertain: false
+	paths:
+		- paidy-wc.php
+		- class-wc-paidy.php
+		- uninstall.php
+		- includes
+	excludePaths:
+		- includes/gateways/paidy/assets/*
+		- vendor/*
+		- node_modules/*
+	scanFiles:
+		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+		- vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php
+	bootstrapFiles:
+		- phpstan-bootstrap.php
+	# Plugin constants are defined at runtime (paidy-wc.php / class-wc-paidy.php);
+	# the bootstrap gives them placeholder values, so never treat them as literals.
+	dynamicConstantNames:
+		- WC_PAIDY_VERSION
+		- JP4WC_PAIDY_FRAMEWORK_VERSION
+		- WC_PAIDY_PLUGIN_URL
+		- WC_PAIDY_ASSETS_URL
+		- WC_PAIDY_BLOCKS_URL
+		- WC_PAIDY_ABSPATH
+		- WC_PAIDY_ASSETS_ABSPATH
+		- WC_PAIDY_PLUGIN_FILE

@@ -1,0 +1,217 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method WC_Paidy\:\:get_instance\(\) has invalid return type Singleton\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class-wc-paidy.php
+
+		-
+			message: '#^Property WC_Paidy\:\:\$instance has unknown class Singleton as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class-wc-paidy.php
+
+		-
+			message: '#^Static property WC_Paidy\:\:\$instance \(Singleton\) does not accept WC_Paidy\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: class-wc-paidy.php
+
+		-
+			message: '#^Action callback returns bool but should not return anything\.$#'
+			identifier: return.void
+			count: 3
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Binary operation "\-" between float and string results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Cannot call method jp4wc_array_to_message\(\) on stdClass\.$#'
+			identifier: method.nonObject
+			count: 6
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Cannot call method jp4wc_debug_log\(\) on stdClass\.$#'
+			identifier: method.nonObject
+			count: 10
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Method WC_Gateway_Paidy\:\:process_refund\(\) should return bool but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^PHPDoc tag @extends has invalid value \(WC_Payment_Gateway\)\: Unexpected token "\\n \* ", expected ''\<'' at offset 195 on line 7$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Parameter \#1 \$attachment_id of function wp_get_attachment_image expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Parameter \#1 \$attachment_id of function wp_get_attachment_url expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Parameter \#1 \$order_id of function wc_reduce_stock_levels expects int\|WC_Order, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_js expects string, float given\.$#'
+			identifier: argument.type
+			count: 1
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_js expects string, float\|int given\.$#'
+			identifier: argument.type
+			count: 3
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_js expects string, int\<0, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Parameter \#3 \$deps of function wp_register_style expects array\<string\>, false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Property WC_Gateway_Paidy\:\:\$jp4wc_framework \(stdClass\) does not accept ArtisanWorkshop\\PluginFramework\\v2_0_14\\JP4WC_Framework\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Property WC_Gateway_Paidy\:\:\$logo_image_url \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Result of && is always false\.$#'
+			identifier: booleanAnd.alwaysFalse
+			count: 1
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Variable \$paidy_info in isset\(\) is never defined\.$#'
+			identifier: isset.variable
+			count: 2
+			path: includes/gateways/paidy/class-wc-gateway-paidy.php
+
+		-
+			message: '#^Method WC_Paidy_Admin_Wizard\:\:paidy_sanitize_on_boarding_settings\(\) should return string but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: includes/gateways/paidy/class-wc-paidy-admin-wizard.php
+
+		-
+			message: '#^Method WC_Paidy_Admin_Wizard\:\:paidy_sanitize_on_boarding_settings\(\) should return string but returns array\<string, bool\|int\<0, max\>\|string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: includes/gateways/paidy/class-wc-paidy-admin-wizard.php
+
+		-
+			message: '#^Variable \$site_hash might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: includes/gateways/paidy/class-wc-paidy-admin-wizard.php
+
+		-
+			message: '#^Function wc_get_logger invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: includes/gateways/paidy/class-wc-paidy-apply-receiver.php
+
+		-
+			message: '#^Parameter \#4 \$autoload of function add_option expects bool\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: includes/gateways/paidy/class-wc-paidy-apply-receiver.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between ''canceled'' and ''canceled'' will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: includes/gateways/paidy/class-wc-paidy-apply-receiver.php
+
+		-
+			message: '#^Access to an undefined property WooCommerce\:\:\$payment_gateways\.$#'
+			identifier: property.notFound
+			count: 1
+			path: includes/gateways/paidy/class-wc-payments-paidy-blocks-support.php
+
+		-
+			message: '#^PHPDoc tag @extends has invalid value \(AbstractPaymentMethodType\)\: Unexpected token "\\n ", expected ''\<'' at offset 87 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: includes/gateways/paidy/class-wc-payments-paidy-blocks-support.php
+
+		-
+			message: '#^Call to function is_null\(\) with float\|int\|numeric\-string will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: includes/jp4wc-framework/class-jp4wc-framework.php
+
+		-
+			message: '#^Function ceil invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: includes/jp4wc-framework/class-jp4wc-framework.php
+
+		-
+			message: '#^Function floor invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: includes/jp4wc-framework/class-jp4wc-framework.php
+
+		-
+			message: '#^Method ArtisanWorkshop\\PluginFramework\\v2_0_14\\JP4WC_Framework\:\:get_order_id_by_transaction_id\(\) should return int but returns false\.$#'
+			identifier: return.type
+			count: 1
+			path: includes/jp4wc-framework/class-jp4wc-framework.php
+
+		-
+			message: '#^Method ArtisanWorkshop\\PluginFramework\\v2_0_14\\JP4WC_Framework\:\:jp4wc_array_to_message\(\) should return string but returns null\.$#'
+			identifier: return.type
+			count: 1
+			path: includes/jp4wc-framework/class-jp4wc-framework.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: includes/jp4wc-framework/class-jp4wc-framework.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp_with_offset of function date_i18n expects bool\|int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: includes/jp4wc-framework/class-jp4wc-framework.php
+
+		-
+			message: '#^Undefined variable\: \$dx$#'
+			identifier: variable.undefined
+			count: 1
+			path: includes/jp4wc-framework/class-jp4wc-framework.php

@@ -10,15 +10,15 @@
 .DS_Store
 Thumbs.db
 
-# VS code
+# VS code / editors
 .vscode/
 .idea/
 
 # node and composer
+# composer.lock IS tracked so CI and every developer install the same tooling.
 /node_modules/
 vendor
 package-lock.json
-composer.lock
 
 # translated files
 /i18n/*.mo
@@ -29,6 +29,16 @@ composer.lock
 
 # dotenv environment variables file
 .env
+
+# wp-env local overrides (ports etc. belong in .wp-env.json, see docs/development.md)
+.wp-env.override.json
+
+# PHPUnit / local tooling caches
+.phpunit.result.cache
+/dist/
+
+# Claude Code local settings
+.claude/settings.local.json
 
 *.tmp
 *.zip

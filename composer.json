@@ -1,9 +1,8 @@
 {
 	"name": "artisanworkshop/paidy-wc",
 	"description": "Paidy for WooCommerce",
-	"license": "GPL-3.0-or-later",
-	"version": "1.4.0",
 	"type": "wordpress-plugin",
+	"license": "GPL-3.0-or-later",
 	"authors": [
 		{
 			"name": "Shohei Tanaka",
@@ -11,29 +10,41 @@
 		}
 	],
 	"require": {
-		"php": ">=7.4"
+		"php": ">=8.1"
 	},
 	"require-dev": {
-		"ergebnis/composer-normalize": "^2.42",
-		"phpcompatibility/phpcompatibility-wp": "*",
-		"roots/wordpress": "~6.4.2",
-		"wp-coding-standards/wpcs": "^3.0",
-		"phpunit/phpunit": "^9.0",
-		"automattic/jetpack-autoloader": "^2"
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"php-stubs/woocommerce-stubs": "^10.0 || ^11.0",
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"phpstan/phpstan": "^2.1",
+		"phpunit/phpunit": "^9.6",
+		"squizlabs/php_codesniffer": "^3.13",
+		"szepeviktor/phpstan-wordpress": "^2.0",
+		"wp-coding-standards/wpcs": "^3.1",
+		"yoast/phpunit-polyfills": "^2.0 || ^3.0 || ^4.0"
 	},
 	"config": {
 		"allow-plugins": {
-			"dealerdirect/phpcodesniffer-composer-installer": true,
-			"ergebnis/composer-normalize": true,
-			"roots/wordpress-core-installer": true,
-			"automattic/jetpack-autoloader": true
-		}
-	},
-	"extra": {
-		"wordpress-install-dir": "vendor/wordpress"
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		},
+		"platform": {
+			"php": "8.1.0"
+		},
+		"sort-packages": true
 	},
 	"scripts": {
-		"phpcs": "@php ./vendor/bin/phpcs",
-		"phpcs:fix": "@php ./vendor/bin/phpcbf"
+		"lint": "phpcs",
+		"format": "phpcbf",
+		"phpstan": "phpstan analyse --memory-limit=1G",
+		"phpstan:baseline": "phpstan analyse --memory-limit=1G --generate-baseline phpstan-baseline.neon --allow-empty-baseline",
+		"test": "phpunit",
+		"test:install": "bash bin/test-db.sh install",
+		"test:db": "bash bin/test-db.sh start",
+		"test:db:stop": "bash bin/test-db.sh stop",
+		"check": [
+			"@lint",
+			"@phpstan",
+			"@test"
+		]
 	}
 }
