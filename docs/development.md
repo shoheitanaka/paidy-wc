@@ -88,7 +88,7 @@ composer test:db:stop     # コンテナ削除
 - `bin/install-wp-tests.sh` の WooCommerce 最新版は `downloads.wordpress.org/plugin/woocommerce.zip`（版なし。200 で直接配信）から取る。
   `woocommerce.latest-stable.zip` は版付き URL への 302 を返すので、`-L` 無しの `curl` だとリダイレクト本文が保存されて
   `unzip` が失敗する（PR #38 の CI で発生）。取得は `curl -fsSL` + `unzip -tq` で検証してから展開する
-- HTTP を伴うコードは `pre_http_request` フィルタでモックする（JP4WC の `tests/Unit/test-paidy-payment-id-format.php` 参照）。
+- HTTP を伴うコードは `pre_http_request` フィルタでモックする（`tests/Unit/test-paidy-payment-id-format.php` の `mock_paidy_api()` 参照）。
   テストから実 Paidy API を呼ばない
 - Paidy の REST ルートは `rest_do_request()` で実際に叩ける（ノンス不要）。`paidy/v1/order` は署名か Paidy の IP が要るので、
   `x-paidy-signature` を付けるか `$_SERVER['REMOTE_ADDR']` を設定し、tearDown で戻す（`test-paidy-webhook-permission.php`）
