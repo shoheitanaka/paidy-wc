@@ -3,7 +3,7 @@
 - 開始: 2026-10-09
 - オプション: auto-commit（確認ゲートなし）
 - PR: 未作成
-- 現在のステップ: 3（review-loop）
+- 現在のステップ: 4（push・PR 作成）
 - Copilot: 依頼 0 回 / 未収束
 - Codex: 未接続（CLAUDE.md。ゲート対象外）
 
@@ -20,3 +20,5 @@
 | 2026-10-09 | 2 | ブランチ `fix/webhook-auth` 作成（base cd56e84） |
 | 2026-10-09 | 2 | 実装コミット 4 件（f2ba611 / b07a603 / c27e9ee / 51a0479）+ docs。composer check green（PHPCS エラー 0・警告 9、PHPStan エラー 0・baseline 56→39、PHPUnit 55 件） |
 | 2026-10-09 | 2 | wp-env の手動確認は不可（既存不具合: WooCommerce が `woocommerce.latest-stable/` にあり paidy-wc 本体が起動しない → backlog B-13）。PHPUnit の `rest_do_request()` テストで代替 |
+| 2026-10-09 | 3 | review-loop R1: Critical/High 0、Medium 1（R1-1 修正）、Low 2（R1-3 修正、R1-2 → B-14）、対象外 4 + Low 1 → B-15〜B-20 |
+| 2026-10-09 | 3 | review-loop R2: APPROVE（R1-1・R1-3 解消、R2-1 Low を 1 行で対応） |
