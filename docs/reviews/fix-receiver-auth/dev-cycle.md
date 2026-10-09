@@ -4,7 +4,7 @@
 - オプション: auto-commit（確認ゲートなし）
 - PR: #41 https://github.com/SoftStepsEC/paidy-wc/pull/41
 - 現在のステップ: 6（CI 待ち・Copilot G1 依頼）
-- Copilot: 依頼 1 回 / 未収束
+- Copilot: 依頼 2 回 / 未収束
 - Codex: 未接続（CLAUDE.md。ゲート対象外）
 
 ## 承認された計画の要判断事項
@@ -26,3 +26,5 @@
 | 2026-10-10 00:52 | 4 | 初回 push（HEAD 16e83f3、T=2026-10-09T15:52:47Z）、PR #41 作成 |
 | 2026-10-10 01:00 | 6 | CI green、Copilot G1 依頼・応答（237f480） |
 | 2026-10-10 | 7 | G1: Copilot 新規 2 件、修正 0 / 保留 2（G1-1 → B-31、G1-2 → B-32）。auto-commit のため確認ゲートなし |
+| 2026-10-10 01:08 | 6 | CI green、Copilot G2 依頼・応答（d3d43f1） |
+| 2026-10-10 | 7 | G2: Copilot 新規 2 件（スレッド 1 + 本文 1）、修正 0 / 保留 2（G2-1 → B-33、G2-2 → B-34） |
