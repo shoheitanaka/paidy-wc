@@ -2,9 +2,9 @@
 - タスク: Phase 1-1 Webhook 認証（JP4WC 2.9.16 の `class-wc-paidy-endpoint.php` を取り込み、`WC_Paidy_Endpoint` を `init` 11 に遅延）
 - 開始: 2026-10-09
 - オプション: auto-commit（確認ゲートなし）
-- PR: 未作成
-- 現在のステップ: 4（push・PR 作成）
-- Copilot: 依頼 0 回 / 未収束
+- PR: #39 https://github.com/SoftStepsEC/paidy-wc/pull/39
+- 現在のステップ: 6（Copilot 依頼 G2）
+- Copilot: 依頼 1 回 / 未収束
 - Codex: 未接続（CLAUDE.md。ゲート対象外）
 
 ## 承認された計画の要判断事項
@@ -22,3 +22,6 @@
 | 2026-10-09 | 2 | wp-env の手動確認は不可（既存不具合: WooCommerce が `woocommerce.latest-stable/` にあり paidy-wc 本体が起動しない → backlog B-13）。PHPUnit の `rest_do_request()` テストで代替 |
 | 2026-10-09 | 3 | review-loop R1: Critical/High 0、Medium 1（R1-1 修正）、Low 2（R1-3 修正、R1-2 → B-14）、対象外 4 + Low 1 → B-15〜B-20 |
 | 2026-10-09 | 3 | review-loop R2: APPROVE（R1-1・R1-3 解消、R2-1 Low を 1 行で対応） |
+| 2026-10-09 20:13 | 4 | 初回 push（HEAD 21726f1、T=2026-10-09T11:13:54Z）、PR #39 作成（gh の既定リポジトリを SoftStepsEC/paidy-wc に設定） |
+| 2026-10-09 20:20 | 6 | CI green（6 checks）、Copilot G1 依頼・応答（21726f1） |
+| 2026-10-09 | 7 | G1: Copilot 新規 2 件、修正 0 / 保留 2（G1-1 → B-21、G1-2 → B-22）。auto-commit のため確認ゲートなし |
