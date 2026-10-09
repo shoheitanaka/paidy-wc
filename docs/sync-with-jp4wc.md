@@ -48,7 +48,9 @@
    （PHPStan baseline の削減）。テスト `test-paidy-payment-id-format.php` の「issue #223」は「Japanized for WooCommerce issue #223」。
    receiver / wizard の `@since 2.9.16` は `@since 1.6.0` に、`@since` の無い state token 系メソッドには `@since 1.6.0` を足す。
    コメント中の「before 2.9.16」「2.9.13–2.9.14 の 2 日 transient」のような JP4WC の版の話は paidy-wc の版（1.6.0 より前は state token
-   なし）に（receiver の `SIGNATURE_HEADER` の DocBlock と署名経路のコメント、wizard の `plugin_version` のコメント）。移植テストの「issue #210」も同様に書き換え、
+   なし）に（receiver の `SIGNATURE_HEADER` の DocBlock と署名経路のコメント、wizard の `plugin_version` のコメント）。
+   ただし `verify_state_token()` / `consume_state_token()` の legacy transient のフォールバックとそのコメントは verbatim のまま残す
+   （paidy-wc 自身は transient の token を発行したことが無いが、JP4WC 2.9.13〜2.9.14 で申込んでから paidy-wc に移ったサイトの token を受けるため）。移植テストの「issue #210」も同様に書き換え、
    `test-paidy-receiver-signature.php` の tearDown の LIKE 削除は `$wpdb->prepare()` + `esc_like()` に（PHPCS エラー）
 9. **アップグレード処理**（`class-wc-paidy-apply-receiver.php` 末尾、`paidy-wc.php`）: JP4WC は `JP4WC_Install` の `jp4wc_updated` で
    `redact_stored_secrets_on_upgrade()` を呼ぶが、paidy-wc にはバージョン検出が無い。paidy-wc は `paidy-wc.php` の
