@@ -1,6 +1,6 @@
 ---
 name: sync-from-jp4wc
-description: Japanized for WooCommerce（JP4WC）の Paidy モジュールの変更を、この単体プラグイン（paidy-wc）へ取り込む。「JP4WC の変更を取り込んで」「JP4WC と同期して」「JP4WC 2.9.x の Paidy 修正を反映して」「Webhook 署名検証を JP4WC から持ってきて」などと言われたら使う。ファイル対応表・テキストドメイン置換・意図的な差分の再適用・設定名の照合・テスト移植・検証までを行う。
+description: Japanized for WooCommerce（JP4WC）の Paidy モジュールの変更を、この単体プラグイン（paidy-wc）へ取り込む。「JP4WC の変更を取り込んで」「JP4WC と同期して」「JP4WC 2.9.x の Paidy 修正を反映して」「Webhook 署名検証を JP4WC から持ってきて」などと言われたら使う。ファイル対応表・テキストドメイン置換・意図的な差分の再適用・設定名の照合・テスト移植・検証までを行う。JP4WC にも残る不具合を見つけたときの Issue の書式と起票後の記録も扱う（「JP4WC に Issue を出して」「JP4WC に起票して」）。
 ---
 
 # JP4WC からの同期スキル（paidy-wc）
@@ -128,7 +128,7 @@ npm run build                                      # src/ を触った場合
 git diff --stat
 ```
 
-- 作り直す前の `composer phpstan` で出る通常のエラーは、新しいコードのエラー。baseline に入れず直す（JP4WC 側のバグなら JP4WC にも報告）。
+- 作り直す前の `composer phpstan` で出る通常のエラーは、新しいコードのエラー。baseline に入れず直す（JP4WC 側のバグなら「JP4WC に Issue を出す」の書式で JP4WC にも報告）。
   既存エントリと同じエラーが増えた場合も、`… is expected to occur 1 time, but occurred 2 times` と本体のエラーが出る。
   `Ignored error pattern … was not matched` / `… but occurred only …` は直って消えた・減った分なので、そのまま再生成してよい。
   `phpstan:baseline` は新しいエラーも吸収して exit 0 にするので、この順番を飛ばさない
@@ -143,6 +143,85 @@ git diff --stat
 - `docs/review-backlog.md` で解消した ID の行を消す
 - `readme.txt` の changelog は `release-bump` スキルの担当（この PR では触らない。ただし PR 本文に JP4WC 側の changelog 文言を引用しておく）
 - コミットはせず、`git diff --stat` と変更の要約・取り込んだ JP4WC 版 / PR 番号をユーザーに提示する
+
+## JP4WC に Issue を出す
+
+同期やレビューで見つけた不具合が JP4WC にも残っているとき（取り込まなかった悪化 hunk、手順 5 の新しいエラー、Bot レビューの指摘で
+JP4WC でも再現するもの）は、paidy-wc では直さず JP4WC に Issue を出し、直ってから同期する。書式は JP4WC #231〜#234（2026-10-10 起票）に揃える。
+
+### 起票前に確かめる
+
+```bash
+J=~/Dev/Japanized-for-WooCommerce
+# artisanworkshop を指すリモート（このマシンのクローンは origin がフォークで upstream が正）
+R=$(git -C "$J" remote -v | awk '/artisanworkshop\/Japanized-for-WooCommerce.*\(fetch\)/ { print $1; exit }')
+git -C "$J" fetch -q "$R"
+git -C "$J" show "$R/main:readme.txt" | grep -m1 '^Stable tag:'; git -C "$J" rev-parse --short "$R/main"   # 「確認した版」
+git -C "$J" grep -n '<該当コード>' "$R/main" -- includes/gateways/paidy/                                     # 行番号
+gh issue list --repo artisanworkshop/Japanized-for-WooCommerce --state all --search '<キーワード> in:title,body'  # 重複
+```
+
+- 版・行番号は artisanworkshop の `main` で取る（ローカルの作業ツリーやフォークの `main` が古いと行番号がずれる。pull はユーザーに確認してから）
+- 該当箇所が `main` に同じ形で残っていることを確かめる。直っていれば Issue ではなく同期する
+
+### タイトル・ラベル
+
+- `Paidy: ` + 店舗・購入者から見て何が起きるかを 1 文で。原因のコードより症状を先に書く（#231・#232・#234）。
+  症状が表に出にくい欠陥は、欠陥そのものを書く（#233「取消・キャプチャ・返金で transaction_id を検証せずに API の URL に連結している」）
+- ラベルは `bug`（機能追加なら `enhancement`）
+
+### 本文
+
+```markdown
+## 概要
+
+`includes/gateways/paidy/<file>.php` の `<function>()` は、<コードが何をしていて、何が足りないか>（<行> 行）。
+
+## 起きること
+
+- **<症状の見出し>**
+  - <起きる条件と結果。エラーメッセージは `Error: Cannot use object of type WP_Error as array` のように原文で>
+
+## 確認した版
+
+- main（<Stable tag>、<短縮ハッシュ>）の <行> 行
+- 同じコードの単体版（Paidy for WooCommerce）で、<一時テスト・`node --check` など、何をして何を確かめたか>
+
+## 修正案
+
+- <方針。差分が小さければ PHP のコードブロックで示す（#234）>
+
+## 関連
+
+- #<JP4WC の関連 Issue / PR>（<関係を一言。別の不具合なら「今回とは別の不具合です」>）
+- 単体版 Paidy for WooCommerce の backlog B-<n>。こちらで直していただいたものを単体版に同期します。
+```
+
+- です・ます調で書く（paidy-wc の docs は である調だが、Issue は JP4WC 向け）
+- paidy-wc は「単体版（Paidy for WooCommerce）」と書き、参照は backlog の `B-<n>` だけにする。paidy-wc の PR 番号は JP4WC の `#` に
+  自動リンクされて別物を指し、レビュー ID（`R1-X1`・`G1-1`）は JP4WC 側から意味が取れないので書かない。単体版の行番号も書かない
+- 実測したこと（一時テストの結果、`node --check`）と推測を分ける。確かめていない挙動を「起きます」と書かない
+- 1 Issue = 1 原因。同じ修正で直る複数の箇所はまとめる（#231 は取消・キャプチャ・返金の 3 か所）
+- JP4WC は公開リポジトリで、private vulnerability reporting は無効（2026-10-10 時点）。悪用の手順が書ける脆弱性（認証の回避・秘密鍵の
+  漏えいなど）は公開 Issue にせず、Security Advisory の下書きにするかをユーザーに確認する。公開 Issue にするときも成立条件と影響の説明に
+  とどめ、再現用のリクエストは書かない（#233）
+
+### 起票と記録
+
+本文は scratchpad に書き、タイトル・ラベル・本文をユーザーに見せて承認を得てから起票する（公開される操作なので、1 件ずつ確認する）。
+
+```bash
+gh issue create --repo artisanworkshop/Japanized-for-WooCommerce --label bug \
+  --title 'Paidy: <症状>' --body-file <scratchpad>/jp4wc-issue-B<n>.md
+```
+
+起票したら paidy-wc 側に記録する（ドキュメントだけの変更なら `main` へ直接コミットしてよい。コミットはユーザーの指示で）:
+
+- `docs/review-backlog.md` の該当行の「解消予定」を `JP4WC #<n> で修正後に同期（<いつまでに>）` にする（B-26 の行と同じ形）
+- リリース前に直すものは `docs/DEVELOPMENT_PLAN.md` の該当ステップに `B-<n> → JP4WC #<n>（<一言>）` を足す（1-5 の記述と同じ形）
+- 取り込まなかった hunk なら `docs/sync-with-jp4wc.md` の「意図的な差分」に Issue 番号を書く
+- Bot レビューの指摘から出したものは、スレッドに Issue 番号と「JP4WC で直してから同期する」旨を返信し、未解決のまま残す
+- JP4WC で直ったら手順 1〜6 で取り込み、backlog の行を消す
 
 ## 失敗モード
 
