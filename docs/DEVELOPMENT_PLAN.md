@@ -45,16 +45,18 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
       `paidy_capture_id` による再キャプチャ防止、説明文の表示時の `force_balance_tags()`、ゲスト注文の注文履歴照会の省略と 5 分キャッシュ、
       商品 JSON の `esc_js()`。JP4WC の返金の `paidy_refund_id` ガード（2 回目の返金が失敗する）、リダイレクト URL の `esc_url()`
       （基本パーマリンクでサンクスページに着かない）、説明文の保存時検証（ブロックチェックアウトの画像が消える）は取り込まず、
-      意図的な差分 12・13・14 + B-36・B-37・B-41 に。B-19・B-20・B-35 が解消。
+      意図的な差分 12・13・14 + B-36・B-37・B-41 に。B-20・B-35 が解消。B-19 は 1-3 以降に保存される `transaction_id` の分だけ解消
+      （1.5.2 以前に検証なしで保存された値が close / capture / refund の URL に入る経路は残る。PR #42 Copilot G1-1）。
       テスト: `test-paidy-description-balance.php` `test-paidy-guest-order-history.php` を移植、
       `test-paidy-thankyou-verification.php` `test-paidy-capture-refund.php`（新規）
 - [ ] **1-4 ブロック対応の fatal 回避**（`class-wc-payments-paidy-blocks-support.php`、2.9.5）
 - [ ] **1-5 リリース 1.6.0**: `release-bump` スキル。changelog は JP4WC の Security 行を流用。`readme.txt` に External Services（B-6）を
       この時点で入れてもよい。
       リリース前に: B-26（再申込時に `site_hash` が未定義、High）を JP4WC で直して同期する。B-42（通信エラーで返金・キャプチャが fatal、
-      5xx で返金済みと誤記録）と B-43（送料無料クーポン等で Paidy Checkout が起動しない）も High の既存バグなので、同じく JP4WC で直して同期するか判断する。仲介サーバー（paidy.artws.info）が
-      paidy-wc のサイトへ署名付き（`x-paidy-receiver-signature`）でコールバックを送ることを確かめる（1.5.2 から出した審査中の申込は
-      state token を持たず、署名経路でしか通らない）
+      5xx で返金済みと誤記録）と B-43（送料無料クーポン等で Paidy Checkout が起動しない）も High の既存バグなので、同じく JP4WC で直して同期するか判断する。
+      B-19（1.5.2 以前に保存された未検証の `transaction_id` が API の URL に入る）も、同じ箇所なので B-42 と一緒に検討する。
+      仲介サーバー（paidy.artws.info）が paidy-wc のサイトへ署名付き（`x-paidy-receiver-signature`）でコールバックを送ることを確かめる
+      （1.5.2 から出した審査中の申込は state token を持たず、署名経路でしか通らない）
 
 ## Phase 2 — クリーンアップ
 
