@@ -129,8 +129,8 @@ JP4WC 2.9.0〜2.9.16 で入った Paidy のセキュリティ修正は 1-1〜1-3
 application_id 一致確認・body のみから値を読む・秘密鍵の伏せ字。JP4WC の `jp4wc_updated` は `paidy_wc_updated`（`paidy-wc.php`）に置き換え
 
 取り込み済み（1-3）: ゲートウェイを JP4WC 版に置換。サンクスページ（`thankyou_completed()`）は `?transaction_id=` を
-`paidy_verify_payment_for_order()` で裏取りしてから `payment_complete()`、`paidy_capture_id` による再キャプチャ防止、説明文の `force_balance_tags()`。
-JP4WC の返金の `paidy_refund_id` ガードとリダイレクト URL の `esc_url()` は取り込まない（`docs/sync-with-jp4wc.md` の意図的な差分 12・13）
+`paidy_verify_payment_for_order()` で裏取りしてから `payment_complete()`、`paidy_capture_id` による再キャプチャ防止、説明文の表示時の `force_balance_tags()`。
+JP4WC の返金の `paidy_refund_id` ガード・リダイレクト URL の `esc_url()`・説明文の保存時検証は取り込まない（`docs/sync-with-jp4wc.md` の意図的な差分 12〜14）
 
 これらに触る変更では JP4WC 側の実装（HMAC 署名 + IP 許可リスト、state token + 署名、`^pay_[A-Za-z0-9_-]+$/D`）をそのまま取り込むこと。
 独自実装で再発明しない。
