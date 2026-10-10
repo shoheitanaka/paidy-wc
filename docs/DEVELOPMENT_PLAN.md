@@ -40,7 +40,7 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
       アップグレード時に 1 回だけ伏せ字にする。`uninstall.php` に新しい option と claim 行の削除を追加。
       テスト: `test-paidy-receiver-signature.php` `test-paidy-application-id.php` `test-paidy-manual-settings.php`
       `test-paidy-onboarding-state.php` を移植、`test-paidy-upgrade.php`（新規）。B-2 の receiver 分が解消
-- [x] **1-3 決済照会の修正**（`class-wc-gateway-paidy.php`、ブランチ `fix/thankyou-verification`）: ゲートウェイを JP4WC 2.9.16 版に置換。
+- [x] **1-3 決済照会の修正**（`class-wc-gateway-paidy.php`、ブランチ `fix/thankyou-verification`、PR #42、2026-10-10 マージ。ステージングで実決済・改ざんの拒否・キャプチャを確認）: ゲートウェイを JP4WC 2.9.16 版に置換。
       サンクスページでの裏取り（`thankyou_completed()` から `paidy_verify_payment_for_order()`、`transaction_id` 設定済みならスキップ）、
       `paidy_capture_id` による再キャプチャ防止、説明文の表示時の `force_balance_tags()`、ゲスト注文の注文履歴照会の省略と 5 分キャッシュ、
       商品 JSON の `esc_js()`。JP4WC の返金の `paidy_refund_id` ガード（2 回目の返金が失敗する）、リダイレクト URL の `esc_url()`
@@ -52,9 +52,9 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
 - [ ] **1-4 ブロック対応の fatal 回避**（`class-wc-payments-paidy-blocks-support.php`、2.9.5）
 - [ ] **1-5 リリース 1.6.0**: `release-bump` スキル。changelog は JP4WC の Security 行を流用。`readme.txt` に External Services（B-6）を
       この時点で入れてもよい。
-      リリース前に: B-26（再申込時に `site_hash` が未定義、High）を JP4WC で直して同期する。B-42（通信エラーで返金・キャプチャが fatal、
-      5xx で返金済みと誤記録）と B-43（送料無料クーポン等で Paidy Checkout が起動しない）も High の既存バグなので、同じく JP4WC で直して同期するか判断する。
-      B-19（1.5.2 以前に保存された未検証の `transaction_id` が API の URL に入る）も、同じ箇所なので B-42 と一緒に検討する。
+      リリース前に、JP4WC で次を直してから同期する（2026-10-10 に JP4WC へ起票。paidy-wc では直さない）:
+      B-42 → JP4WC #231（通信エラーで返金・キャプチャが fatal、5xx で返金済みと誤記録）、B-43 → #232（送料無料クーポン等で Paidy Checkout が起動しない）、
+      B-19 → #233（旧版で保存された未検証の `transaction_id` が API の URL に入る）、B-26 → #234（再申込時に `site_hash` が未定義）。
       仲介サーバー（paidy.artws.info）が paidy-wc のサイトへ署名付き（`x-paidy-receiver-signature`）でコールバックを送ることを確かめる
       （1.5.2 から出した審査中の申込は state token を持たず、署名経路でしか通らない）
 

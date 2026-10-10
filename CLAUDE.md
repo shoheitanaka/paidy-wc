@@ -65,7 +65,7 @@ composer check       # 上の 3 つをまとめて実行
 | 用途 | 値 |
 |------|-----|
 | wp-env 開発サイト / テストサイト | http://localhost:10150 / http://localhost:10151（`npm run env:start`） |
-| 動作確認 | wp-env では paidy-wc 本体が起動しない（B-13。直したらこの行を消す）。REST / Webhook は PHPUnit の `rest_do_request()` で、実 Webhook は外部から届くステージングで確かめる |
+| 動作確認 | wp-env では paidy-wc 本体が起動しない（B-13。直したらこの行を消す）。REST / Webhook は PHPUnit の `rest_do_request()` で、実 Webhook は外部から届くステージングで確かめる。ステージング用 ZIP は `dist/` に作る（docs/development.md） |
 | phpMyAdmin（dev / tests） | 10152 / 10153 |
 | PHPUnit 用 MySQL（Docker） | 127.0.0.1:10154（`composer test:db` / `composer test:db:stop`） |
 | ポート台帳 | `~/.claude/skills/dev-env/ports.json` のスロット 15。変更は `dev-env` スキルで |
@@ -119,18 +119,9 @@ composer check       # 上の 3 つをまとめて実行
 
 ## セキュリティ上の現状（最重要・Phase 1）
 
-JP4WC 2.9.0〜2.9.16 で入った Paidy のセキュリティ修正は 1-1〜1-3 で取り込み済み。Phase 1 の残りは 1-4（ブロック対応の fatal 回避）と
-1-5（1.6.0 リリース）（`docs/DEVELOPMENT_PLAN.md`）。
-
-取り込み済み（1-1）: `paidy/v1/order` の HMAC 署名 + IP 許可リスト認証・決済方法確認・冪等性・Paidy API での裏取り、
-`paidy_get_payment_data()` の GET 化・`payment_id` 形式検証・`rawurlencode()`。`paidy/v1/check` は JP4WC と同じく `__return_true`（状態を変えない）
-
-取り込み済み（1-2）: `paidy-receiver/v1/receive` の state token / body の HMAC 署名（`x-paidy-receiver-signature`）認証・リプレイ防止・
-application_id 一致確認・body のみから値を読む・秘密鍵の伏せ字。JP4WC の `jp4wc_updated` は `paidy_wc_updated`（`paidy-wc.php`）に置き換え
-
-取り込み済み（1-3）: ゲートウェイを JP4WC 版に置換。サンクスページ（`thankyou_completed()`）は `?transaction_id=` を
-`paidy_verify_payment_for_order()` で裏取りしてから `payment_complete()`、`paidy_capture_id` による再キャプチャ防止、説明文の表示時の `force_balance_tags()`。
-JP4WC の返金の `paidy_refund_id` ガード・リダイレクト URL の `esc_url()`・説明文の保存時検証は取り込まない（`docs/sync-with-jp4wc.md` の意図的な差分 12〜14）
+JP4WC 2.9.0〜2.9.16 の Paidy のセキュリティ修正は 1-1〜1-3（PR #39・#41・#42）で取り込み済み（Webhook の署名 + IP 認証、受信エンドポイントの
+state token + 署名、サンクスページと Webhook の Paidy API での裏取り）。内容と取り込まなかった箇所は `docs/sync-with-jp4wc.md` の「取り込み済み」「意図的な差分」。
+Phase 1 の残りは 1-4（ブロック対応の fatal 回避）と 1-5（1.6.0 リリース。前に JP4WC Issue #231〜#234 を直して同期）。
 
 これらに触る変更では JP4WC 側の実装（HMAC 署名 + IP 許可リスト、state token + 署名、`^pay_[A-Za-z0-9_-]+$/D`）をそのまま取り込むこと。
 独自実装で再発明しない。
@@ -146,7 +137,11 @@ JP4WC の返金の `paidy_refund_id` ガード・リダイレクト URL の `esc
   コンストラクタでゲートウェイを作るので `init` 11 で生成している（`class-wc-paidy.php`）。`plugins_loaded` で生成する処理を足さない
 - JP4WC のコードにもバグはある。Webhook 署名の鍵選択が存在しない `testmode` 設定を見ていた（実際は `environment`）。
   取り込むときは設定名・プロパティ名が paidy-wc のゲートウェイに実在するかを確かめ（`sync-from-jp4wc` 同梱の `check-setting-keys.php` で照合できる）、
-  直したら `docs/sync-with-jp4wc.md` の「意図的な差分」に書く
+  直したら `docs/sync-with-jp4wc.md` の「意図的な差分」に書く。ファイルごと置き換えるときも hunk ごとに main と比べる。PR #42 では
+  返金のガード（部分返金が失敗）、`<script>` 内の `esc_url()`（`&` が `&#038;` になりサンクスページに着かない）、説明文の保存時の狭い kses
+  （ブロックチェックアウトは `paidy_description` を `RawHTML` で生表示するので画像が消える）が悪化だった。悪化する hunk は取り込まず、差分に書いて JP4WC に Issue
+- ゲートウェイのコンストラクタのフックはインスタンスごとに登録される（フロントで 2 重、管理画面で 3 重。B-18・B-12）。action のコールバックに
+  副作用を足すときは冪等にする。`process_refund()` は action ではなく WooCommerce が返金 1 回につき 1 回呼ぶ（重複ガードを入れると部分返金が壊れる）
 - `class_exists()` は `use` エイリアスを解決しない。常に完全修飾名を渡す
 - 管理者が入力した説明文 HTML は `wp_kses( force_balance_tags( $html ), $allowed )` で出力（閉じタグ漏れで注文ボタンが重複した実例）
 - `stripslashes()` ではなく `wp_unslash()`。`json_encode()` ではなく `wp_json_encode()`

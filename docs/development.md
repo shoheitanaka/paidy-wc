@@ -43,6 +43,26 @@ npm run env:stop
 REST / Webhook の確認は PHPUnit の `rest_do_request()` で代替し、実 Webhook は外部から届くステージングで確かめる。
 Paidy のテスト鍵は wp-admin の WooCommerce → 設定 → 決済 → Paidy で入力する（リポジトリに資格情報を書かない）。
 
+## ステージング用 ZIP
+
+wp-env では本体が起動しない（B-13）ので、実決済・実 Webhook はステージングで確かめる。インストール用 ZIP はリリースと同じ構成
+（Git で追跡しているファイルに `.distignore` を適用）で `dist/` に作る（`dist/` は `.gitignore` 済み。PR #42 で使った手順）。
+
+```bash
+S=$(mktemp -d) && mkdir -p "$S/src" "$S/out/paidy-wc" dist
+git ls-files -z | rsync -a --from0 --files-from=- ./ "$S/src/"
+rsync -a --exclude-from=.distignore "$S/src/" "$S/out/paidy-wc/"
+( cd "$S/out" && zip -qr -X "$OLDPWD/dist/paidy-wc-$(git -C "$OLDPWD" rev-parse --short HEAD).zip" paidy-wc )
+unzip -tq dist/paidy-wc-*.zip
+```
+
+- ZIP の中のフォルダー名は `paidy-wc/`。「プラグインのアップロード」で既存のプラグインを置き換えられる。版は上げないので管理画面の表示は元の版のまま
+- サンクスページの確認は debug ログ（source `paidy-wc`）で判断する。裏取りに失敗すると `Paidy thank-you completion blocked` が出る。
+  WooCommerce はゲスト注文の受領ページを、注文から 10 分を過ぎるとメール確認のフォームに差し替える（会員の注文はログインを求める）ので、
+  そのときは `woocommerce_thankyou_paidy` が動かない。「支払い待ちのまま」だけでは合否を判断しない
+- 改ざんの拒否の確認は、支払い待ちの注文の `order-pay` の URL（アドレスバー、または管理画面の「顧客の支払いページ」）の `order-pay` を
+  `order-received` に変え、`&transaction_id=<別の注文の決済 ID>` を付けて開く
+
 ## 品質チェック
 
 ### PHPCS（`composer lint` / `composer format`）
