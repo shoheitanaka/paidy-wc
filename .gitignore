@@ -44,3 +44,5 @@ package-lock.json
 *.zip
 *.js.map
 *.css.map
+# Distribution directory
+dist/
