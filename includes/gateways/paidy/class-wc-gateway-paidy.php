@@ -360,26 +360,6 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * Validate the Paidy description field on save.
-	 *
-	 * The wp_kses() function does not fix unbalanced tags, and a stray closing tag saved in
-	 * this field escapes the payment box when the classic checkout payment
-	 * fragment is re-rendered, leaving an orphaned place-order row behind on
-	 * every update_order_review call (duplicated order buttons). Balance the
-	 * tags before saving so broken markup never reaches the checkout.
-	 *
-	 * @since 1.6.0
-	 *
-	 * @param string      $key   Field key.
-	 * @param string|null $value Posted value.
-	 * @return string Sanitized value with balanced tags.
-	 */
-	public function validate_paidy_description_field( $key, $value ) {
-		$value = is_null( $value ) ? '' : trim( wp_unslash( $value ) );
-		return wp_kses( force_balance_tags( $value ), $this->paidy_description_allowed_html() );
-	}
-
-	/**
 	 * Provides the explanation for Paidy payment method.
 	 *
 	 * @return string HTML content explaining Paidy payment method.

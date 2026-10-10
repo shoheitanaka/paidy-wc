@@ -8,7 +8,14 @@
  * when the classic checkout payment fragment was re-rendered via
  * update_order_review, leaving an orphaned place-order row behind on every
  * checkout update (duplicated order buttons). Covers the force_balance_tags()
- * fix on both the save path and the output path.
+ * fix on the output path.
+ *
+ * Japanized for WooCommerce also balances and filters the value on save
+ * (validate_paidy_description_field()) with the narrow output allowlist,
+ * which strips the <img>, class and style attributes of the default
+ * explanation. The block checkout shows the saved value as is, so paidy-wc
+ * does not take that save-path validation (docs/sync-with-jp4wc.md,
+ * intentional difference 14) and covers that saving keeps the markup.
  *
  * @package paidy-wc
  */
@@ -39,61 +46,35 @@ class WC_Paidy_Description_Balance_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A stray closing tag must be removed on save.
+	 * Saving the description keeps the markup that the block checkout shows.
 	 */
-	public function test_validate_removes_stray_closing_tag() {
-		$result = $this->gateway->validate_paidy_description_field(
+	public function test_saving_keeps_the_markup_the_block_checkout_shows() {
+		$field   = $this->gateway->get_form_fields()['paidy_description'];
+		$default = $field['default'];
+		$this->assertStringContainsString( '<img', $default );
+
+		$saved = $this->gateway->get_field_value(
 			'paidy_description',
-			'<div>Paidyで翌月払い</div></div>'
+			$field,
+			array( $this->gateway->get_field_key( 'paidy_description' ) => wp_slash( $default ) )
 		);
 
-		$this->assertSame( '<div>Paidyで翌月払い</div>', $result );
+		$this->assertStringContainsString( '<img', $saved );
+		$this->assertStringContainsString( 'class="jp4wc-paidy-explanation"', $saved );
 	}
 
 	/**
-	 * An unclosed tag must be closed on save.
+	 * Saving still strips disallowed tags (WooCommerce's textarea validation).
 	 */
-	public function test_validate_closes_unclosed_tag() {
-		$result = $this->gateway->validate_paidy_description_field(
+	public function test_saving_strips_disallowed_tags() {
+		$saved = $this->gateway->get_field_value(
 			'paidy_description',
-			'<div><ul><li>登録不要'
+			$this->gateway->get_form_fields()['paidy_description'],
+			array( $this->gateway->get_field_key( 'paidy_description' ) => '<div><script>alert(1)</script><strong>OK</strong></div>' )
 		);
 
-		$this->assertSame( '<div><ul><li>登録不要</li></ul></div>', $result );
-	}
-
-	/**
-	 * Disallowed tags must be stripped while allowed markup is kept.
-	 */
-	public function test_validate_strips_disallowed_tags() {
-		$result = $this->gateway->validate_paidy_description_field(
-			'paidy_description',
-			'<div><script>alert(1)</script><strong>OK</strong></div>'
-		);
-
-		$this->assertStringNotContainsString( '<script', $result );
-		$this->assertStringContainsString( '<strong>OK</strong>', $result );
-	}
-
-	/**
-	 * The default explanation must survive validation unchanged in structure.
-	 */
-	public function test_validate_keeps_default_explanation_balanced() {
-		$default = $this->gateway->get_form_fields()['paidy_description']['default'];
-
-		$result = $this->gateway->validate_paidy_description_field( 'paidy_description', $default );
-
-		$this->assertSame(
-			substr_count( $result, '<div' ),
-			substr_count( $result, '</div' ),
-			'div tags should stay balanced'
-		);
-		$this->assertStringContainsString( '<ul>', $result );
-		$this->assertSame(
-			substr_count( $result, '<li' ),
-			substr_count( $result, '</li' ),
-			'li tags should stay balanced'
-		);
+		$this->assertStringNotContainsString( '<script', $saved );
+		$this->assertStringContainsString( '<strong>OK</strong>', $saved );
 	}
 
 	/**
