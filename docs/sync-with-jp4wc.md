@@ -75,8 +75,9 @@
     WooCommerce が返金 1 回につき 1 回呼ぶ関数で、これがあると 2 回目以降の返金（部分返金の追加）が null = 失敗になる
     （「決済ゲートウェイ API で返金を作成中にエラー」）。直後のコードは `paidy_refund_id` に複数の返金 ID を追記する前提。
     ただし `process_refund()` は `woocommerce_order_status_completed_to_cancelled` のコールバック
-    （`paidy_order_paidy_status_completed_to_cancelled()`）からも呼ばれ、このコールバックは B-18 のとおり二重に登録されるので、
-    ガードが無いと completed → cancelled で返金 API が 2 回呼ばれ、2 回目のエラーの注文メモが残る（main と同じ。返金が二重になるわけではない）。
+    （`paidy_order_paidy_status_completed_to_cancelled()`）からも呼ばれ、このコールバックは B-18 のとおり二重に（管理画面では
+    B-12 の `admin_init` のインスタンスが加わり三重に）登録されるので、ガードが無いと completed → cancelled で返金 API が 2〜3 回呼ばれ、
+    2 回目以降のエラーの注文メモが残る（main と同じ。返金が二重になるわけではない）。
     JP4WC のガードはこの重複も抑えていたが、部分返金が壊れるほうが重いので、paidy-wc はこのガードを入れない。JP4WC が消したらこの項目を消す（backlog B-36）。回帰テスト: `test-paidy-capture-refund.php` の
     `test_second_refund_is_sent_to_paidy`
 13. **受領ページの JS リダイレクト URL**（`paidy_make_order()` の `window.location.href`）: JP4WC（8e648b1）は
