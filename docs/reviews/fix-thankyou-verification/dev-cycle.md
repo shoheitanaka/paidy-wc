@@ -34,3 +34,4 @@
 | 2026-10-10 09:30 | 6 | CI green、Copilot G3 依頼・応答（579fc33、🟢 Approval recommended） |
 | 2026-10-10 | 7 | G3: Copilot 新規 0 件 → 収束 |
 | 2026-10-10 | 8 | 最終報告（final-report.md） |
+| 2026-10-10 | 8 後 | ステージング（`dist/paidy-wc-a17e363.zip`）で実決済・改ざんの拒否・キャプチャをユーザーが確認。`.gitignore` に `dist/` を追加（41946f5、ユーザーの指示で PR #42 に含める） |
