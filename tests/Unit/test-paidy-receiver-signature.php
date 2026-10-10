@@ -458,7 +458,7 @@ class WC_Paidy_Receiver_Signature_Test extends WP_UnitTestCase {
 	 * End to end: consuming the state token on success does not let an
 	 * identical sequential retry re-authorize via the signature path, because
 	 * the accompanying signature was already claimed on the first delivery
-	 * (the scenario reported in PR #211 review).
+	 * (the scenario reported in the Japanized for WooCommerce PR #211 review).
 	 */
 	public function test_sequential_retry_after_state_success_is_rejected_via_signature() {
 		WC_Paidy_Apply_Receiver::store_state_token( self::TOKEN );
@@ -494,7 +494,7 @@ class WC_Paidy_Receiver_Signature_Test extends WP_UnitTestCase {
 
 	/**
 	 * The event_claim_key() result is stable across different timestamps for the same
-	 * application_id + paidy_status + key fields (the P1 finding on PR #211:
+	 * application_id + paidy_status + key fields (the P1 finding on Japanized for WooCommerce PR #211:
 	 * the signature-derived claim varies with the timestamp, so a retry with
 	 * a fresh timestamp produced a different claim and bypassed the guard).
 	 */
@@ -535,7 +535,7 @@ class WC_Paidy_Receiver_Signature_Test extends WP_UnitTestCase {
 	 * decision (application_id + paidy_status + key fields) delivered twice
 	 * with two different timestamps — and therefore two different, both
 	 * individually valid, signatures — is authorized only once. This is the
-	 * exact scenario reported in the PR #211 review.
+	 * exact scenario reported in the Japanized for WooCommerce PR #211 review.
 	 */
 	public function test_same_decision_with_different_timestamps_is_authorized_once() {
 		$receiver = new WC_Paidy_Apply_Receiver();
@@ -575,13 +575,13 @@ class WC_Paidy_Receiver_Signature_Test extends WP_UnitTestCase {
 	/**
 	 * A GET request (or any request with an empty raw body) is never
 	 * authorized via the signature — a signature over an empty body proves
-	 * nothing about query-string-only parameters (PR #211 review finding).
+	 * nothing about query-string-only parameters (Japanized for WooCommerce PR #211 review finding).
 	 *
 	 * Also confirms the request never enters the signature-verification
 	 * branch at all: WP_REST_Request::get_body() returns null (not '') for
 	 * a request that never had a body, so a strict `'' !== $body` guard
 	 * would fail to exclude it and — for this signature-only path — log a
-	 * spurious "rejected" warning (PR #211 review, second round).
+	 * spurious "rejected" warning (Japanized for WooCommerce PR #211 review, second round).
 	 */
 	public function test_empty_body_is_never_authorized_via_signature() {
 		$receiver = new WC_Paidy_Apply_Receiver();
@@ -610,7 +610,7 @@ class WC_Paidy_Receiver_Signature_Test extends WP_UnitTestCase {
 
 	/**
 	 * The check_permissions() callback rejects a callback whose application_id does not
-	 * match the currently on-record application (PR #211 review finding): a
+	 * match the currently on-record application (Japanized for WooCommerce PR #211 review finding): a
 	 * delayed/resent callback for a superseded application must not be able
 	 * to approve/reject/cancel a newer onboarding attempt.
 	 */
@@ -665,7 +665,7 @@ class WC_Paidy_Receiver_Signature_Test extends WP_UnitTestCase {
 	 * A GET request carrying a valid state token — the still-registered
 	 * `GET` variant of the route, which has an empty body and therefore no
 	 * signed payload — is processed end to end via its query parameters
-	 * (PR #211 review: get_body_only_params() must not turn this into an
+	 * (Japanized for WooCommerce PR #211 review: get_body_only_params() must not turn this into an
 	 * unconditional `no_data` error).
 	 */
 	public function test_state_authorized_get_request_processed_via_query_params() {
