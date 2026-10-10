@@ -12,7 +12,8 @@
 # Unlike the release, the files are read from the working tree, so changes that
 # are not committed yet can be tried on staging. The ZIP is written to
 # dist/paidy-wc-<short HEAD>.zip, or to dist/paidy-wc-<short HEAD>-dirty.zip
-# when the shipped files differ from HEAD (the differing files are listed).
+# when its contents differ from what HEAD would ship (the differing files are
+# listed).
 # Files Git does not track are never included; the ones that would ship are
 # listed so they can be `git add`ed.
 
@@ -56,19 +57,26 @@ tracked_files() {
 echo "Building the ${SLUG} ZIP from the working tree..."
 tracked_files | stage "${WORK}/tree" "${PKG}"
 
-# What HEAD would ship, to tell which changed paths end up in the ZIP.
-# git archive also drops export-ignore paths; those are all in .distignore, and
-# a shipped one would only make the ZIP be labelled -dirty.
+# What HEAD would ship: its tree filtered through its own .distignore, so an
+# edited .distignore shows up as a difference too. A throw-away index keeps the
+# export-ignore paths that git archive would drop.
 mkdir -p "${WORK}/head"
-git archive --format=tar HEAD | tar -x -C "${WORK}/head"
-rsync -a --exclude-from=.distignore "${WORK}/head/" "${HEAD_DIST}/"
+GIT_INDEX_FILE="${WORK}/head.index" git read-tree HEAD
+GIT_INDEX_FILE="${WORK}/head.index" git checkout-index -a --prefix="${WORK}/head/"
+git show HEAD:.distignore >"${WORK}/head.distignore"
+rsync -a --exclude-from="${WORK}/head.distignore" "${WORK}/head/" "${HEAD_DIST}/"
 
-dirty=''
-while IFS= read -r -d '' path; do
-	if [ -e "${HEAD_DIST}/${path}" ] || [ -e "${PKG}/${path}" ]; then
-		dirty="${dirty}  ${path}"$'\n'
-	fi
-done < <(git diff -z --no-renames --name-only HEAD --)
+# Compare the contents instead of asking git diff, which misses assume-unchanged
+# and skip-worktree files and does not know what .distignore lets through.
+dirty=$(
+	{ (cd "${HEAD_DIST}" && find . ! -type d) && (cd "${PKG}" && find . ! -type d); } |
+		sed 's|^\./||' | sort -u |
+		while IFS= read -r path; do
+			if ! cmp -s "${HEAD_DIST}/${path}" "${PKG}/${path}"; then
+				printf '  %s\n' "${path}"
+			fi
+		done
+)
 
 untracked=''
 if [ -n "$(git ls-files --others --exclude-standard)" ]; then
@@ -106,8 +114,8 @@ echo "Built dist/${ZIP##*/} (version ${version}, ${files} files, $(du -h "${ZIP}
 
 if [ -n "${dirty}" ]; then
 	echo
-	echo "It contains changes not committed to HEAD (${rev}):"
-	printf '%s' "${dirty}"
+	echo "It differs from what HEAD (${rev}) would ship in:"
+	echo "${dirty}"
 fi
 if [ -n "${untracked}" ]; then
 	echo

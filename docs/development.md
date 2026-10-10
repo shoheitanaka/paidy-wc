@@ -53,7 +53,8 @@ bash bin/build-zip.sh   # → dist/paidy-wc-<HEAD の短縮ハッシュ>.zip
 ```
 
 - 構成はリリースと同じ（Git で追跡しているファイルに rsync で `.distignore` を適用）。ただし中身は**作業ツリー**から読むので、
-  コミット前の修正もステージングで試せる。出荷するファイルが HEAD と違うときは名前が `paidy-wc-<hash>-dirty.zip` になり、違うファイルを表示する。
+  コミット前の修正もステージングで試せる。中身が HEAD から作る ZIP と違うとき（`.distignore` の変更も含む）は名前が `paidy-wc-<hash>-dirty.zip` になり、
+  違うファイルを表示する。
   ステージングでの確認を記録するときは ZIP の名前を書く（`-dirty` なら未コミットの変更を含む）
 - Git が追跡していないファイルは入らない。出荷対象のものがあれば一覧を表示するので、入れるなら `git add` してから作り直す
 - スクリプトは作った後に `unzip -tq` で検証し、`paidy-wc/paidy-wc.php` があることと、`.distignore` の `/` で始まる項目（`/tests` `/vendor` など）が
