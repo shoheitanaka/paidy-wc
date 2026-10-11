@@ -76,10 +76,11 @@ JP4WC との配置の違いは [sync-with-jp4wc.md](sync-with-jp4wc.md) の対�
    JP4WC の `paidy_refund_id` ガードは 2 回目の返金を止めるので入れない＝意図的な差分 12。追記の保存形式の不具合は B-40）
 
 5〜7 と `paidy_get_payment_data()` の URL はすべて `paidy_payment_api_url()` で組む（`transaction_id` を `^pay_[A-Za-z0-9_-]+$/D` で検証して
-`rawurlencode()`。形式が違えば Paidy に送らず、注文メモを残して失敗。キャプチャは通知メールも送る。1.5.2 以前に検証なしで保存された値や
-注文画面で書き換えられた値のため。JP4WC 2.9.17 / #233）。5〜7 は `is_wp_error()` を先に見て、`paidy_is_closed_response()`
-（HTTP 2xx かつ body が JSON オブジェクトで `status` が `closed`）のときだけ成功。それ以外は注文メモに HTTP ステータスを付けて失敗を返す
-（返金の 5xx を返金済みと記録しない。JP4WC 2.9.17 / #231）
+`rawurlencode()`。形式が違えば Paidy に送らない。5〜7 は注文メモを残して失敗し、キャプチャは通知メールも送る。`paidy_get_payment_data()` は
+デバッグログを書いて `null`。1.5.2 以前に検証なしで保存された値や注文画面で書き換えられた値のため。JP4WC 2.9.17 / #233）。5〜7 は `is_wp_error()` を先に見て、`paidy_is_closed_response()`
+（HTTP 2xx かつ body が JSON オブジェクトで `status` が `closed`）のときだけ成功。それ以外は注文メモを残して失敗を返す（`WP_Error` は
+そのメッセージ、Paidy のエラー応答は `paidy_check_response()` のメモ、`status` の無い応答と close の失敗は HTTP ステータス付きのメモ。
+返金の 5xx を返金済みと記録しない。JP4WC 2.9.17 / #231）
 
 Paidy API は `https://api.paidy.com/`、認証は `Authorization: Bearer <secret key>`（テスト/本番は `environment` 設定で切替）。
 `debug` 設定が `yes` のとき `jp4wc_debug_log()` が `wc_get_logger()`（source `paidy-wc`）に出す。

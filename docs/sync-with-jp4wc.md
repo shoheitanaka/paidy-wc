@@ -122,7 +122,9 @@ git -C "$J" log --oneline -- includes/gateways/paidy tests/Unit/test-paidy-*.php
 
 2026-10-09 時点の一覧から、Phase 1-1（ブランチ `fix/webhook-auth`）・1-2（`fix/receiver-auth`）・1-3（`fix/thankyou-verification`）と
 2.9.17 の同期（`fix/sync-jp4wc-2.9.17`）で取り込んだ分を除いたもの。2.9.17 の同期は JP4WC `829d580` → `fe717d0`（Paidy の最後の変更。
-`upstream/main` は `7fa70fd`）の差分なので、次回はそれ以降の `git -C "$J" log fe717d0..upstream/main -- includes/gateways/paidy tests/Unit/test-paidy-*.php src/js/paidy` を見る。
+`upstream/main` は `7fa70fd`）の差分なので、次回はそれ以降を見る（glob は `$J` 側で解決させるため引用符で囲む）:
+`git -C "$J" log --oneline fe717d0..upstream/main -- includes/gateways/paidy includes/jp4wc-framework 'tests/Unit/test-paidy-*.php' src/js/paidy class-wc-paidy.php uninstall.php woocommerce-for-japan.php`。
+`uninstall.php` と `woocommerce-for-japan.php` は Paidy 以外の変更も拾うので、中身を見て Paidy 関係だけを取り込む。
 
 | JP4WC 版 | 内容 | 対象ファイル |
 |---------|------|------------|
@@ -138,7 +140,7 @@ git -C "$J" log --oneline -- includes/gateways/paidy tests/Unit/test-paidy-*.php
 | 1-1 | 2.9.14 / #223 | `paidy_get_payment_data()` の `wp_safe_remote_get()` 化、`^pay_[A-Za-z0-9_-]+$/D` 検証 + `rawurlencode()`、`paidy_verify_payment_for_order()`。テスト `test-paidy-payment-id-format.php` |
 | 1-2 | 2.9.13 / 2.9.15 / 2.9.16 | receiver の state token（non-autoload option）・HMAC 署名フォールバック・リプレイ防止・body のみから認証・application_id 一致確認・復号失敗の翻訳可能化・鍵フィールドの補完・`paidy_received_data` から秘密鍵除外（既存分はアップグレード時に伏せ字）。wizard の state token 送信・申込 ID の保存・`wizard=false` 修正・`pk_test_` 書き換えの廃止・二重ログ修正。`uninstall.php` の Paidy 部分。テスト `test-paidy-receiver-signature.php` `test-paidy-onboarding-state.php` `test-paidy-application-id.php` `test-paidy-manual-settings.php` |
 | 1-3 | 2.9.0 / 2.9.14 / 2.9.15 / JP4WC PR #213 | ゲートウェイ `class-wc-gateway-paidy.php` を JP4WC 版に置き換え（意図的な差分 8・12・13・14 を除く）: サンクスページ `thankyou_completed()` での裏取り（`paidy_verify_payment_for_order()`）と冪等性、`paidy_capture_id` による再キャプチャ防止、説明文の表示時の `force_balance_tags()`（保存時検証は差分 14 で除外）、ゲスト注文の注文履歴照会の省略と 5 分キャッシュ（transient `jp4wc_paidy_order_history_<user_id>`）、Paidy Checkout に渡す商品・クーポンの `esc_js()` と数値のキャスト、キャプチャ金額の `(float)` 比較、`paidy_check_response()` の文字列比較・`200`・`Status:` の追記、注文メモ文字列の `__()` 化。テスト `test-paidy-description-balance.php` `test-paidy-guest-order-history.php` |
-| 1-5 前 | 2.9.17 / #231〜#234 | JP4WC `829d580..fe717d0` のゲートウェイ・wizard の差分をパッチで適用（意図的な差分 8・12・13・14 はそのまま）: Paidy Checkout の `order.items` を配列 + `wp_json_encode()`（`JSON_HEX_*`）に、割引額 0 のクーポン（`"0.00"` も）と `product_id` の無い明細を除外（#232。B-43・B-39 が解消）。close / capture / refund の URL を `paidy_payment_api_url()`（形式検証 + `rawurlencode()`）で組み、形式が違えば送らず注文メモ（キャプチャは通知メールも）（#233。B-19 が解消）。`is_wp_error()` を先に見て、HTTP 2xx かつ `status: closed` のときだけ成功、失敗の注文メモに HTTP ステータス（#231。B-42 が解消）。wizard の `get_or_create_site_hash()` で再申込でも保存済みの `site_hash` を送る（#234。B-26 が解消）。テスト `test-paidy-api-response-handling.php` `test-paidy-order-items.php` `test-paidy-onboarding-site-hash.php` を移植、`test-paidy-payment-id-format.php` に close / capture / refund のケースを追加（main では 70 件が失敗することを確認） |
+| 1-5 前 | 2.9.17 / #231〜#234 | JP4WC `829d580..fe717d0` のゲートウェイ・wizard の差分をパッチで適用（意図的な差分 8・10・11・12・13・14 はそのまま）: Paidy Checkout の `order.items` を配列 + `wp_json_encode()`（`JSON_HEX_*`）に、割引額 0 のクーポン（`"0.00"` も）と `product_id` の無い明細を除外（#232。B-43・B-39 が解消）。close / capture / refund の URL を `paidy_payment_api_url()`（形式検証 + `rawurlencode()`）で組み、形式が違えば送らず注文メモ（キャプチャは通知メールも）（#233。B-19 が解消）。`is_wp_error()` を先に見て、HTTP 2xx かつ `status: closed` のときだけ成功。それ以外は注文メモを残して失敗（`status` の無い応答と close の失敗のメモには HTTP ステータスを付ける）（#231。B-42 が解消）。wizard の `get_or_create_site_hash()` で再申込でも保存済みの `site_hash` を送る（#234。B-26 が解消）。テスト `test-paidy-api-response-handling.php` `test-paidy-order-items.php` `test-paidy-onboarding-site-hash.php` を移植、`test-paidy-payment-id-format.php` に close / capture / refund のケースを追加（main では 70 件が失敗することを確認） |
 
 ## 同期後のチェック
 
