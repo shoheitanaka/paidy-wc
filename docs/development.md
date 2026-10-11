@@ -45,17 +45,21 @@ Paidy のテスト鍵は wp-admin の WooCommerce → 設定 → 決済 → Paid
 
 ## ステージング用 ZIP
 
-wp-env では本体が起動しない（B-13）ので、実決済・実 Webhook はステージングで確かめる。インストール用 ZIP はリリースと同じ構成
-（Git で追跡しているファイルに `.distignore` を適用）で `dist/` に作る（`dist/` は `.gitignore` 済み。PR #42 で使った手順）。
+wp-env では本体が起動しない（B-13）ので、実決済・実 Webhook はステージングで確かめる。インストール用 ZIP は `bin/build-zip.sh` で
+`dist/` に作る（`dist/` は `.gitignore` 済み）。
 
 ```bash
-S=$(mktemp -d) && mkdir -p "$S/src" "$S/out/paidy-wc" dist
-git ls-files -z | rsync -a --from0 --files-from=- ./ "$S/src/"
-rsync -a --exclude-from=.distignore "$S/src/" "$S/out/paidy-wc/"
-( cd "$S/out" && zip -qr -X "$OLDPWD/dist/paidy-wc-$(git -C "$OLDPWD" rev-parse --short HEAD).zip" paidy-wc )
-unzip -tq dist/paidy-wc-*.zip
+bash bin/build-zip.sh   # → dist/paidy-wc-<HEAD の短縮ハッシュ>.zip
 ```
 
+- 構成はリリースと同じ（Git で追跡しているファイルに rsync で `.distignore` を適用）。ただし中身は**作業ツリー**から読むので、
+  コミット前の修正もステージングで試せる。中身が HEAD から作る ZIP と違うとき（`.distignore` の変更も含む）は名前が `paidy-wc-<hash>-dirty.zip` になり、
+  違うファイルを表示する。
+  ステージングでの確認を記録するときは ZIP の名前を書く（`-dirty` なら未コミットの変更を含む）
+- Git が追跡していないファイルは入らない。出荷対象のものがあれば一覧を表示するので、入れるなら `git add` してから作り直す
+- スクリプトは作った後に `unzip -tq` で検証し、`paidy-wc/paidy-wc.php` があることと、`.distignore` の `/` で始まる項目（`/tests` `/vendor` など）が
+  入っていないことを確かめる（macOS の openrsync とデプロイの GNU rsync の違いへの備え）。同じ名前の ZIP は消してから作る
+  （`zip -r` は既存の ZIP に追記し、消したファイルが残るため）
 - ZIP の中のフォルダー名は `paidy-wc/`。「プラグインのアップロード」で既存のプラグインを置き換えられる。版は上げないので管理画面の表示は元の版のまま
 - サンクスページの確認は debug ログ（source `paidy-wc`）で判断する。裏取りに失敗すると `Paidy thank-you completion blocked` が出る。
   WooCommerce はゲスト注文の受領ページを、注文から 10 分を過ぎるとメール確認のフォームに差し替える（会員の注文はログインを求める）ので、

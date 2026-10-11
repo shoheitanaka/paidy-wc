@@ -65,7 +65,7 @@ composer check       # 上の 3 つをまとめて実行
 | 用途 | 値 |
 |------|-----|
 | wp-env 開発サイト / テストサイト | http://localhost:10150 / http://localhost:10151（`npm run env:start`） |
-| 動作確認 | wp-env では paidy-wc 本体が起動しない（B-13。直したらこの行を消す）。REST / Webhook は PHPUnit の `rest_do_request()` で、実 Webhook は外部から届くステージングで確かめる。ステージング用 ZIP は `dist/` に作る（docs/development.md） |
+| 動作確認 | wp-env では paidy-wc 本体が起動しない（B-13。直したらこの行を消す）。REST / Webhook は PHPUnit の `rest_do_request()` で、実 Webhook は外部から届くステージングで確かめる。ステージング用 ZIP は `bash bin/build-zip.sh` で `dist/` に作る（docs/development.md） |
 | phpMyAdmin（dev / tests） | 10152 / 10153 |
 | PHPUnit 用 MySQL（Docker） | 127.0.0.1:10154（`composer test:db` / `composer test:db:stop`） |
 | ポート台帳 | `~/.claude/skills/dev-env/ports.json` のスロット 15。変更は `dev-env` スキルで |
