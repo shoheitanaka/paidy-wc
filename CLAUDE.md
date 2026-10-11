@@ -30,7 +30,8 @@ Paidy 決済モジュールを切り出したもので、**JP4WC 側が常に最
 
 - **`git commit` / `git push` はユーザーの明示的な指示があるまで実行しない**。変更はワーキングツリーに残して報告する
   （グローバル CLAUDE.md の規約）。`gh pr create` もユーザー確認後
-- **開発はブランチを切ってから始める**（`main` 直接作業は禁止）。命名: `feature/<topic>` `fix/<topic>` `chore/<topic>`。
+- **開発はブランチを切ってから始める**（`main` 直接作業は禁止。ただし `*.md`・`docs/` だけの変更はグローバル規約どおり
+  `main` に直接コミットし、`upstream` と `origin` の `main` に push する）。命名: `feature/<topic>` `fix/<topic>` `chore/<topic>`。
   PR は `origin` に push したブランチから `upstream`（SoftStepsEC/paidy-wc）の `main` へ:
   `gh pr create --repo SoftStepsEC/paidy-wc --base main --head shoheitanaka:<branch>`
 - コード・コミットメッセージ・コード内コメントは英語、レビュー・説明・ドキュメントは日本語
@@ -78,7 +79,7 @@ composer check       # 上の 3 つをまとめて実行
 
 | スキル | 使いどころ |
 |--------|-----------|
-| `.claude/skills/sync-from-jp4wc`（同梱） | JP4WC の Paidy 変更をこのリポジトリへ取り込む |
+| `.claude/skills/sync-from-jp4wc`（同梱） | JP4WC の Paidy 変更をこのリポジトリへ取り込む / JP4WC に Issue を出す（書式・起票後の記録） |
 | `.claude/skills/update-i18n`（同梱） | 文字列を追加・変更した PR で POT / JSON を更新する |
 | `wc-development` / `wp-plugin-development` | WooCommerce ゲートウェイ・HPOS・Blocks / プラグイン全般 |
 | `wp-security-check` | 決済 Webhook・REST・管理画面のセキュリティ監査 |
@@ -98,7 +99,7 @@ composer check       # 上の 3 つをまとめて実行
 - `.claude/**` / `docs/**` / `*.md` だけの PR は CI が走らない（`ci.yml` の `paths-ignore`）。`request-gate-review.sh` に `--wait-ci` を付けない
 - Copilot は「Needs a closer look・0 findings」でも総評文に実在する問題を書くことがある（PR #38 で 2 件とも実在）。
   総評は読み飛ばさず調査対象にする。`docs/review-baseline.md` / `review-backlog.md` に載っている事項は再対応しない
-- JP4WC から同期したコードへの指摘で JP4WC でも再現するものは、paidy-wc では直さず backlog（JP4WC へ PR）に送り、JP4WC で直してから同期する。
+- JP4WC から同期したコードへの指摘で JP4WC でも再現するものは、paidy-wc では直さず backlog に送り、JP4WC に Issue を出して（書式は `sync-from-jp4wc` スキル）JP4WC で直してから同期する。
   スレッドは理由を返信して未解決のまま残す（PR #41 の B-31〜B-34）。WordPress core の挙動を根拠に誤検知と判定するときは、
   method・Content-Type ごとの分岐まで core のソースで確かめる（PR #41 G1-1 を誤検知と判定し、後で訂正）
 
@@ -146,7 +147,9 @@ Phase 1 の残りは 1-4（ブロック対応の fatal 回避）と 1-5（1.6.0 
 - 管理者が入力した説明文 HTML は `wp_kses( force_balance_tags( $html ), $allowed )` で出力（閉じタグ漏れで注文ボタンが重複した実例）
 - `stripslashes()` ではなく `wp_unslash()`。`json_encode()` ではなく `wp_json_encode()`
 - テストでプラグインクラスが無いときに `markTestSkipped()` しない。`require_once` して `class_exists` を assert する
-- `.gitignore` は配布 ZIP から除外しない。配布に入れたくないものは `.distignore` にも書く（rsync `--exclude-from`）
+- `.gitignore` は配布 ZIP から除外しない。配布に入れたくないものは `.distignore` にも書く（rsync `--exclude-from`）。
+  `.gitattributes` の export-ignore とは一致していない（`src/`・`LICENSE` は `git archive` に入るが配布には入らない）ので、
+  配布物の中身は `git archive` ではなく `bin/build-zip.sh` の ZIP で確かめる
 - `@since` は現行 Stable tag + 1（作業開始時の版ではない）。Copilot が指摘する
 - ブロックチェックアウトの REST 検証は 1 ページ表示で複数回走る（`calc_totals` 等）。副作用のある処理はガードする
 - 翻訳 JSON のファイル名はビルド済みスクリプトのプラグイン相対パスの md5（`includes/gateways/paidy/assets/js/wizard/paidy.js` → `12e0aa1e…`）。
