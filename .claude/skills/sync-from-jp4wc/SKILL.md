@@ -215,7 +215,7 @@ gh issue create --repo artisanworkshop/Japanized-for-WooCommerce --label bug \
   --title 'Paidy: <症状>' --body-file <scratchpad>/jp4wc-issue-B<n>.md
 ```
 
-起票したら paidy-wc 側に記録する（ドキュメントだけの変更なら `main` へ直接コミットしてよい。コミットはユーザーの指示で）:
+起票したら paidy-wc 側に記録する（ブランチの扱いは CLAUDE.md に従う。コミットはユーザーの指示で）:
 
 - `docs/review-backlog.md` の該当行の「解消予定」を `JP4WC #<n> で修正後に同期（<いつまでに>）` にする（B-26 の行と同じ形）
 - リリース前に直すものは `docs/DEVELOPMENT_PLAN.md` の該当ステップに `B-<n> → JP4WC #<n>（<一言>）` を足す（1-5 の記述と同じ形）
