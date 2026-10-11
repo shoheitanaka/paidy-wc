@@ -51,7 +51,7 @@ composer check       # 上の 3 つをまとめて実行
 ```
 
 - PHPCS の警告（フレームワークの `base64_*` 2 件）は `docs/review-baseline.md` で把握済み。**新しい警告は増やさない**
-- PHPStan の baseline（35 件）はレガシーコード専用。新規コードのエラーを baseline に追加しない。
+- PHPStan の baseline（34 件）はレガシーコード専用。新規コードのエラーを baseline に追加しない。
   JP4WC からファイルを同期したら、**再生成の前に** `composer phpstan` で `Ignored error pattern …` 以外のエラーが 0 件であることを
   確かめてから `composer phpstan:baseline` で再生成し、件数が減ったことを確認する（再生成は新しいエラーも吸収して exit 0 になる。PR #40 で実測）。
   baseline を include したまま同じファイルへ再生成してよい（PHPStan は生成先を include から除外する。PR #38 で検証済み。
@@ -121,8 +121,10 @@ composer check       # 上の 3 つをまとめて実行
 ## セキュリティ上の現状（最重要・Phase 1）
 
 JP4WC 2.9.0〜2.9.16 の Paidy のセキュリティ修正は 1-1〜1-3（PR #39・#41・#42）で取り込み済み（Webhook の署名 + IP 認証、受信エンドポイントの
-state token + 署名、サンクスページと Webhook の Paidy API での裏取り）。内容と取り込まなかった箇所は `docs/sync-with-jp4wc.md` の「取り込み済み」「意図的な差分」。
-Phase 1 の残りは 1-4（ブロック対応の fatal 回避）と 1-5（1.6.0 リリース。前に JP4WC Issue #231〜#234 を直して同期）。
+state token + 署名、サンクスページと Webhook の Paidy API での裏取り）。JP4WC 2.9.17（#231〜#234: close / capture / refund の
+`transaction_id` 検証と応答の判定、Paidy Checkout の items の JSON 化、再申込の `site_hash`）も `fix/sync-jp4wc-2.9.17` で取り込み済み。
+内容と取り込まなかった箇所は `docs/sync-with-jp4wc.md` の「取り込み済み」「意図的な差分」。
+Phase 1 の残りは 1-4（ブロック対応の fatal 回避）と 1-5（1.6.0 リリース）。
 
 これらに触る変更では JP4WC 側の実装（HMAC 署名 + IP 許可リスト、state token + 署名、`^pay_[A-Za-z0-9_-]+$/D`）をそのまま取り込むこと。
 独自実装で再発明しない。
