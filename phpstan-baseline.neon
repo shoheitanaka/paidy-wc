@@ -109,12 +109,6 @@ parameters:
 			path: includes/gateways/paidy/class-wc-paidy-admin-wizard.php
 
 		-
-			message: '#^Variable \$site_hash might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: includes/gateways/paidy/class-wc-paidy-admin-wizard.php
-
-		-
 			message: '#^Parameter \#4 \$autoload of function add_option expects bool\|null, string given\.$#'
 			identifier: argument.type
 			count: 1
