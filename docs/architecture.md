@@ -49,6 +49,8 @@ JP4WC との配置の違いは [sync-with-jp4wc.md](sync-with-jp4wc.md) の対�
 1. `process_payment()` → `result: success`、`redirect` は受領ページ（`order-pay`）
 2. 受領ページ `woocommerce_receipt_paidy` → `paidy_make_order()`: 注文データ（items / coupons / shipping / 購入者。
    `jp4wc_paidy_order_items` `jp4wc_paidy_order_coupons` フィルタ）を JS に埋め込み、`https://apps.paidy.com/` の Paidy Checkout を起動。
+   `order.items` は配列で組んで `wp_json_encode()`（`JSON_HEX_TAG|AMP|APOS|QUOT`）で出す。`product_id` の無い明細と割引額 0 のクーポン
+   （`"0.00"` も数値で比較）は入れない（JP4WC 2.9.17 / #232）
    `_billing_yomigana_*`（JP4WC の読み仮名）があれば `name2` に渡す
 3. 認証成功 → JS が `get_return_url()` + `&transaction_id=pay_...` へ遷移（`esc_url()` しない。意図的な差分 13）→
    サンクスページ `woocommerce_thankyou_paidy` → `thankyou_completed()`: 注文が `pending` / `cancelled` で `transaction_id` が未設定のときだけ、
@@ -73,6 +75,13 @@ JP4WC との配置の違いは [sync-with-jp4wc.md](sync-with-jp4wc.md) の対�
 7. 返金 `process_refund()` → `POST /payments/{id}/refunds`（`capture_id` 必須。`paidy_refund_id` に配列で追記。
    JP4WC の `paidy_refund_id` ガードは 2 回目の返金を止めるので入れない＝意図的な差分 12。追記の保存形式の不具合は B-40）
 
+5〜7 と `paidy_get_payment_data()` の URL はすべて `paidy_payment_api_url()` で組む（`transaction_id` を `^pay_[A-Za-z0-9_-]+$/D` で検証して
+`rawurlencode()`。形式が違えば Paidy に送らない。5〜7 は注文メモを残して失敗し、キャプチャは通知メールも送る。`paidy_get_payment_data()` は
+デバッグログを書いて `null`。1.5.2 以前に検証なしで保存された値や注文画面で書き換えられた値のため。JP4WC 2.9.17 / #233）。5〜7 は `is_wp_error()` を先に見て、`paidy_is_closed_response()`
+（HTTP 2xx かつ body が JSON オブジェクトで `status` が `closed`）のときだけ成功。それ以外は注文メモを残して失敗を返す（`WP_Error` は
+そのメッセージ、Paidy のエラー応答は `paidy_check_response()` のメモ、`status` の無い応答と close の失敗は HTTP ステータス付きのメモ。
+返金の 5xx を返金済みと記録しない。JP4WC 2.9.17 / #231）
+
 Paidy API は `https://api.paidy.com/`、認証は `Authorization: Bearer <secret key>`（テスト/本番は `environment` 設定で切替）。
 `debug` 設定が `yes` のとき `jp4wc_debug_log()` が `wc_get_logger()`（source `paidy-wc`）に出す。
 
@@ -81,7 +90,8 @@ Paidy API は `https://api.paidy.com/`、認証は `Authorization: Bearer <secre
 - `WC_Paidy_Admin_Wizard` が wc-admin に `/paidy-on-boarding` ページを登録し、`src/wizard` の React アプリを表示
 - 申込フォームの保存（`woocommerce_paidy_on_boarding_settings` の `add_option` / `updated_option`）をトリガに
   `send_apply_data_to_wcartws()` が `https://paidy.artws.info/api/applications/` へ `wp_remote_post()`。
-  このとき `paidy_site_hash`（16 文字ランダム）と、1 回限りの state token（32 文字。`paidy_onboarding_state_<token>` に
+  このとき `paidy_site_hash`（16 文字ランダム。`get_or_create_site_hash()` が保存済みの値を再利用し、無いか空のときだけ作る。
+  審査の取消や再インストールでも消えないので、再申込でも同じ値を送る。JP4WC 2.9.17 / #234）と、1 回限りの state token（32 文字。`paidy_onboarding_state_<token>` に
   発行時刻を non-autoload で保存、有効 90 日）を生成・送信する。応答の申込 ID は `paidy_application_id` に保存
 - 審査結果と API 鍵は仲介サーバーから `POST /wp-json/paidy-receiver/v1/receive` で届く。
   鍵は `site_hash` 派生鍵の AES-256-CBC で暗号化されており、復号して `woocommerce_paidy_settings` に書き込む。

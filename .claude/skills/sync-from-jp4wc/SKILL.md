@@ -217,7 +217,7 @@ gh issue create --repo artisanworkshop/Japanized-for-WooCommerce --label bug \
 
 起票したら paidy-wc 側に記録する（ブランチの扱いは CLAUDE.md に従う。コミットはユーザーの指示で）:
 
-- `docs/review-backlog.md` の該当行の「解消予定」を `JP4WC #<n> で修正後に同期（<いつまでに>）` にする（B-26 の行と同じ形）
+- `docs/review-backlog.md` の該当行の「解消予定」を `JP4WC #<n> で修正後に同期（<いつまでに>）` にする（例: `JP4WC #234 で修正後に同期（1-5 のリリース前）`）
 - リリース前に直すものは `docs/DEVELOPMENT_PLAN.md` の該当ステップに `B-<n> → JP4WC #<n>（<一言>）` を足す（1-5 の記述と同じ形）
 - 取り込まなかった hunk なら `docs/sync-with-jp4wc.md` の「意図的な差分」に Issue 番号を書く
 - Bot レビューの指摘から出したものは、スレッドに Issue 番号と「JP4WC で直してから同期する」旨を返信し、未解決のまま残す

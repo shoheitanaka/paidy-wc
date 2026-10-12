@@ -81,7 +81,7 @@ bash bin/build-zip.sh   # → dist/paidy-wc-<HEAD の短縮ハッシュ>.zip
 
 - `phpstan.neon.dist`: level 5、`szepeviktor/phpstan-wordpress` + `php-stubs/woocommerce-stubs`、
   実行時定数は `phpstan-bootstrap.php` で定義（`dynamicConstantNames` でリテラル扱いを防ぐ）
-- `phpstan-baseline.neon`: レガシー 35 件。新規エラーは baseline に入れず直す。
+- `phpstan-baseline.neon`: レガシー 34 件。新規エラーは baseline に入れず直す。
   JP4WC から同期してファイルが入れ替わったら、再生成の前に `composer phpstan` で `Ignored error pattern …` 以外のエラーが 0 件であることを
   確かめてから `composer phpstan:baseline` で再生成し、減ったことを確認する（再生成は新しいエラーも吸収して exit 0 になる）
 
