@@ -1,6 +1,6 @@
 # 開発計画
 
-最終更新: 2026-10-12。各フェーズは 1 つ以上の PR。PR はブランチを切って `upstream`（SoftStepsEC/paidy-wc）`main` へ。
+最終更新: 2026-10-13。各フェーズは 1 つ以上の PR。PR はブランチを切って `upstream`（SoftStepsEC/paidy-wc）`main` へ。
 タスク完了時はチェックボックスを更新する。
 
 ## 方針
@@ -45,24 +45,27 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
       `paidy_capture_id` による再キャプチャ防止、説明文の表示時の `force_balance_tags()`、ゲスト注文の注文履歴照会の省略と 5 分キャッシュ、
       商品 JSON の `esc_js()`。JP4WC の返金の `paidy_refund_id` ガード（2 回目の返金が失敗する）、リダイレクト URL の `esc_url()`
       （基本パーマリンクでサンクスページに着かない）、説明文の保存時検証（ブロックチェックアウトの画像が消える）は取り込まず、
-      意図的な差分 12・13・14 + B-36・B-37・B-41 に。B-20・B-35 が解消。B-19 は 1-3 以降に保存される `transaction_id` の分だけ解消
+      意図的な差分 12・13・14（当時の番号。返金ガードの 12 は JP4WC #243 の同期で消し、13・14 は 12・13 に繰り上げ）+ B-36・B-37・B-41 に。B-20・B-35 が解消。B-19 は 1-3 以降に保存される `transaction_id` の分だけ解消
       （1.5.2 以前に検証なしで保存された値が close / capture / refund の URL に入る経路は残った。PR #42 Copilot G1-1。2.9.17 の同期で解消）。
       テスト: `test-paidy-description-balance.php` `test-paidy-guest-order-history.php` を移植、
       `test-paidy-thankyou-verification.php` `test-paidy-capture-refund.php`（新規）
-- [ ] **1-4 ブロック対応の fatal 回避**（`class-wc-payments-paidy-blocks-support.php`、2.9.5）
+- [ ] **1-4 ブロック対応の fatal 回避**（`class-wc-payments-paidy-blocks-support.php`、2.9.5。同じ 2.9.5 の `paidy_redirect_to_wizard()` の
+      `class_exists` ガードは #241 の同期で取り込み済み）
 - [ ] **1-5 リリース 1.6.0**: `release-bump` スキル。changelog は JP4WC の Security 行を流用。`readme.txt` に External Services（B-6）を
       この時点で入れてもよい。
       リリース前に JP4WC で直してから同期するとした 4 件（2026-10-10 に JP4WC へ起票）は、JP4WC 2.9.17 で直り、
       2026-10-12 に同期した（ブランチ `fix/sync-jp4wc-2.9.17`。B-19・B-26・B-39・B-42・B-43 が解消）:
       B-42 → JP4WC #231（通信エラーで返金・キャプチャが fatal、5xx で返金済みと誤記録）、B-43 → #232（送料無料クーポン等で Paidy Checkout が起動しない）、
       B-19 → #233（旧版で保存された未検証の `transaction_id` が API の URL に入る）、B-26 → #234（再申込時に `site_hash` が未定義）。
-      changelog には JP4WC 2.9.17 の Paidy の 5 行を流用する（#223 の行の修正は 1-1 で取り込み済みで、1.6.0 が最初のリリース）。
+      JP4WC 2.9.17 の残り 2 件（#241: 注文状態のコールバック（キャプチャ・close・返金）を静的ハンドラで 1 回だけ登録、#243: 2 回目以降の返金と
+      取消時の残額返金）は 2026-10-13 に同期した（ブランチ `fix/sync-jp4wc-order-status-hooks`。B-12・B-18・B-36・B-40 と B-53 の返金部分が解消）。
+      changelog には JP4WC 2.9.17 の Paidy の 7 行を流用する（#223 の行の修正は 1-1 で取り込み済みで、1.6.0 が最初のリリース）。
       仲介サーバー（paidy.artws.info）が paidy-wc のサイトへ署名付き（`x-paidy-receiver-signature`）でコールバックを送ることを確かめる
       （1.5.2 から出した審査中の申込は state token を持たず、署名経路でしか通らない）
 
 ## Phase 2 — クリーンアップ
 
-- [ ] 2-1 `paidy-wc.php` の未接頭辞関数のリネーム、`class_exists( 'WooCommerce' )` 判定、`paidy_redirect_to_wizard()` の生成抑制（B-1, B-12）。
+- [ ] 2-1 `paidy-wc.php` の未接頭辞関数のリネーム、`class_exists( 'WooCommerce' )` 判定（B-1）。
       `.phpcs.xml.dist` の一時除外を削除
 - [ ] 2-2 `includes/jp4wc-framework/` を JP4WC 最新版に同期し、`composer phpstan:baseline` を再生成（B-3）。
       JP4WC 側にも残るバグ（`ceil()` 2 引数など）は JP4WC へ PR

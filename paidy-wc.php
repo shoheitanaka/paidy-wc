@@ -116,15 +116,23 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 	 * Redirects to the Paidy wizard after plugin activation.
 	 */
 	function paidy_redirect_to_wizard() {
-		$paidy_payment_method = new WC_Gateway_Paidy();
-		if ( get_option( 'paidy_do_activation_redirect', false ) ) {
-			if ( 'yes' !== $paidy_payment_method->enabled ) {
-				$paidy_payment_method->update_option( 'enabled', 'yes' );
-				// Check if the user is an admin and has the capability to manage options.
-				delete_option( 'paidy_do_activation_redirect' );
-				wp_safe_redirect( admin_url( 'admin.php?page=wc-admin&path=%2Fpaidy-on-boarding' ) );
-				exit;
-			}
+		if ( ! class_exists( 'WC_Gateway_Paidy' ) ) {
+			return;
+		}
+		if ( ! get_option( 'paidy_do_activation_redirect', false ) ) {
+			return;
+		}
+		// Read the setting rather than create a gateway, whose constructor adds its hooks again.
+		$settings = get_option( 'woocommerce_paidy_settings', array() );
+		$enabled  = is_array( $settings ) && isset( $settings['enabled'] ) ? $settings['enabled'] : 'no';
+		if ( 'yes' !== $enabled ) {
+			// The one request that redirects enables the gateway through its settings API.
+			$paidy_payment_method = new WC_Gateway_Paidy();
+			$paidy_payment_method->update_option( 'enabled', 'yes' );
+			// Check if the user is an admin and has the capability to manage options.
+			delete_option( 'paidy_do_activation_redirect' );
+			wp_safe_redirect( admin_url( 'admin.php?page=wc-admin&path=%2Fpaidy-on-boarding' ) );
+			exit;
 		}
 	}
 

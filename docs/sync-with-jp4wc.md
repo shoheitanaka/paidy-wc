@@ -10,7 +10,7 @@
 | ローカル | `~/Dev/Japanized-for-WooCommerce` | `~/Dev/paidy-wc` |
 | GitHub | artisanworkshop/Japanized-for-WooCommerce | SoftStepsEC/paidy-wc（`upstream`）/ shoheitanaka/paidy-wc（`origin`） |
 | テキストドメイン | `woocommerce-for-japan` | `paidy-wc` |
-| バージョン（2026-10-12） | 2.9.17（main。タグは未作成） | 1.5.2 |
+| バージョン（2026-10-13） | 2.9.17（タグ済み。`upstream/main` は `1bf0bd0`） | 1.5.2 |
 
 ## ファイル対応表
 
@@ -62,7 +62,14 @@
    wizard の `get_or_create_site_hash()` の `@since 2.9.17` は `@since 1.6.0` に、`paidy_payment_api_url()` の DocBlock と
    `test-paidy-payment-id-format.php` のファイル DocBlock の「versions before 2.9.14 saved the thank-you URL parameter unverified」は
    「versions before 1.6.0」に（paidy-wc で検証なしに保存していたのは 1.5.2 以前）。コメント・テストの「(#232)」「issue #231」〜「issue #234」は
-   「Japanized for WooCommerce issue #…」に
+   「Japanized for WooCommerce issue #…」に。
+   #241・#243 の同期: ゲートウェイの `register_order_status_hooks()` / `handle_order_status_*()` / `get_gateway_for_order()` /
+   `paidy_merge_refund_ids()` の `@since 2.9.17` は `@since 1.6.0` に、`paidy_order_paidy_status_completed_to_cancelled()` の DocBlock と
+   コメントの「2.9.17」は「1.6.0」に。同コメントの「earlier versions blocked the refund on cancellation once anything had been refunded」は
+   JP4WC の返金ガードの話で、ガードの無かった paidy-wc では「versions before 1.6.0 refunded the order total on cancellation without
+   recording a refund」に（判定のロジックは同じ）。`jp4wc_order_paidy_status_completed()` / `paidy_order_paidy_status_processing_to_cancelled()` /
+   `notice_message()` の `@param string $order_id` は `@param int`（静的ハンドラが int を渡すので PHPStan `argument.type`。WooCommerce の
+   `woocommerce_order_status_*` が渡すのも int。JP4WC は `string` のまま）。移植テストの「issue #241」「issue #243」も「Japanized for WooCommerce issue #…」に
 9. **アップグレード処理**（`class-wc-paidy-apply-receiver.php` 末尾、`paidy-wc.php`）: JP4WC は `JP4WC_Install` の `jp4wc_updated` で
    `redact_stored_secrets_on_upgrade()` を呼ぶが、paidy-wc にはバージョン検出が無い。paidy-wc は `paidy-wc.php` の
    `paidy_wc_check_version()`（`init` 5、option `paidy_wc_version`）が版の変化で `paidy_wc_updated` を発火し、receiver はそれにつなぐ。
@@ -75,28 +82,23 @@
     スクリプト・説明文フィルタの登録を API キー有無の条件から外し、JS に `hasApiKeys` を渡して JS 側でリダイレクトする。
     paidy-wc は JS（`src/`）を同期していないので、条件付き登録・`$plugin_name = 'Paidy for WooCommerce'`・`hasApiKeys` なしのまま
     （backlog B-25。JS を同期するときに一緒に取り込んでこの項目を消す）
-12. **返金の `paidy_refund_id` ガード**（`class-wc-gateway-paidy.php` の `process_refund()`）: JP4WC（8e648b1、2.9.0）は先頭で
-    `if ( $order->get_meta( 'paidy_refund_id' ) ) { return; }` とするが、`process_refund()` はアクションのコールバックではなく
-    WooCommerce が返金 1 回につき 1 回呼ぶ関数で、これがあると 2 回目以降の返金（部分返金の追加）が null = 失敗になる
-    （「決済ゲートウェイ API で返金を作成中にエラー」）。直後のコードは `paidy_refund_id` に複数の返金 ID を追記する前提。
-    ただし `process_refund()` は `woocommerce_order_status_completed_to_cancelled` のコールバック
-    （`paidy_order_paidy_status_completed_to_cancelled()`）からも呼ばれ、このコールバックは B-18 のとおり二重に（管理画面では
-    B-12 の `admin_init` のインスタンスが加わり三重に）登録されるので、ガードが無いと completed → cancelled で返金 API が 2〜3 回呼ばれ、
-    2 回目以降のエラーの注文メモが残る（main と同じ。返金が二重になるわけではない）。
-    JP4WC のガードはこの重複も抑えていたが、部分返金が壊れるほうが重いので、paidy-wc はこのガードを入れない。JP4WC が消したらこの項目を消す（backlog B-36）。回帰テスト: `test-paidy-capture-refund.php` の
-    `test_second_refund_is_sent_to_paidy`
-13. **受領ページの JS リダイレクト URL**（`paidy_make_order()` の `window.location.href`）: JP4WC（8e648b1）は
+12. **受領ページの JS リダイレクト URL**（`paidy_make_order()` の `window.location.href`）: JP4WC（8e648b1）は
     `esc_url( $this->get_return_url( $order ) )` だが、`esc_url()` は `&` を `&#038;` にし、`<script>` の中では実体参照が戻らない。
     基本パーマリンク（`?page_id=…&order-received=…&key=…`）では `#038;` 以降がフラグメントになり、サンクスページに着かない。
     paidy-wc は従来の生の出力（`//phpcs:ignore`）のまま。JP4WC で `wp_json_encode( esc_url_raw( … ) )` などに直したら取り込んで
     この項目を消す（backlog B-37）。回帰テスト: `test-paidy-capture-refund.php` の `test_receipt_page_redirect_url_is_not_html_encoded`
-14. **説明文の保存時検証**（`class-wc-gateway-paidy.php`）: JP4WC 2.9.15 は `validate_paidy_description_field()` で保存時にも
+13. **説明文の保存時検証**（`class-wc-gateway-paidy.php`）: JP4WC 2.9.15 は `validate_paidy_description_field()` で保存時にも
     `wp_kses( force_balance_tags() )` をかけるが、許可タグ（`paidy_description_allowed_html()`）に `img` と `class` / `style` 属性が無く、
     既定の説明文の Paidy 画像と `jp4wc-paidy-explanation` クラスが保存で消える。ブロックチェックアウトは保存値をそのまま表示する
     （`src/paidy/index.js` の `RawHTML`）ので、設定を 1 回保存するとブロック側から画像が消え、元にも戻せない（クラシックは表示時に同じ kses で
     元から消えていた）。ボタンの重複は表示時の `force_balance_tags()`（取り込み済み）で直るので、paidy-wc は保存時検証を入れず、
     WooCommerce 既定の textarea の検証のまま。移植テスト `test-paidy-description-balance.php` の保存時検証の 4 件は外し、保存で
     `<img>` とクラスが残ることを確かめる回帰テストに差し替えた。JP4WC で許可タグを直したら取り込んでこの項目を消す（backlog B-41）
+14. **有効化後のウィザードへのリダイレクト**（`paidy-wc.php` の `paidy_redirect_to_wizard()`。JP4WC は `woocommerce-for-japan.php`）: JP4WC は
+    `'yes' !== $enabled && jp4wc_has_orders_in_last_5_days()`（直近 5 日に注文のあるサイトだけ）のときにフラグを消してリダイレクトする。paidy-wc は
+    注文の有無を見ず、ゲートウェイを `enabled = yes` にしてからリダイレクトする（1.5.2 以前からの独自処理。このときだけ `new WC_Gateway_Paidy()` する）。
+    `class_exists( 'WC_Gateway_Paidy' )` の早期 return と、設定を `get_option( 'woocommerce_paidy_settings' )` で読む形は JP4WC と同じ。
+    回帰テスト: `test-paidy-order-status-hooks.php` の `test_wizard_redirect_check_creates_no_gateway`
 
 ## 差分の取り方
 
@@ -121,14 +123,15 @@ git -C "$J" log --oneline -- includes/gateways/paidy tests/Unit/test-paidy-*.php
 ## 未取り込み（JP4WC changelog より。詳細は DEVELOPMENT_PLAN.md Phase 1）
 
 2026-10-09 時点の一覧から、Phase 1-1（ブランチ `fix/webhook-auth`）・1-2（`fix/receiver-auth`）・1-3（`fix/thankyou-verification`）と
-2.9.17 の同期（`fix/sync-jp4wc-2.9.17`）で取り込んだ分を除いたもの。2.9.17 の同期は JP4WC `829d580` → `fe717d0`（Paidy の最後の変更。
-`upstream/main` は `7fa70fd`）の差分なので、次回はそれ以降を見る（glob は `$J` 側で解決させるため引用符で囲む）:
-`git -C "$J" log --oneline fe717d0..upstream/main -- includes/gateways/paidy includes/jp4wc-framework 'tests/Unit/test-paidy-*.php' src/js/paidy class-wc-paidy.php uninstall.php woocommerce-for-japan.php`。
+2.9.17 の同期（`fix/sync-jp4wc-2.9.17`、JP4WC `829d580..fe717d0`）と #241・#243 の同期（`fix/sync-jp4wc-order-status-hooks`、
+JP4WC `fe717d0..1bf0bd0`。`1bf0bd0` は 2.9.17 タグ後の `upstream/main`）で取り込んだ分を除いたもの。次回は `1bf0bd0` 以降を見る
+（glob は `$J` 側で解決させるため引用符で囲む）:
+`git -C "$J" log --oneline 1bf0bd0..upstream/main -- includes/gateways/paidy includes/jp4wc-framework 'tests/Unit/test-paidy-*.php' src/js/paidy class-wc-paidy.php uninstall.php woocommerce-for-japan.php`。
 `uninstall.php` と `woocommerce-for-japan.php` は Paidy 以外の変更も拾うので、中身を見て Paidy 関係だけを取り込む。
 
 | JP4WC 版 | 内容 | 対象ファイル |
 |---------|------|------------|
-| 2.9.5 | ゲートウェイ未登録時のブロック対応 fatal 回避、wp-env 等の非標準パスでの `WC_Gateway_Paidy not found` 修正 | blocks-support, loader |
+| 2.9.5 | ゲートウェイ未登録時のブロック対応 fatal 回避（`paidy_redirect_to_wizard()` の `class_exists( 'WC_Gateway_Paidy' )` ガードは #241 の同期で取り込み済み） | blocks-support |
 | （2026-02、`a417036`） | wizard のフック登録条件と JS の `hasApiKeys` リダイレクト、申込 ID の表示（JS） | wizard, `src/` |
 
 ### 取り込み済み
@@ -139,8 +142,9 @@ git -C "$J" log --oneline -- includes/gateways/paidy tests/Unit/test-paidy-*.php
 | 1-1 | 2.9.6 / 2.9.13 | `paidy/v1/order` の HMAC 署名 or IP 許可リスト認証（署名なしの通知を拒否しない）、決済方法確認、冪等性、Paidy API での裏取り。`paidy/v1/check` は JP4WC 同様 `__return_true` |
 | 1-1 | 2.9.14 / #223 | `paidy_get_payment_data()` の `wp_safe_remote_get()` 化、`^pay_[A-Za-z0-9_-]+$/D` 検証 + `rawurlencode()`、`paidy_verify_payment_for_order()`。テスト `test-paidy-payment-id-format.php` |
 | 1-2 | 2.9.13 / 2.9.15 / 2.9.16 | receiver の state token（non-autoload option）・HMAC 署名フォールバック・リプレイ防止・body のみから認証・application_id 一致確認・復号失敗の翻訳可能化・鍵フィールドの補完・`paidy_received_data` から秘密鍵除外（既存分はアップグレード時に伏せ字）。wizard の state token 送信・申込 ID の保存・`wizard=false` 修正・`pk_test_` 書き換えの廃止・二重ログ修正。`uninstall.php` の Paidy 部分。テスト `test-paidy-receiver-signature.php` `test-paidy-onboarding-state.php` `test-paidy-application-id.php` `test-paidy-manual-settings.php` |
-| 1-3 | 2.9.0 / 2.9.14 / 2.9.15 / JP4WC PR #213 | ゲートウェイ `class-wc-gateway-paidy.php` を JP4WC 版に置き換え（意図的な差分 8・12・13・14 を除く）: サンクスページ `thankyou_completed()` での裏取り（`paidy_verify_payment_for_order()`）と冪等性、`paidy_capture_id` による再キャプチャ防止、説明文の表示時の `force_balance_tags()`（保存時検証は差分 14 で除外）、ゲスト注文の注文履歴照会の省略と 5 分キャッシュ（transient `jp4wc_paidy_order_history_<user_id>`）、Paidy Checkout に渡す商品・クーポンの `esc_js()` と数値のキャスト、キャプチャ金額の `(float)` 比較、`paidy_check_response()` の文字列比較・`200`・`Status:` の追記、注文メモ文字列の `__()` 化。テスト `test-paidy-description-balance.php` `test-paidy-guest-order-history.php` |
-| 1-5 前 | 2.9.17 / #231〜#234 | JP4WC `829d580..fe717d0` のゲートウェイ・wizard の差分をパッチで適用（意図的な差分 8・10・11・12・13・14 はそのまま）: Paidy Checkout の `order.items` を配列 + `wp_json_encode()`（`JSON_HEX_*`）に、割引額 0 のクーポン（`"0.00"` も）と `product_id` の無い明細を除外（#232。B-43・B-39 が解消）。close / capture / refund の URL を `paidy_payment_api_url()`（形式検証 + `rawurlencode()`）で組み、形式が違えば送らず注文メモ（キャプチャは通知メールも）（#233。B-19 が解消）。`is_wp_error()` を先に見て、HTTP 2xx かつ `status: closed` のときだけ成功。それ以外は注文メモを残して失敗（`status` の無い応答と close の失敗のメモには HTTP ステータスを付ける）（#231。B-42 が解消）。wizard の `get_or_create_site_hash()` で再申込でも保存済みの `site_hash` を送る（#234。B-26 が解消）。テスト `test-paidy-api-response-handling.php` `test-paidy-order-items.php` `test-paidy-onboarding-site-hash.php` を移植、`test-paidy-payment-id-format.php` に close / capture / refund のケースを追加（main では 70 件が失敗することを確認） |
+| 1-3 | 2.9.0 / 2.9.14 / 2.9.15 / JP4WC PR #213 | ゲートウェイ `class-wc-gateway-paidy.php` を JP4WC 版に置き換え（意図的な差分 8・12・13 と、#243 の同期で消した返金ガードの差分を除く）: サンクスページ `thankyou_completed()` での裏取り（`paidy_verify_payment_for_order()`）と冪等性、`paidy_capture_id` による再キャプチャ防止、説明文の表示時の `force_balance_tags()`（保存時検証は差分 13 で除外）、ゲスト注文の注文履歴照会の省略と 5 分キャッシュ（transient `jp4wc_paidy_order_history_<user_id>`）、Paidy Checkout に渡す商品・クーポンの `esc_js()` と数値のキャスト、キャプチャ金額の `(float)` 比較、`paidy_check_response()` の文字列比較・`200`・`Status:` の追記、注文メモ文字列の `__()` 化。テスト `test-paidy-description-balance.php` `test-paidy-guest-order-history.php` |
+| 1-5 前 | 2.9.17 / #231〜#234 | JP4WC `829d580..fe717d0` のゲートウェイ・wizard の差分をパッチで適用（意図的な差分 8・10・11・12・13 と返金ガードの差分はそのまま）: Paidy Checkout の `order.items` を配列 + `wp_json_encode()`（`JSON_HEX_*`）に、割引額 0 のクーポン（`"0.00"` も）と `product_id` の無い明細を除外（#232。B-43・B-39 が解消）。close / capture / refund の URL を `paidy_payment_api_url()`（形式検証 + `rawurlencode()`）で組み、形式が違えば送らず注文メモ（キャプチャは通知メールも）（#233。B-19 が解消）。`is_wp_error()` を先に見て、HTTP 2xx かつ `status: closed` のときだけ成功。それ以外は注文メモを残して失敗（`status` の無い応答と close の失敗のメモには HTTP ステータスを付ける）（#231。B-42 が解消）。wizard の `get_or_create_site_hash()` で再申込でも保存済みの `site_hash` を送る（#234。B-26 が解消）。テスト `test-paidy-api-response-handling.php` `test-paidy-order-items.php` `test-paidy-onboarding-site-hash.php` を移植、`test-paidy-payment-id-format.php` に close / capture / refund のケースを追加（main では 70 件が失敗することを確認） |
+| 1-5 前 | 2.9.17 / #241・#243 | JP4WC `fe717d0..1bf0bd0` のゲートウェイの差分をパッチで適用（JP4WC の返金ガードを消す hunk は paidy-wc に無いので不適用。意図的な差分 8・10・11・12・13 はそのまま）: 注文状態のコールバック（キャプチャ・close・返金）をコンストラクタから外し、`register_order_status_hooks()` の静的ハンドラ `handle_order_status_*()` を `class-wc-paidy.php` でゲートウェイ読み込み直後に 1 回だけ登録。ハンドラは `payment_method` が `paidy` の注文だけ `WC()->payment_gateways()` のインスタンスに渡す（#241。B-18 が解消）。`paidy-wc.php` の `paidy_redirect_to_wizard()` は設定を読み、リダイレクトする 1 回だけゲートウェイを生成する（B-12 が解消。paidy-wc 独自の「有効化してから遷移」は維持 = 意図的な差分 14）。JP4WC 2.9.5 の `class_exists( 'WC_Gateway_Paidy' )` ガード（WooCommerce 無効のサイトで有効化した直後の `admin_init` が fatal になる）も同じ関数なので取り込み（R1 S-X1）。completed → cancelled の返金は `wc_create_refund()`（`refund_payment`、`restock_items` なし）で残額だけ返金し、全額でも `woocommerce_order_fully_refunded_status` を一時的に `false` にして cancelled のまま、失敗は注文メモ。`paidy_refund_id` の追記は `paidy_merge_refund_ids()`（single meta の配列に、応答の `refunds` のうち未保存の ID をすべて追加。#243。B-40・B-53 の返金部分が解消。JP4WC が返金ガードを消したので旧・意図的な差分 12 と B-36 も解消）。テスト `test-paidy-order-status-hooks.php` `test-paidy-refunds.php` を移植（main のコードでは 17 件中 15 件が失敗することを確認） |
 
 ## 同期後のチェック
 

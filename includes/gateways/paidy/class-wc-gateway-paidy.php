@@ -175,11 +175,94 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		add_action( 'woocommerce_before_checkout_form', array( $this, 'checkout_reject_to_cancel' ) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_completed' ) );
 
-		add_action( 'woocommerce_order_status_completed', array( $this, 'jp4wc_order_paidy_status_completed' ) );
-		add_action( 'woocommerce_order_status_processing_to_cancelled', array( $this, 'paidy_order_paidy_status_processing_to_cancelled' ) );
-		add_action( 'woocommerce_order_status_completed_to_cancelled', array( $this, 'paidy_order_paidy_status_completed_to_cancelled' ) );
+		// The order status callbacks are registered once by register_order_status_hooks().
 
 		add_action( 'admin_print_footer_scripts', array( $this, 'paidy_remove_refund_button_for_processing' ), 10 );
+	}
+
+	/**
+	 * Register the order status callbacks that capture, cancel and refund at Paidy.
+	 *
+	 * They are not registered in the constructor because this class is created more than
+	 * once in a request (WooCommerce's gateway list, WC_Paidy_Endpoint), and each instance
+	 * would send the same request to Paidy again. They are not left to WooCommerce's
+	 * instance alone either: a request that changes an order status, such as a REST API
+	 * call or a bulk action, does not always load the payment gateways.
+	 *
+	 * @since 1.6.0
+	 */
+	public static function register_order_status_hooks() {
+		$hooks = array(
+			'woocommerce_order_status_completed' => 'handle_order_status_completed',
+			'woocommerce_order_status_processing_to_cancelled' => 'handle_order_status_processing_to_cancelled',
+			'woocommerce_order_status_completed_to_cancelled' => 'handle_order_status_completed_to_cancelled',
+		);
+		foreach ( $hooks as $hook => $method ) {
+			// WordPress keys a callback by its name and priority, so adding it again does not run it twice.
+			add_action( $hook, array( __CLASS__, $method ) );
+		}
+	}
+
+	/**
+	 * Capture at Paidy when a Paidy order is completed.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param int $order_id Order ID.
+	 */
+	public static function handle_order_status_completed( $order_id ) {
+		$gateway = self::get_gateway_for_order( $order_id );
+		if ( $gateway ) {
+			$gateway->jp4wc_order_paidy_status_completed( $order_id );
+		}
+	}
+
+	/**
+	 * Close the payment at Paidy when a processing Paidy order is cancelled.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param int $order_id Order ID.
+	 */
+	public static function handle_order_status_processing_to_cancelled( $order_id ) {
+		$gateway = self::get_gateway_for_order( $order_id );
+		if ( $gateway ) {
+			$gateway->paidy_order_paidy_status_processing_to_cancelled( $order_id );
+		}
+	}
+
+	/**
+	 * Refund at Paidy when a completed Paidy order is cancelled.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param int $order_id Order ID.
+	 */
+	public static function handle_order_status_completed_to_cancelled( $order_id ) {
+		$gateway = self::get_gateway_for_order( $order_id );
+		if ( $gateway ) {
+			$gateway->paidy_order_paidy_status_completed_to_cancelled( $order_id );
+		}
+	}
+
+	/**
+	 * The gateway instance WooCommerce has registered, for an order paid with Paidy.
+	 *
+	 * Orders paid by other methods return null without loading the payment gateways.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param int $order_id Order ID.
+	 * @return WC_Gateway_Paidy|null
+	 */
+	private static function get_gateway_for_order( $order_id ) {
+		$order = wc_get_order( $order_id );
+		if ( ! $order || 'paidy' !== $order->get_payment_method() ) {
+			return null;
+		}
+		$gateways = WC()->payment_gateways()->payment_gateways();
+
+		return isset( $gateways['paidy'] ) && $gateways['paidy'] instanceof self ? $gateways['paidy'] : null;
 	}
 
 	/**
@@ -851,7 +934,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	/**
 	 * Update Cancel from Auth to Paidy System
 	 *
-	 * @param string $order_id Order ID.
+	 * @param int $order_id Order ID.
 	 */
 	public function paidy_order_paidy_status_processing_to_cancelled( $order_id ) {
 		$secret_key           = $this->set_api_secret_key();
@@ -899,14 +982,60 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * Handle order status change from completed to cancelled.
+	 * Refund at Paidy what is left of a completed order when it is cancelled.
+	 *
+	 * The refund goes through wc_create_refund(), so WooCommerce records it and only the
+	 * amount not refunded yet is sent. The order stays cancelled even when this refunds it
+	 * in full. Versions before 1.6.0 refunded the order total at Paidy without recording a
+	 * refund in WooCommerce; such an order is not refunded again.
 	 *
 	 * @param int $order_id Order ID.
 	 */
 	public function paidy_order_paidy_status_completed_to_cancelled( $order_id ) {
-		$order  = wc_get_order( $order_id );
-		$amount = $order->get_total();
-		$this->process_refund( $order_id, $amount );
+		$order = wc_get_order( $order_id );
+		if ( ! $order || $this->id !== $order->get_payment_method() ) {
+			return;
+		}
+		// Every Paidy refund since 1.6.0 has a WooCommerce refund sent through the gateway,
+		// while versions before 1.6.0 refunded the order total on cancellation without
+		// recording a refund. A Paidy refund ID without such a refund is therefore an
+		// earlier version's refund on cancellation.
+		$gateway_refunds = array_filter(
+			$order->get_refunds(),
+			static function ( $refund ) {
+				return $refund->get_refunded_payment();
+			}
+		);
+		if ( $order->get_meta( 'paidy_refund_id' ) && empty( $gateway_refunds ) ) {
+			return;
+		}
+		$amount = $order->get_remaining_refund_amount();
+		if ( 0 >= (float) $amount ) {
+			return;
+		}
+
+		// WooCommerce marks an order it refunds in full as refunded; keep the status the shop chose.
+		$keep_status = static function ( $status, $refunded_order_id ) use ( $order_id ) {
+			return (int) $refunded_order_id === (int) $order_id ? false : $status;
+		};
+		add_filter( 'woocommerce_order_fully_refunded_status', $keep_status, PHP_INT_MAX, 2 );
+		try {
+			$refund = wc_create_refund(
+				array(
+					'order_id'       => $order_id,
+					'amount'         => $amount,
+					'refund_payment' => true,
+					// WooCommerce puts the items back in stock when the order is cancelled.
+					'restock_items'  => false,
+				)
+			);
+		} finally {
+			remove_filter( 'woocommerce_order_fully_refunded_status', $keep_status, PHP_INT_MAX );
+		}
+
+		if ( is_wp_error( $refund ) ) {
+			$order->add_order_note( __( 'The remaining amount was not refunded at Paidy when the order was cancelled. Please check Paidy admin.', 'paidy-wc' ) . ' (' . $refund->get_error_message() . ')' );
+		}
 	}
 	/**
 	 * Remove the refund button for orders with status 'processing'.
@@ -948,7 +1077,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	/**
 	 * Update Sale from Auth to Paidy System
 	 *
-	 * @param string $order_id Order ID.
+	 * @param int $order_id Order ID.
 	 *
 	 * @return boolean true or false
 	 */
@@ -1105,13 +1234,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 			$http_code    = (int) wp_remote_retrieve_response_code( $refund );
 			$refund_array = json_decode( wp_remote_retrieve_body( $refund ), true );
 			if ( $this->paidy_is_closed_response( $http_code, $refund_array ) ) {
-				$refunds_array = $order->get_meta( 'paidy_refund_id', false );
-				if ( empty( $refunds_array ) ) {
-					$refunds_array = array( $refund_array['refunds'][0]['id'] );
-				} else {
-					$refunds_array = array_merge( $refunds_array, array( $refund_array['refunds'][0]['id'] ) );
-				}
-				$order->update_meta_data( 'paidy_refund_id', $refunds_array );
+				$order->update_meta_data( 'paidy_refund_id', $this->paidy_merge_refund_ids( $order->get_meta( 'paidy_refund_id' ), $refund_array ) );
 				$order->save_meta_data();
 				$order->add_order_note( __( 'Completion refunding has been completed at Paidy.', 'paidy-wc' ) );
 				return true;
@@ -1179,6 +1302,35 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 */
 	private function paidy_is_closed_response( $http_code, $body ) {
 		return $http_code >= 200 && $http_code < 300 && is_array( $body ) && isset( $body['status'] ) && 'closed' === $body['status'];
+	}
+
+	/**
+	 * The refund IDs to save on an order after Paidy carried out a refund.
+	 *
+	 * Paidy answers a refund with the payment and all of its refunds, in an order it does
+	 * not document, so every refund ID in the answer that is not saved yet is added,
+	 * rather than the first one, which would be the earlier refund on a second refund.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param mixed $saved_ids Value of the order's paidy_refund_id meta.
+	 * @param array $payment   Decoded Paidy payment from the refund answer.
+	 * @return string[]
+	 */
+	private function paidy_merge_refund_ids( $saved_ids, $payment ) {
+		if ( is_array( $saved_ids ) ) {
+			$refund_ids = array_values( array_filter( $saved_ids, 'is_string' ) );
+		} else {
+			$refund_ids = is_string( $saved_ids ) && '' !== $saved_ids ? array( $saved_ids ) : array();
+		}
+		$refunds = isset( $payment['refunds'] ) && is_array( $payment['refunds'] ) ? $payment['refunds'] : array();
+		foreach ( $refunds as $refund ) {
+			if ( is_array( $refund ) && isset( $refund['id'] ) && is_string( $refund['id'] ) && ! in_array( $refund['id'], $refund_ids, true ) ) {
+				$refund_ids[] = $refund['id'];
+			}
+		}
+
+		return $refund_ids;
 	}
 
 	/**
@@ -1349,7 +1501,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	/**
 	 * Send notice e-mail to shop owner
 	 *
-	 * @param  string $order_id Order ID.
+	 * @param  int    $order_id Order ID.
 	 * @param  string $transaction_id Paidy payment ID.
 	 * @param  string $situation Error situation.
 	 * @param  string $error_message Error message.

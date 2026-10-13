@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-11T21:52:30+00:00\n"
+"POT-Creation-Date: 2026-10-13T08:43:22+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: paidy-wc\n"
@@ -37,21 +37,21 @@ msgstr ""
 
 #. translators: %s: Payment method name.
 #: includes/gateways/paidy/class-wc-gateway-paidy.php:141
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:223
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:306
 #, php-format
 msgid "Proceed to %s"
 msgstr ""
 
 #. translators: %s: Payment method name.
 #: includes/gateways/paidy/class-wc-gateway-paidy.php:141
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:223
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:306
 #: includes/gateways/paidy/class-wc-payments-paidy-blocks-support.php:105
 #: src/paidy/index.js:16
 msgid "Paidy"
 msgstr ""
 
 #: includes/gateways/paidy/class-wc-gateway-paidy.php:147
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:200
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:283
 msgid "Paidy Payment"
 msgstr ""
 
@@ -59,319 +59,323 @@ msgstr ""
 msgid "\"Paidy next month payment\" reduces the opportunity loss due to the payment method and contributes to sales increase."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:191
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:274
 msgid "Enable/Disable"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:193
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:276
 msgid "Enable Paidy"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:197
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:280
 msgid "Title"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:199
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:282
 msgid "This controls the title which the user sees during checkout."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:204
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:287
 msgid "Description"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:206
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:289
 msgid "Payment method description that the customer will see on your checkout."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:207
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:290
 msgid "No matter how many times you shop a month, you pay once in the following month. <br /> The following payment methods are available."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:211
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:294
 msgid "Paidy description"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:214
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:297
 msgid "Payment method description for paidy explanation that the customer will see on your checkout."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:219
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:302
 msgid "Order Button Text"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:221
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:304
 msgid "This controls the description which the user sees during checkout."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:226
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:309
 msgid "Environment"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:228
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:311
 msgid "This setting specifies whether you will process live transactions, or whether you will process simulated transactions using the Paidy Sandbox."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:232
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:315
 msgid "Live"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:233
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:316
 msgid "Sandbox"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:237
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:243
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:819
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:320
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:326
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:902
 msgid "API Public Key"
 msgstr ""
 
 #. translators: %s: Enter Key.
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:242
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:254
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:266
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:278
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:325
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:337
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:349
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:361
 #, php-format
 msgid "Please enter %s from Paidy Admin site."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:249
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:255
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:830
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:332
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:338
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:913
 msgid "API Secret Key"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:261
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:267
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:344
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:350
 msgid "Test API Public Key"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:273
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:279
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:356
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:362
 msgid "Test API Secret Key"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:285
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:368
 msgid "Store Name"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:287
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:370
 msgid "This controls the store name which the user sees during paidy checkout."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:291
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:374
 msgid "Logo Image (168×168 recommend)"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:293
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:376
 msgid "URL of a custom logo that can be displayed in the checkout application header. If no value is specified, the Paidy logo will be displayed."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:295
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:378
 msgid "Optional"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:298
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:381
 msgid "Debug Mode"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:300
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:383
 msgid "Enable Debug Mode"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:302
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:385
 msgid "Save debug data using WooCommerce logging."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:305
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:388
 msgid "Notice e-mail"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:307
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:390
 msgid "Set an e-mail address to send an e-mail when an error occurs during connection with paidy."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:311
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:394
 msgid "About Webhook"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:313
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:396
 msgid "The webhooks set in the Paidy management screen are as follows. <br />"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:677
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:760
 msgid "This order has already been settled."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:679
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:762
 msgid "API Public key is not set. Please set an API public key in the admin page."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:765
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:848
 msgid "Once the customer interrupted the payment.. Order ID:"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:768
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:851
 msgid "This Paidy payment has been declined. Please select another payment method."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:805
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:888
 msgid "Paidy Payment succeeds to authorize and move to thank you page. Get data is following."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:819
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:830
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:902
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:913
 msgid "Production environment"
 msgstr ""
 
 #. translators: 1) Field title 2) Environment 3) Paidy PR link
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:845
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:928
 #, php-format
 msgid "If you do not set %1$s, it will not work in the %2$s. Application is necessary for acquisition."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:888
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:971
 msgid "This order is success cancellation data at Paidy."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:891
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:974
 msgid "This order is already close data at Paidy."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:894
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:977
 msgid "Cancelled processing has not been completed due to a Paidy error. Please check Paidy admin."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:966
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1037
+msgid "The remaining amount was not refunded at Paidy when the order was cancelled. Please check Paidy admin."
+msgstr ""
+
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1095
 msgid "Status Change from Processing to completed."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:997
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1014
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1126
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1143
 msgid "This is capture data."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1005
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1134
 msgid "In the payment completion process, the amount and ID match were confirmed."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1008
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1137
 msgid "In the payment completion process, the amount and ID did not match. Check on the Paidy admin."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1023
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1133
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1152
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1256
 msgid "There was no status in the notification from Paidy."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1041
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1170
 msgid "You have made a forbidden request."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1041
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1044
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1047
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1050
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1053
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1170
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1173
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1176
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1179
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1182
 msgid "Please go to your Paidy dashboard and check."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1044
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1173
 msgid "You have made an unauthorized request."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1047
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1176
 msgid "You have made a conflict request."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1050
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1179
 msgid "The requested resource could not be found."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1053
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1182
 msgid "The request failed."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1056
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1185
 msgid "I received a notification from Paidy and the status was successful."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1058
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1187
 msgid "I received a notification from Paidy stating that the status was unexpected."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1093
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1222
 msgid "Refund is not possible because Paidy has not completed processing."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1116
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1239
 msgid "Completion refunding has been completed at Paidy."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1119
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1242
 msgid "This is refund data."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1192
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1344
 msgid "The Paidy payment ID of this order is not in the expected format, so no request was sent to Paidy. Please check the transaction ID and your Paidy dashboard."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1343
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1495
 msgid "[WooCommerce] Notice of error occurrence in Paidy payment linkage"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1360
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1512
 msgid "An error has occurred in the Paidy payment linkage when changing the status of WooCommerce."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1361
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1513
 msgid "Please check the status of Paidy payment and respond accordingly."
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1362
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1514
 msgid "Order number:"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1363
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1515
 msgid "Order details URL:"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1364
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1516
 msgid "Paidy payment ID:"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1365
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1517
 msgid "Error occurrence time:"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1366
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1368
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1518
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1520
 msgid "Error situation:"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1370
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1522
 msgid "* This e-mail is for sending only, so you cannot reply directly to this e-mail."
 msgstr ""
 
 #. translators: %s: URL of the image.
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1426
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1578
 #, php-format
 msgid "Already using URL as image: %s"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1434
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1586
 msgid "Select a image to upload"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1435
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1587
 msgid "Use this image"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1436
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1439
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1588
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1591
 msgid "Add image"
 msgstr ""
 
-#: includes/gateways/paidy/class-wc-gateway-paidy.php:1447
+#: includes/gateways/paidy/class-wc-gateway-paidy.php:1599
 msgid "Remove image"
 msgstr ""
 

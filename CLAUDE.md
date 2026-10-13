@@ -123,6 +123,8 @@ composer check       # 上の 3 つをまとめて実行
 JP4WC 2.9.0〜2.9.16 の Paidy のセキュリティ修正は 1-1〜1-3（PR #39・#41・#42）で取り込み済み（Webhook の署名 + IP 認証、受信エンドポイントの
 state token + 署名、サンクスページと Webhook の Paidy API での裏取り）。JP4WC 2.9.17（#231〜#234: close / capture / refund の
 `transaction_id` 検証と応答の判定、Paidy Checkout の items の JSON 化、再申込の `site_hash`）も `fix/sync-jp4wc-2.9.17` で取り込み済み。
+同じ 2.9.17 の #241（注文状態のコールバックを静的ハンドラで 1 回だけ登録）・#243（2 回目以降の返金と取消時の残額返金）は
+`fix/sync-jp4wc-order-status-hooks` で取り込み済み。
 内容と取り込まなかった箇所は `docs/sync-with-jp4wc.md` の「取り込み済み」「意図的な差分」。
 Phase 1 の残りは 1-4（ブロック対応の fatal 回避）と 1-5（1.6.0 リリース）。
 
@@ -143,8 +145,10 @@ Phase 1 の残りは 1-4（ブロック対応の fatal 回避）と 1-5（1.6.0 
   直したら `docs/sync-with-jp4wc.md` の「意図的な差分」に書く。ファイルごと置き換えるときも hunk ごとに main と比べる。PR #42 では
   返金のガード（部分返金が失敗）、`<script>` 内の `esc_url()`（`&` が `&#038;` になりサンクスページに着かない）、説明文の保存時の狭い kses
   （ブロックチェックアウトは `paidy_description` を `RawHTML` で生表示するので画像が消える）が悪化だった。悪化する hunk は取り込まず、差分に書いて JP4WC に Issue
-- ゲートウェイのコンストラクタのフックはインスタンスごとに登録される（フロントで 2 重、管理画面で 3 重。B-18・B-12）。action のコールバックに
-  副作用を足すときは冪等にする。`process_refund()` は action ではなく WooCommerce が返金 1 回につき 1 回呼ぶ（重複ガードを入れると部分返金が壊れる）
+- ゲートウェイは 1 リクエストで複数回生成される（WooCommerce の決済方法一覧・`WC_Paidy_Endpoint`）ので、コンストラクタの `add_action()` は
+  インスタンスごとに登録される。注文状態のコールバック（キャプチャ・close・返金）は `register_order_status_hooks()` の静的ハンドラで
+  1 回だけ登録する（JP4WC #241）。コンストラクタに副作用のある action を足さない。`process_refund()` は action ではなく WooCommerce が
+  返金 1 回につき 1 回呼ぶ（重複ガードを入れると部分返金が壊れる）
 - `class_exists()` は `use` エイリアスを解決しない。常に完全修飾名を渡す
 - 管理者が入力した説明文 HTML は `wp_kses( force_balance_tags( $html ), $allowed )` で出力（閉じタグ漏れで注文ボタンが重複した実例）
 - `stripslashes()` ではなく `wp_unslash()`。`json_encode()` ではなく `wp_json_encode()`

@@ -105,6 +105,10 @@ composer test:db:stop     # コンテナ削除
   WooCommerce の版を変えたいときは `WC_VERSION=10.6.2 bash bin/install-wp-tests.sh ...` の前に
   `$TMPDIR/wordpress/wp-content/plugins/woocommerce` を消す。macOS は temp を定期的に消すので、
   `Could not find .../functions.php` が出たら `composer test:install` をやり直す
+- `$TMPDIR/wordpress-tests-lib/wp-tests-config.php` は他リポジトリの install にも書き換えられる（2026-10-13 に `DB_HOST` が `127.0.0.1:3306` に
+  なっていて `Error establishing a database connection` で全件失敗）。`composer test:install` で 10154 に戻る
+- 特定のテストだけ走らせるときは `composer test -- --filter 'WC_Paidy_Refunds_Test|WC_Paidy_Order_Status_Hooks_Test'`。
+  ファイルパスを渡すと PHPUnit 9 がファイル名と同じクラスを探して `Class test-paidy-refunds could not be found` になる
 - `composer test:install` は何度実行しても安全。「インストール済み」の判定はディレクトリではなく実ファイル
   （`wp-includes/version.php` / `woocommerce.php` / `includes/functions.php`）で行うので、途中で失敗した展開は再実行で補完される。
   `wp-tests-config.php` は毎回作り直す（DB の接続先を変えたら再実行だけでよい）。スクリプトは `set -x` を使わないので
