@@ -179,7 +179,7 @@ class WC_Paidy_Capture_Refund_Test extends WP_UnitTestCase {
 		$this->assertSame( array( 'POST' ), $this->requested_methods );
 		$this->assertSame( self::CAPTURE_ID, wc_get_order( $order->get_id() )->get_meta( 'paidy_capture_id' ) );
 
-		// A second completion (another gateway instance's hook) does not call Paidy again.
+		// A second completion does not call Paidy again.
 		$this->gateway->jp4wc_order_paidy_status_completed( $order->get_id() );
 		$this->assertCount( 1, $this->requested_urls );
 	}
