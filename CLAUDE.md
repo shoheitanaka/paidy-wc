@@ -69,6 +69,7 @@ composer check       # 上の 3 つをまとめて実行
 | 動作確認 | wp-env では paidy-wc 本体が起動しない（B-13。直したらこの行を消す）。REST / Webhook は PHPUnit の `rest_do_request()` で、実 Webhook は外部から届くステージングで確かめる。ステージング用 ZIP は `bash bin/build-zip.sh` で `dist/` に作る（docs/development.md） |
 | phpMyAdmin（dev / tests） | 10152 / 10153 |
 | PHPUnit 用 MySQL（Docker） | 127.0.0.1:10154（`composer test:db` / `composer test:db:stop`） |
+| PHPUnit の落とし穴 | `composer test` が `Error establishing a database connection` → `$TMPDIR/wordpress-tests-lib` の設定を他リポジトリの install が書き換えている。`composer test:install` で戻る。1 クラスだけ走らせるには `composer test -- --filter '<Class>'`（ファイルパスは不可） |
 | ポート台帳 | `~/.claude/skills/dev-env/ports.json` のスロット 15。変更は `dev-env` スキルで |
 | Node / npm | 20 / 10（`node_modules` はコミットしない。`package-lock.json` は現状未追跡 → backlog B-8） |
 | wp-cli | ローカル未導入。`wp i18n` は `update-i18n` スキルの phar フォールバックを使う |
@@ -93,9 +94,10 @@ composer check       # 上の 3 つをまとめて実行
 
 ## レビュー Bot（dev-cycle / fix-copilot-review のゲート設定）
 
-- **Copilot のみ**。依頼は `gh pr edit <N> --repo SoftStepsEC/paidy-wc --add-reviewer @copilot`
-- **Codex は未接続**（PR #38・#40 で push しても `@codex review` でも反応なし。2026-10-09 時点）。dev-cycle のゲートで Codex を待たない
-  （`request-gate-review.sh ... --copilot-only`）。接続したらこの行を更新する
+- **Copilot と Codex の 2 体**。Copilot の依頼は `gh pr edit <N> --repo SoftStepsEC/paidy-wc --add-reviewer @copilot`
+- **Codex は 2026-10-13 に接続**（組織 SoftStepsEC に GitHub App `chatgpt-codex-connector` をインストール。PR #46 で `@codex review` に応答し、
+  指摘なしなら「Didn't find any major issues 👍」のコメントを残す）。push 時の自動レビューは未確認なので、dev-cycle のゲートは
+  `request-gate-review.sh ... --request-codex` で `@codex review` も投稿する（自動レビューを確認できたら `--request-codex` を外す）
 - `.claude/**` / `docs/**` / `*.md` だけの PR は CI が走らない（`ci.yml` の `paths-ignore`）。`request-gate-review.sh` に `--wait-ci` を付けない
 - Copilot は「Needs a closer look・0 findings」でも総評文に実在する問題を書くことがある（PR #38 で 2 件とも実在）。
   総評は読み飛ばさず調査対象にする。`docs/review-baseline.md` / `review-backlog.md` に載っている事項は再対応しない
@@ -122,9 +124,8 @@ composer check       # 上の 3 つをまとめて実行
 
 JP4WC 2.9.0〜2.9.16 の Paidy のセキュリティ修正は 1-1〜1-3（PR #39・#41・#42）で取り込み済み（Webhook の署名 + IP 認証、受信エンドポイントの
 state token + 署名、サンクスページと Webhook の Paidy API での裏取り）。JP4WC 2.9.17（#231〜#234: close / capture / refund の
-`transaction_id` 検証と応答の判定、Paidy Checkout の items の JSON 化、再申込の `site_hash`）も `fix/sync-jp4wc-2.9.17` で取り込み済み。
-同じ 2.9.17 の #241（注文状態のコールバックを静的ハンドラで 1 回だけ登録）・#243（2 回目以降の返金と取消時の残額返金）は
-`fix/sync-jp4wc-order-status-hooks` で取り込み済み。
+`transaction_id` 検証と応答の判定、Paidy Checkout の items の JSON 化、再申込の `site_hash`）も PR #45 で取り込み済み。
+同じ 2.9.17 の #241（注文状態のコールバックを静的ハンドラで 1 回だけ登録）・#243（2 回目以降の返金と取消時の残額返金）は PR #46 で取り込み済み。
 内容と取り込まなかった箇所は `docs/sync-with-jp4wc.md` の「取り込み済み」「意図的な差分」。
 Phase 1 の残りは 1-4（ブロック対応の fatal 回避）と 1-5（1.6.0 リリース）。
 

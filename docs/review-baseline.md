@@ -24,6 +24,8 @@
   「既存 baseline を無視して上書きする」という指摘は誤検知
 - PHPCS 警告 2 件（`class-jp4wc-framework.php` の `base64_*`）— 共有コード。フレームワークの同期（Phase 2-2）で扱う
 - `tests/` で `WordPress.Files.FileName` を除外（`test-*.php` + `*_Test` は WordPress コアのテスト命名）
+- テスト内で `add_filter()` したフックを `tearDown()` で外していないこと — `WP_UnitTestCase` が `set_up()` で `$wp_filter` を控え
+  `tear_down()` で戻すので他のテストへ漏れない（PR #46 の Copilot 総評を一時テストで実測し誤検知と判定）
 
 ## 設計上の判断
 

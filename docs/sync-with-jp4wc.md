@@ -123,7 +123,7 @@ git -C "$J" log --oneline -- includes/gateways/paidy tests/Unit/test-paidy-*.php
 ## 未取り込み（JP4WC changelog より。詳細は DEVELOPMENT_PLAN.md Phase 1）
 
 2026-10-09 時点の一覧から、Phase 1-1（ブランチ `fix/webhook-auth`）・1-2（`fix/receiver-auth`）・1-3（`fix/thankyou-verification`）と
-2.9.17 の同期（`fix/sync-jp4wc-2.9.17`、JP4WC `829d580..fe717d0`）と #241・#243 の同期（`fix/sync-jp4wc-order-status-hooks`、
+2.9.17 の同期（`fix/sync-jp4wc-2.9.17`、PR #45、JP4WC `829d580..fe717d0`）と #241・#243 の同期（`fix/sync-jp4wc-order-status-hooks`、PR #46、
 JP4WC `fe717d0..1bf0bd0`。`1bf0bd0` は 2.9.17 タグ後の `upstream/main`）で取り込んだ分を除いたもの。次回は `1bf0bd0` 以降を見る
 （glob は `$J` 側で解決させるため引用符で囲む）:
 `git -C "$J" log --oneline 1bf0bd0..upstream/main -- includes/gateways/paidy includes/jp4wc-framework 'tests/Unit/test-paidy-*.php' src/js/paidy class-wc-paidy.php uninstall.php woocommerce-for-japan.php`。
