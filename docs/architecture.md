@@ -52,7 +52,7 @@ JP4WC との配置の違いは [sync-with-jp4wc.md](sync-with-jp4wc.md) の対�
    `order.items` は配列で組んで `wp_json_encode()`（`JSON_HEX_TAG|AMP|APOS|QUOT`）で出す。`product_id` の無い明細と割引額 0 のクーポン
    （`"0.00"` も数値で比較）は入れない（JP4WC 2.9.17 / #232）
    `_billing_yomigana_*`（JP4WC の読み仮名）があれば `name2` に渡す
-3. 認証成功 → JS が `get_return_url()` + `&transaction_id=pay_...` へ遷移（`esc_url()` しない。意図的な差分 13）→
+3. 認証成功 → JS が `get_return_url()` + `&transaction_id=pay_...` へ遷移（`esc_url()` しない。意図的な差分 12）→
    サンクスページ `woocommerce_thankyou_paidy` → `thankyou_completed()`: 注文が `pending` / `cancelled` で `transaction_id` が未設定のときだけ、
    `?transaction_id=`（購入者が書き換えられる）を `paidy_verify_payment_for_order()`（下記 4 と同じ裏取り）で確かめてから
    在庫を引き `payment_complete( $transaction_id )`。裏取りに失敗したら何もしない（注文は Webhook で完了する）。
@@ -69,11 +69,20 @@ JP4WC との配置の違いは [sync-with-jp4wc.md](sync-with-jp4wc.md) の対�
      `GET /payments/{id}` を裏取り（ID 一致・`order.order_ref` 一致・金額一致・状態が `authorized|active|closed`。`paidy_verify_allowed_statuses` フィルタ）
      → 在庫を引き `payment_complete()`。`capture_success` / `close_success` / `refund_success` は注文メモのみ
    - `paidy_get_payment_data()` は `^pay_[A-Za-z0-9_-]+$/D` で検証し `rawurlencode()` して `wp_safe_remote_get()`。失敗時は `null`
-5. 注文 `completed` → `jp4wc_order_paidy_status_completed()`: `paidy_capture_id` があれば何もしない（ゲートウェイのインスタンスごとに
-   フックが登録されるため。B-18）→ `POST /payments/{id}/captures` → `paidy_capture_id` を保存
-6. `processing|completed → cancelled` → `POST /payments/{id}/close`
-7. 返金 `process_refund()` → `POST /payments/{id}/refunds`（`capture_id` 必須。`paidy_refund_id` に配列で追記。
-   JP4WC の `paidy_refund_id` ガードは 2 回目の返金を止めるので入れない＝意図的な差分 12。追記の保存形式の不具合は B-40）
+5. 注文 `completed` → `WC_Gateway_Paidy::handle_order_status_completed()` → `jp4wc_order_paidy_status_completed()`:
+   `paidy_capture_id` があれば何もしない（再キャプチャ防止）→ `POST /payments/{id}/captures` → `paidy_capture_id` を保存。
+   5〜6 の注文状態のコールバックは `register_order_status_hooks()` が `class-wc-paidy.php` でゲートウェイ読み込み直後に 1 回だけ登録する
+   静的ハンドラ `handle_order_status_*()`（ゲートウェイは 1 リクエストで複数回生成されるのでコンストラクタでは登録しない）。ハンドラは
+   `payment_method` が `paidy` の注文だけ `WC()->payment_gateways()` のインスタンスに渡す（他の決済方法の注文ではゲートウェイ一覧を読み込まない。
+   JP4WC 2.9.17 / #241）
+6. `processing → cancelled` → `paidy_order_paidy_status_processing_to_cancelled()` → `POST /payments/{id}/close`。
+   `completed → cancelled` → `paidy_order_paidy_status_completed_to_cancelled()`: 未返金の残額（`get_remaining_refund_amount()`）を
+   `wc_create_refund()`（`refund_payment`。在庫はキャンセルが戻すので `restock_items` なし）で 7 に流し、全額でも
+   `woocommerce_order_fully_refunded_status` を一時的に `false` にして cancelled のまま。残額 0 なら何もしない。`paidy_refund_id` があるのに
+   `refunded_payment` の返金が 1 件も無い注文（1.5.2 以前がキャンセル時に全額を Paidy だけで返金したもの）は再返金しない。
+   失敗は注文メモ（JP4WC 2.9.17 / #243）
+7. 返金 `process_refund()` → `POST /payments/{id}/refunds`（`capture_id` 必須。WooCommerce が返金 1 回につき 1 回呼び、2 回目以降も送る。
+   `paidy_refund_id` は `paidy_merge_refund_ids()` が応答の `refunds` のうち未保存の ID を配列に追加して保存する）
 
 5〜7 と `paidy_get_payment_data()` の URL はすべて `paidy_payment_api_url()` で組む（`transaction_id` を `^pay_[A-Za-z0-9_-]+$/D` で検証して
 `rawurlencode()`。形式が違えば Paidy に送らない。5〜7 は注文メモを残して失敗し、キャプチャは通知メールも送る。`paidy_get_payment_data()` は
