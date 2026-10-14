@@ -66,6 +66,10 @@ bash bin/build-zip.sh   # → dist/paidy-wc-<HEAD の短縮ハッシュ>.zip
   そのときは `woocommerce_thankyou_paidy` が動かない。「支払い待ちのまま」だけでは合否を判断しない
 - 改ざんの拒否の確認は、支払い待ちの注文の `order-pay` の URL（アドレスバー、または管理画面の「顧客の支払いページ」）の `order-pay` を
   `order-received` に変え、`&transaction_id=<別の注文の決済 ID>` を付けて開く
+- 一連の受け入れテスト（置き換え → 成功 / 拒否決済 → 改ざんの拒否 → キャプチャ → close → 部分返金 → 取消時の残額返金 → Webhook・ログ）は
+  `.claude/skills/staging-test` スキルで、ユーザーがログインした Chrome を Claude in Chrome で操作して回す。Paidy のテスト購入者
+  （`successful.payment@paidy.com` / `rejected.payment@paidy.com`、認証コード `8888`）と各ケースの期待値はスキルの `references/checklist.md`。
+  結果は `docs/staging-tests/YYYY-MM-DD-paidy-wc-<hash>.md` に ZIP 名付きで残す（ステージングのホスト名・鍵は書かない）
 
 ## 品質チェック
 

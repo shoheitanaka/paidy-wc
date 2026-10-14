@@ -66,7 +66,7 @@ composer check       # 上の 3 つをまとめて実行
 | 用途 | 値 |
 |------|-----|
 | wp-env 開発サイト / テストサイト | http://localhost:10150 / http://localhost:10151（`npm run env:start`） |
-| 動作確認 | wp-env では paidy-wc 本体が起動しない（B-13。直したらこの行を消す）。REST / Webhook は PHPUnit の `rest_do_request()` で、実 Webhook は外部から届くステージングで確かめる。ステージング用 ZIP は `bash bin/build-zip.sh` で `dist/` に作る（docs/development.md） |
+| 動作確認 | wp-env では paidy-wc 本体が起動しない（B-13。直したらこの行を消す）。REST / Webhook は PHPUnit の `rest_do_request()` で、実 Webhook は外部から届くステージングで確かめる。ステージング用 ZIP は `bash bin/build-zip.sh` で `dist/` に作る（docs/development.md）。ステージングでの一連の受け入れテスト（決済・キャプチャ・close・返金・Webhook）は `staging-test` スキル（同梱）で Claude in Chrome を操作して回す |
 | phpMyAdmin（dev / tests） | 10152 / 10153 |
 | PHPUnit 用 MySQL（Docker） | 127.0.0.1:10154（`composer test:db` / `composer test:db:stop`） |
 | PHPUnit の落とし穴 | `composer test` が `Error establishing a database connection` → `$TMPDIR/wordpress-tests-lib` の設定を他リポジトリの install が書き換えている。`composer test:install` で戻る。1 クラスだけ走らせるには `composer test -- --filter '<Class>'`（ファイルパスは不可） |
@@ -82,6 +82,7 @@ composer check       # 上の 3 つをまとめて実行
 |--------|-----------|
 | `.claude/skills/sync-from-jp4wc`（同梱） | JP4WC の Paidy 変更をこのリポジトリへ取り込む / JP4WC に Issue を出す（書式・起票後の記録） |
 | `.claude/skills/update-i18n`（同梱） | 文字列を追加・変更した PR で POT / JSON を更新する |
+| `.claude/skills/staging-test`（同梱） | ステージングで Claude in Chrome を使った決済の受け入れテスト（ZIP 置き換え → テスト決済 → 改ざんの拒否 → キャプチャ / close / 返金 → Webhook・ログ → 報告書を `docs/staging-tests/` に保存） |
 | `wc-development` / `wp-plugin-development` | WooCommerce ゲートウェイ・HPOS・Blocks / プラグイン全般 |
 | `wp-security-check` | 決済 Webhook・REST・管理画面のセキュリティ監査 |
 | `wp-phpcs` / `wp-phpstan` / `wp-phpunit` / `wp-github-actions` | 品質ツールの設定変更 |
@@ -90,7 +91,7 @@ composer check       # 上の 3 つをまとめて実行
 | `release-bump` | バージョンアップ・changelog・タグ（WordPress.org 自動デプロイ） |
 | `dev-cycle` / `start-task` / `post-merge` | 計画 → ブランチ → 実装 → PR → ゲート → 後始末 |
 
-共有スキルは `~/.claude/skills/`（元本は `~/Dev/claude-skills`）。このリポジトリの `.claude/skills/` にはプロジェクト固有の 2 つだけを置く。
+共有スキルは `~/.claude/skills/`（元本は `~/Dev/claude-skills`）。このリポジトリの `.claude/skills/` にはプロジェクト固有の 3 つだけを置く。
 
 ## レビュー Bot（dev-cycle / fix-copilot-review のゲート設定）
 
