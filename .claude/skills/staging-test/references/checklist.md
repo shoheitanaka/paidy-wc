@@ -56,8 +56,12 @@ T5 のために **同じ手順をもう 1 回** 行い、2 件目の成功注文
 
 **期待する結果**
 - Paidy 側の拒否画面（ここまでで Paidy の判定は PASS）
-- チェックアウト上部にエラー通知 `This Paidy payment has been declined. Please select another payment method.`（`checkout_reject_to_cancel()`。
-  日本語訳なし）。**ブロックチェックアウトでは `woocommerce_before_checkout_form` が発火しないので出ない見込み**（2026-10-14 時点で確認中）
+- チェックアウト上部にエラー通知 `This Paidy payment has been declined. Please select another payment method.`
+  （このPaidyでのお支払いは拒否されました。別のお支払い方法を選択してください。`checkout_reject_to_cancel()`）。
+  **既知: ブロックチェックアウトでは出ない（B-60）。ショートコードのチェックアウトでは出るが 2 件重複する（B-61 = JP4WC #244）。**
+  直るまでは「ブロックで通知なし / ショートコードで 2 件」が現状の期待値。変わっていたら直った印
+- 戻り先はモーダルなしで再現できる: `checkout/?add-to-cart=<id>&status=rejected&order_id=<N2>`（ブロック）とショートコードのページに
+  `?status=rejected&order_id=<N2>`。カートが空だとフックが動かないので 1 点入れ、確認後に Store API `cart/remove-item` で戻す
 - 注文 N2 は **支払い待ち** のまま、取引 ID なし、在庫は減っていない（在庫は `payment_complete()` 前には引かない）
 - ログに `Once the customer interrupted the payment..` は **出ない**（これは `status=closed`、購入者がモーダルを閉じたとき）
 
