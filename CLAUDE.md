@@ -9,7 +9,7 @@ Paidy 決済モジュールを切り出したもので、**JP4WC 側が常に最
 | 項目 | 値 |
 |------|-----|
 | プラグイン名 / スラッグ / テキストドメイン | Paidy for WooCommerce / `paidy-wc` / `paidy-wc` |
-| 現行バージョン | 1.5.2（`paidy-wc.php` ヘッダー・`WC_PAIDY_VERSION`・`readme.txt` Stable tag・`package.json`） |
+| 現行バージョン | 2.0.0（`paidy-wc.php` ヘッダー・`WC_PAIDY_VERSION`・`readme.txt` Stable tag・`package.json`） |
 | 動作要件 | PHP 8.1+（ヘッダー）/ CI は WP 6.7+ / WC 10.2+ で検証（`.github/workflows/ci.yml`） |
 | メインファイル | `paidy-wc.php`（エントリ・フック登録）、`class-wc-paidy.php`（`WC_Paidy` シングルトン・定数・読み込み） |
 | 配布 | WordPress.org（タグ push → `deploy-on-pushing-a-new-tag-...yml` が SVN デプロイ + GitHub Release） |

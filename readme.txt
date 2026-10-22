@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=info@art
 Tags: woocommerce, ecommerce, japanese, payment, paidy
 Requires at least: 5.0
 Tested up to: 6.8.3
-Stable tag: 1.5.2
+Stable tag: 2.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -68,6 +68,27 @@ A: No, after application, it becomes available after providing information such 
 
 
 == Changelog ==
+
+= 2.0.0 - 2026-10-22 =
+* Security - The Paidy webhook (`paidy/v1/order`) now authenticates every request with the `x-paidy-signature` HMAC-SHA256 signature or, when no signature is sent, with the Paidy sender IP allowlist, and confirms an `authorize_success` with the Paidy API before completing the order. Previously anyone who knew an order number could mark a pending Paidy order as paid (#39)
+* Security - The onboarding key-delivery endpoint (`paidy-receiver/v1/receive`) now requires the one-time state token issued by the setup wizard or an HMAC-SHA256 signature, rejects callbacks for an application other than the current one, and processes each callback only once. Secret keys are no longer kept in the diagnostic `paidy_received_data` option or returned in the response (#41)
+* Security - The thank-you page confirms the transaction ID with the Paidy API (ID, order reference, amount and status) before completing the order, instead of trusting the `transaction_id` URL parameter (#42)
+* Security - The transaction ID is validated against the Paidy payment ID format and URL-encoded before it is put into the cancel, capture and refund API URLs. For an ID that does not match, no request is sent to Paidy and an order note is added (#45)
+* Fixed - Paidy payment verification always failed (HTTP 404) because `GET /payments/{id}` was sent as POST (#39)
+* Fixed - Paidy Checkout failed to open for orders with a zero-discount coupon such as free shipping, a line item whose product had been deleted, or a fee name containing a line break or backslash. The order items are now passed to Paidy as JSON (#45)
+* Fixed - A connection error or timeout on a cancel, capture or refund request caused a fatal error, and a refund answered without a status was recorded as refunded. These requests now count as successful only when Paidy returns the payment as closed (#45)
+* Fixed - Applying for Paidy again through the setup wizard sent the application without the site hash, so the API keys could not be delivered automatically (#45)
+* Fixed - Changing a Paidy order from Processing to Cancelled sent the cancel request to Paidy up to three times and left "cancellation not completed" order notes, and a capture, failed capture or refund was likewise sent more than once. These callbacks now run once per order status change (#42, #46)
+* Fixed - A second partial refund of a Paidy order failed, and changing a partly refunded order from Completed to Cancelled did not refund the rest. Every refund is now sent to Paidy, and the refund on cancellation refunds only the remaining amount and is recorded as a WooCommerce refund (#46)
+* Fixed - In the Checkout block, a customer who came back from Paidy Checkout after Paidy declined the payment saw no message, and the classic checkout showed it twice (#47)
+* Fixed - The Paidy payment script was printed twice on the order-pay page and the Paidy settings were saved twice, because the webhook endpoint created its own copy of the gateway on every request (#47)
+* Fixed - Signed Paidy webhooks in sandbox mode were verified with the live secret key instead of the test secret key (#47)
+* Fixed - With debug mode on, the URL of the capture request was not written to the log, unlike the cancel and refund requests (#47)
+* Fixed - A request that was running while the plugin was being updated could stop with a fatal error (#47)
+* Fixed - Unbalanced HTML in the admin-edited Paidy description duplicated the place-order row on every classic-checkout update (#42)
+* Fixed - The Paidy order lookup on the checkout picked up orders of unrelated guests; guest orders are no longer looked up, and the result for a logged-in customer is cached for 5 minutes (#42)
+* Fixed - `wizard=false` now shows the manual configuration fields of the Paidy gateway, and the wizard no longer rewrites the `pk_test_` prefix of the saved test public key (#41)
+* Dev - Removed `WC_Gateway_Paidy::checkout_reject_to_cancel()` and `WC_Paidy_Endpoint::$paidy`. The order status callbacks (capture, cancel, refund) and the checkout return handlers are registered once by `WC_Gateway_Paidy::register_order_status_hooks()` and `register_checkout_return_hooks()` instead of in the gateway constructor (#46, #47)
 
 = 1.5.2 - 2025-11-04 =
 * Fixed - Some bugs Fixed.
