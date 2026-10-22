@@ -97,8 +97,8 @@ composer check       # 上の 3 つをまとめて実行
 
 - **Copilot と Codex の 2 体**。Copilot の依頼は `gh pr edit <N> --repo SoftStepsEC/paidy-wc --add-reviewer @copilot`
 - **Codex は 2026-10-13 に接続**（組織 SoftStepsEC に GitHub App `chatgpt-codex-connector` をインストール。PR #46 で `@codex review` に応答し、
-  指摘なしなら「Didn't find any major issues 👍」のコメントを残す）。push 時の自動レビューは未確認なので、dev-cycle のゲートは
-  `request-gate-review.sh ... --request-codex` で `@codex review` も投稿する（自動レビューを確認できたら `--request-codex` を外す）
+  指摘なしなら「Didn't find any major issues 👍」のコメントを残す）。**push ごとに自動でレビューする**（PR #48 で 4 push すべてに
+  5 分以内に応答。指摘が無い回は 👍 のみ）。dev-cycle のゲートで `--request-codex` は不要
 - `.claude/**` / `docs/**` / `*.md` だけの PR は CI が走らない（`ci.yml` の `paths-ignore`）。`request-gate-review.sh` に `--wait-ci` を付けない
 - Copilot は「Needs a closer look・0 findings」でも総評文に実在する問題を書くことがある（PR #38 で 2 件とも実在）。
   総評は読み飛ばさず調査対象にする。`docs/review-baseline.md` / `review-backlog.md` に載っている事項は再対応しない
@@ -130,7 +130,7 @@ state token + 署名、サンクスページと Webhook の Paidy API での裏�
 2.9.18 の #244（`WC_Paidy_Endpoint` が自前のゲートウェイを作らない。一覧に無ければ Webhook 503 + 警告ログ、署名の鍵は保存済み設定から）・#247（キャプチャの `Send URL` ログ）・
 #248（拒否の通知をブロックチェックアウトにも 1 回だけ）・#266（フレームワーク文字列のクラス内移動。更新中の fatal 回避）と 2.9.19 の #268（ブロック対応ファイルの早期読み込み。同じく更新中の fatal 回避）は PR #47 で取り込み済み（2026-10-22 マージ）。
 内容と取り込まなかった箇所は `docs/sync-with-jp4wc.md` の「取り込み済み」「意図的な差分」。
-Phase 1 の残りは 1-5（2.0.0 リリース）。1-4 は 2.9.18 の同期で完了。
+1-5 は PR #48（2026-10-22 マージ）で 2.0.0 に bump 済み。残りはタグ push（`/release-bump tag 2.0.0`）。
 
 これらに触る変更では JP4WC 側の実装（HMAC 署名 + IP 許可リスト、state token + 署名、`^pay_[A-Za-z0-9_-]+$/D`）をそのまま取り込むこと。
 独自実装で再発明しない。
@@ -161,7 +161,12 @@ Phase 1 の残りは 1-5（2.0.0 リリース）。1-4 は 2.9.18 の同期で�
 - `.gitignore` は配布 ZIP から除外しない。配布に入れたくないものは `.distignore` にも書く（rsync `--exclude-from`）。
   `.gitattributes` の export-ignore とは一致していない（`src/`・`LICENSE` は `git archive` に入るが配布には入らない）ので、
   配布物の中身は `git archive` ではなく `bin/build-zip.sh` の ZIP で確かめる
-- `@since` は現行 Stable tag + 1（作業開始時の版ではない）。Copilot が指摘する
+- `@since` は現行 Stable tag + 1（作業開始時の版ではない）。Copilot が指摘する。リリース版を開発中の呼称から変えたとき（1.6.0 → 2.0.0）は
+  `@since`・「versions before x」コメント・テスト・docs を一括置換する（PR #48）
+- `readme.txt` の External Services は実コードから書く: API は操作ごとの headers / body（全経路 `Authorization: Bearer <秘密鍵>`、
+  金額を送るのは refund だけ）、`paidy_make_order()` の payload（注文 ID・ユーザー ID・注文履歴の要約まで）、`send_apply_data_to_wcartws()` の送信項目、
+  ゲートウェイ無効化後も呼ばれる経路。docs の要約を写さない（CLAUDE.md の「Basic 認証」が誤りで、Codex に 3 ラウンド指摘された）。
+  通信先・送信項目を変えたら readme と `docs/architecture.md` を更新する
 - ブロックチェックアウトの REST 検証は 1 ページ表示で複数回走る（`calc_totals` 等）。副作用のある処理はガードする
 - 翻訳 JSON のファイル名はビルド済みスクリプトのプラグイン相対パスの md5（`includes/gateways/paidy/assets/js/wizard/paidy.js` → `12e0aa1e…`）。
   出力パスを変えると JSON を作り直す必要がある（`update-i18n` スキル）
