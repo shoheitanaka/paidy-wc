@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Paidy for WooCommerce plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Paidy for WooCommerce 1.5.2\n"
+"Project-Id-Version: Paidy for WooCommerce 2.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/paidy-wc\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"

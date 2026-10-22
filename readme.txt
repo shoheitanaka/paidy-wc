@@ -39,7 +39,7 @@ Regardless of the customer's payment status, we guarantee payment to member stor
 2. Webhook method.
 3. Cooperation between Paidy and WooCommerce.
 
-= External Services =
+== External Services ==
 
 This plugin connects to the following third-party services:
 
