@@ -78,6 +78,18 @@ function wc_paidy_tests_load_plugins() {
 tests_add_filter( 'muplugins_loaded', 'wc_paidy_tests_load_plugins' );
 
 /**
+ * Record the files and classes loaded by the end of plugins_loaded, for
+ * test-paidy-load-at-plugins-loaded.php.
+ */
+function wc_paidy_tests_record_plugins_loaded_state() {
+	$GLOBALS['wc_paidy_tests_plugins_loaded_state'] = array(
+		'files'   => get_included_files(),
+		'classes' => get_declared_classes(),
+	);
+}
+tests_add_filter( 'plugins_loaded', 'wc_paidy_tests_record_plugins_loaded_state', PHP_INT_MAX );
+
+/**
  * Install WooCommerce tables and defaults once WordPress is loaded.
  */
 function wc_paidy_tests_install_woocommerce() {

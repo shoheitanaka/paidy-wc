@@ -39,8 +39,10 @@ JP4WC との配置の違いは [sync-with-jp4wc.md](sync-with-jp4wc.md) の対�
 2. `plugins_loaded`(0) `wc_paidy_plugin()`: `active_plugins` に WooCommerce があれば `WC_Paidy::get_instance()`、無ければ管理画面に通知
 3. `WC_Paidy::__construct()`: 定数（`WC_PAIDY_PLUGIN_URL` `WC_PAIDY_ASSETS_URL` `WC_PAIDY_BLOCKS_URL` `WC_PAIDY_ABSPATH`
    `WC_PAIDY_ASSETS_ABSPATH` `WC_PAIDY_PLUGIN_FILE` `JP4WC_PAIDY_FRAMEWORK_VERSION`）→ `init()`（`woocommerce_blocks_loaded` 登録）→
-   `includes()`: フレームワーク → `WC_Gateway_Paidy` → `WC_Paidy_Endpoint` を読み込み、**生成は `init`(11) に遅延**
-   （コンストラクタで `new WC_Gateway_Paidy()` が `__()` を呼ぶため。`init` 中・後に呼ばれたときは即時生成）→ `WC_Paidy_Apply_Admin_Dashboard`
+   `includes()`: フレームワーク → `WC_Gateway_Paidy`（`register_order_status_hooks()` と `register_checkout_return_hooks()` で静的ハンドラを 1 回登録）→
+   `WC_Paidy_Endpoint` を読み込み、**生成は `init`(11) に遅延**（フレームワークのインスタンスは `init` 中・後に作るとその場で `__()` の文字列を読む。それより前なら `init` 2 に遅延する。`init` 中・後に呼ばれたときは即時生成。
+   ゲートウェイは作らず、必要なときに `WC_Gateway_Paidy::get_registered_instance()` で WooCommerce の一覧から取る。JP4WC #244）→ `WC_Paidy_Apply_Admin_Dashboard`
+   → ブロック決済サポートのファイルを読み込む（登録は `init` の `woocommerce_blocks_payment_method_type_registration` で、クラスがあるときだけ。JP4WC #268）
    → `init`(10) で `load_plugin_textdomain( 'paidy-wc', false, '<dir>/i18n' )` → `init`(11) で `new WC_Paidy_Endpoint()`
 4. `woocommerce_blocks_loaded` → `woocommerce_blocks_payment_method_type_registration` で `WC_Payments_Paidy_Blocks_Support` 登録
 
@@ -53,14 +55,17 @@ JP4WC との配置の違いは [sync-with-jp4wc.md](sync-with-jp4wc.md) の対�
    （`"0.00"` も数値で比較）は入れない（JP4WC 2.9.17 / #232）
    `_billing_yomigana_*`（JP4WC の読み仮名）があれば `name2` に渡す
 3. 認証成功 → JS が `get_return_url()` + `&transaction_id=pay_...` へ遷移（`esc_url()` しない。意図的な差分 12）→
-   サンクスページ `woocommerce_thankyou_paidy` → `thankyou_completed()`: 注文が `pending` / `cancelled` で `transaction_id` が未設定のときだけ、
+   サンクスページ `woocommerce_thankyou_paidy` → 静的 `handle_thankyou()`（一覧のインスタンスが無ければ警告ログだけ）→ `thankyou_completed()`: 注文が `pending` / `cancelled` で `transaction_id` が未設定のときだけ、
    `?transaction_id=`（購入者が書き換えられる）を `paidy_verify_payment_for_order()`（下記 4 と同じ裏取り）で確かめてから
    在庫を引き `payment_complete( $transaction_id )`。裏取りに失敗したら何もしない（注文は Webhook で完了する）。
-   失敗/クローズ → チェックアウトへ戻る。`checkout_reject_to_cancel()`（`woocommerce_before_checkout_form`）は
-   `?status=closed` ならデバッグログだけ、`?status=rejected`（または `order_id` 付き）なら「別の支払い方法を選んで」のエラー通知を出す（注文はキャンセルしない）
+   失敗/クローズ → チェックアウトへ戻る（`wc_get_checkout_url()?status=…&order_id=…`）。静的 `handle_checkout_return()`（`template_redirect`。`is_checkout()` かつエンドポイントでないとき）は
+   `?status=closed` ならデバッグログだけ、`?status=rejected` なら「別の支払い方法を選んで」のエラー通知を出す（注文はキャンセルしない）。クラシックは `wc_add_notice()`、
+   ブロックチェックアウト（`CartCheckoutUtils::is_checkout_block_default()`、`jp4wc_paidy_is_block_checkout` フィルタ）は `wp_enqueue_scripts` の
+   `enqueue_block_checkout_reject_notice()` がインラインスクリプトで `core/notices` の `wc/checkout` コンテキストに `createErrorNotice`（JP4WC #248）
 4. Paidy Webhook `POST /wp-json/paidy/v1/order`（`payment_id`, `order_ref`, `status`）:
    - 認証 `paidy_webhook_permission_check()`: `x-paidy-signature` があれば body の HMAC-SHA256 を秘密鍵で検証
-     （`environment` が `live` なら `api_secret_key`、それ以外は `test_api_secret_key`。ゲートウェイの `set_api_secret_key()` と同じ判定）。
+     （`environment` が `live` なら `api_secret_key`、それ以外は `test_api_secret_key`。ゲートウェイの `set_api_secret_key()` と同じ判定。
+     鍵と `debug` は `get_option( 'woocommerce_paidy_settings' )` から読み、認証の段階ではゲートウェイ一覧を読み込まない）。
      署名が無ければ `REMOTE_ADDR` を Paidy 公式の送信元 IP（`WC_Paidy_Endpoint::PAIDY_WEBHOOK_IPS`、`paidy_webhook_allowed_ips` フィルタ）と照合。
      `X-Forwarded-For` は `paidy_trust_proxy_headers` フィルタで明示的に有効にしたときだけ使う。フィルタで許可リストを空にすると検証なしで通す
    - 注文の `payment_method` が `paidy` でなければ 403
@@ -119,7 +124,7 @@ Paidy API は `https://api.paidy.com/`、認証は `Authorization: Bearer <secre
 
 | ルート | クラス | 認証（現状 → JP4WC） | 用途 |
 |--------|--------|---------------------|------|
-| `POST paidy/v1/order` | `WC_Paidy_Endpoint::paidy_check_webhook` | HMAC 署名 or IP 許可リスト（`paidy_webhook_permission_check`。JP4WC と同じ） | Paidy Webhook |
+| `POST paidy/v1/order` | `WC_Paidy_Endpoint::paidy_check_webhook` | HMAC 署名 or IP 許可リスト（`paidy_webhook_permission_check`。JP4WC と同じ）。認証後、Paidy が WooCommerce の一覧に無ければ 503 `paidy_gateway_unavailable`（Paidy は 200 以外で再送する） | Paidy Webhook |
 | `POST paidy/v1/check` | `WC_Paidy_Endpoint::paidy_regist_webhook` | `__return_true`（JP4WC も同じ。呼び出し元は paidy.artws.info で状態を変えない） | Webhook 登録確認 |
 | `GET, POST paidy-receiver/v1/receive` | `WC_Paidy_Apply_Receiver::handle_receive_data` | state token か body の HMAC 署名 + application_id 一致（`check_permissions`。JP4WC と同じ） | 申込結果・鍵配信 |
 

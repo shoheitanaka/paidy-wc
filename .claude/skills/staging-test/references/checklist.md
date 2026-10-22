@@ -57,11 +57,11 @@ T5 のために **同じ手順をもう 1 回** 行い、2 件目の成功注文
 **期待する結果**
 - Paidy 側の拒否画面（ここまでで Paidy の判定は PASS）
 - チェックアウト上部にエラー通知 `This Paidy payment has been declined. Please select another payment method.`
-  （このPaidyでのお支払いは拒否されました。別のお支払い方法を選択してください。`checkout_reject_to_cancel()`）。
-  **既知: ブロックチェックアウトでは出ない（B-60）。ショートコードのチェックアウトでは出るが 2 件重複する（B-61 = JP4WC #244）。**
-  直るまでは「ブロックで通知なし / ショートコードで 2 件」が現状の期待値。変わっていたら直った印
+  （このPaidyでのお支払いは拒否されました。別のお支払い方法を選択してください。`handle_checkout_return()`。1.5.2 では `checkout_reject_to_cancel()`）。
+  1.5.2 の ZIP（`9d347a9`）では、ブロックチェックアウトでは出ず（B-60）、ショートコードでは 2 件重複した（B-61 = JP4WC #244）。
+  JP4WC 2.9.18 を同期した版（`fix/sync-jp4wc-2.9.18` 以降）では **両方で 1 件**が期待値（ブロックは `core/notices` の `wc/checkout` に出るエラー通知）
 - 戻り先はモーダルなしで再現できる: `checkout/?add-to-cart=<id>&status=rejected&order_id=<N2>`（ブロック）とショートコードのページに
-  `?status=rejected&order_id=<N2>`。カートが空だとフックが動かないので 1 点入れ、確認後に Store API `cart/remove-item` で戻す
+  `?status=rejected&order_id=<N2>`。1.5.2 の実装はカートが空だとフックが動かなかったので 1 点入れ、確認後に Store API `cart/remove-item` で戻す（1.6.0 以降は `template_redirect` で動くのでカートは不要）
 - 注文 N2 は **支払い待ち** のまま、取引 ID なし、在庫は減っていない（在庫は `payment_complete()` 前には引かない）
 - ログに `Once the customer interrupted the payment..` は **出ない**（これは `status=closed`、購入者がモーダルを閉じたとき）
 

@@ -1,5 +1,14 @@
 <?php
 /**
+ * Framework strings for the framework class of 1.5.2 and earlier.
+ *
+ * This version does not load this file: its strings are in
+ * JP4WC_Framework::get_text_config(). The class of 1.5.2 and earlier requires
+ * this file at init, so a request that loaded that class before the plugin was
+ * updated still requires it after the update (Japanized for WooCommerce issue #266). Keep the file until
+ * updates from those versions are rare. It does not need to follow changes to
+ * the strings in the class.
+ *
  * Plugin Name: Paidy for WooCommerce
  * Framework Name: Artisan Workshop FrameWork for WooCommerce
  * Framework Version : 2.0.14

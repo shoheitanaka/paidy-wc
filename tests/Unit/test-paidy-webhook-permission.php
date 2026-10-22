@@ -515,7 +515,7 @@ class WC_Paidy_Webhook_Permission_Test extends WP_UnitTestCase {
 			'status' => 'authorized',
 		);
 
-		$this->assertNull( $endpoint->paidy->paidy_get_payment_data( self::PAYMENT_ID ) );
+		$this->assertNull( ( new WC_Gateway_Paidy() )->paidy_get_payment_data( self::PAYMENT_ID ) );
 		$this->assertSame( array( 'GET' ), $this->requested_methods );
 	}
 
