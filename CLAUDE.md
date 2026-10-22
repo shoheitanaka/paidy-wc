@@ -51,7 +51,7 @@ composer check       # 上の 3 つをまとめて実行
 ```
 
 - PHPCS の警告（フレームワークの `base64_*` 2 件）は `docs/review-baseline.md` で把握済み。**新しい警告は増やさない**
-- PHPStan の baseline（34 件）はレガシーコード専用。新規コードのエラーを baseline に追加しない。
+- PHPStan の baseline（33 件）はレガシーコード専用。新規コードのエラーを baseline に追加しない。
   JP4WC からファイルを同期したら、**再生成の前に** `composer phpstan` で `Ignored error pattern …` 以外のエラーが 0 件であることを
   確かめてから `composer phpstan:baseline` で再生成し、件数が減ったことを確認する（再生成は新しいエラーも吸収して exit 0 になる。PR #40 で実測）。
   baseline を include したまま同じファイルへ再生成してよい（PHPStan は生成先を include から除外する。PR #38 で検証済み。
@@ -127,8 +127,10 @@ JP4WC 2.9.0〜2.9.16 の Paidy のセキュリティ修正は 1-1〜1-3（PR #39
 state token + 署名、サンクスページと Webhook の Paidy API での裏取り）。JP4WC 2.9.17（#231〜#234: close / capture / refund の
 `transaction_id` 検証と応答の判定、Paidy Checkout の items の JSON 化、再申込の `site_hash`）も PR #45 で取り込み済み。
 同じ 2.9.17 の #241（注文状態のコールバックを静的ハンドラで 1 回だけ登録）・#243（2 回目以降の返金と取消時の残額返金）は PR #46 で取り込み済み。
+2.9.18 の #244（`WC_Paidy_Endpoint` が自前のゲートウェイを作らない。一覧に無ければ Webhook 503 + 警告ログ、署名の鍵は保存済み設定から）・#247（キャプチャの `Send URL` ログ）・
+#248（拒否の通知をブロックチェックアウトにも 1 回だけ）・#266（フレームワーク文字列のクラス内移動。更新中の fatal 回避）と 2.9.19 の #268（ブロック対応ファイルの早期読み込み。同じく更新中の fatal 回避）はブランチ `fix/sync-jp4wc-2.9.18` で取り込み（2026-10-22）。
 内容と取り込まなかった箇所は `docs/sync-with-jp4wc.md` の「取り込み済み」「意図的な差分」。
-Phase 1 の残りは 1-4（ブロック対応の fatal 回避）と 1-5（1.6.0 リリース）。
+Phase 1 の残りは 1-5（1.6.0 リリース）。1-4 は 2.9.18 の同期で完了。
 
 これらに触る変更では JP4WC 側の実装（HMAC 署名 + IP 許可リスト、state token + 署名、`^pay_[A-Za-z0-9_-]+$/D`）をそのまま取り込むこと。
 独自実装で再発明しない。
@@ -140,16 +142,17 @@ Phase 1 の残りは 1-4（ブロック対応の fatal 回避）と 1-5（1.6.0 
 - `WP_REST_Request::get_body()` は body が無いと `null`（`''` ではない）。`empty()` で判定する
 - `get_param()` / `get_params()` の優先順は JSON（Content-Type が JSON のときだけ）→ POST（POST/PUT/PATCH/DELETE のときだけ）→ クエリ。
   `GET` に form-encoded の body を付けるとクエリが body に勝つ。署名検証する値は `get_json_params()` / `get_body_params()` からだけ読む
-- `WC_Gateway_Paidy` を `init` より前に生成すると `_load_textdomain_just_in_time` 警告（WP 6.7+）。`WC_Paidy_Endpoint` は
-  コンストラクタでゲートウェイを作るので `init` 11 で生成している（`class-wc-paidy.php`）。`plugins_loaded` で生成する処理を足さない
+- `WC_Gateway_Paidy` を `init` より前に生成すると `_load_textdomain_just_in_time` 警告（WP 6.7+）。`WC_Paidy_Endpoint` はゲートウェイを作らなくなった
+  （JP4WC #244。`WC_Gateway_Paidy::get_registered_instance()` で WooCommerce の一覧から取る）が、フレームワークのインスタンスは `init` 中・後に作ると
+  その場で翻訳を読む（それより前なら `init` 2 に遅延）ので、`init` 11 のまま（`class-wc-paidy.php`）。`plugins_loaded` で生成する処理を足さない。`new WC_Gateway_Paidy()` を本体コードに足さない（フックが二重登録される）
 - JP4WC のコードにもバグはある。Webhook 署名の鍵選択が存在しない `testmode` 設定を見ていた（実際は `environment`）。
   取り込むときは設定名・プロパティ名が paidy-wc のゲートウェイに実在するかを確かめ（`sync-from-jp4wc` 同梱の `check-setting-keys.php` で照合できる）、
   直したら `docs/sync-with-jp4wc.md` の「意図的な差分」に書く。ファイルごと置き換えるときも hunk ごとに main と比べる。PR #42 では
   返金のガード（部分返金が失敗）、`<script>` 内の `esc_url()`（`&` が `&#038;` になりサンクスページに着かない）、説明文の保存時の狭い kses
   （ブロックチェックアウトは `paidy_description` を `RawHTML` で生表示するので画像が消える）が悪化だった。悪化する hunk は取り込まず、差分に書いて JP4WC に Issue
-- ゲートウェイは 1 リクエストで複数回生成される（WooCommerce の決済方法一覧・`WC_Paidy_Endpoint`）ので、コンストラクタの `add_action()` は
-  インスタンスごとに登録される。注文状態のコールバック（キャプチャ・close・返金）は `register_order_status_hooks()` の静的ハンドラで
-  1 回だけ登録する（JP4WC #241）。コンストラクタに副作用のある action を足さない。`process_refund()` は action ではなく WooCommerce が
+- ゲートウェイは WooCommerce の決済方法一覧以外でも生成され得る（`paidy_redirect_to_wizard()` の 1 回、テスト）ので、コンストラクタの `add_action()` は
+  インスタンスごとに登録される。注文状態のコールバック（キャプチャ・close・返金）は `register_order_status_hooks()`、拒否の通知とサンクスページの完了は
+  `register_checkout_return_hooks()` の静的ハンドラで 1 回だけ登録する（JP4WC #241・#248）。コンストラクタに副作用のある action を足さない。`process_refund()` は action ではなく WooCommerce が
   返金 1 回につき 1 回呼ぶ（重複ガードを入れると部分返金が壊れる）
 - `class_exists()` は `use` エイリアスを解決しない。常に完全修飾名を渡す
 - 管理者が入力した説明文 HTML は `wp_kses( force_balance_tags( $html ), $allowed )` で出力（閉じタグ漏れで注文ボタンが重複した実例）

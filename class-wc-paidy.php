@@ -89,10 +89,15 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 			require_once __DIR__ . '/includes/gateways/paidy/class-wc-gateway-paidy.php';
 			// Capture, cancel and refund at Paidy once per order status change.
 			WC_Gateway_Paidy::register_order_status_hooks();
+			// Show the "declined" notice when the buyer returns from Paidy Checkout, and complete
+			// the order on the thank-you page, each once.
+			WC_Gateway_Paidy::register_checkout_return_hooks();
 
 			// Endpoints.
-			// Instantiated at init priority 11 (after load_plugin_textdomain at priority 10)
-			// to avoid _load_textdomain_just_in_time warning from WC_Gateway_Paidy::__construct().
+			// The endpoint registers its REST routes, so it must exist before rest_api_init, and
+			// takes the gateway from WooCommerce's list when a request needs it. Its framework
+			// instance loads translated strings at once when created during init, so keep it
+			// after load_plugin_textdomain (init priority 10); init priority 11 is kept as it was.
 			if ( ! class_exists( 'WC_Paidy_Endpoint' ) ) {
 				require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-endpoint.php';
 				if ( did_action( 'init' ) || doing_action( 'init' ) ) {
@@ -112,6 +117,13 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 			if ( ! class_exists( 'WC_Paidy_Apply_Admin_Dashboard' ) ) {
 				require_once __DIR__ . '/includes/gateways/paidy/class-wc-paidy-apply-admin-dashboard.php';
 				new WC_Paidy_Apply_Admin_Dashboard();
+			}
+
+			// Block checkout support, registered in wc_paidy_blocks_support() when WooCommerce
+			// registers payment methods at init. Loaded here because a plugin update can remove
+			// the plugin directory by then (Japanized for WooCommerce issue #268).
+			if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+				require_once __DIR__ . '/includes/gateways/paidy/class-wc-payments-paidy-blocks-support.php';
 			}
 		}
 
@@ -140,8 +152,11 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 				add_action(
 					'woocommerce_blocks_payment_method_type_registration',
 					function ( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
-						require_once 'includes/gateways/paidy/class-wc-payments-paidy-blocks-support.php';
-						$payment_method_registry->register( new WC_Payments_Paidy_Blocks_Support() );
+						// Defensive: includes() loads the file; skip the registration if it did not
+						// (a request whose files are of mixed versions during an update or rollback).
+						if ( class_exists( 'WC_Payments_Paidy_Blocks_Support', false ) ) {
+							$payment_method_registry->register( new WC_Payments_Paidy_Blocks_Support() );
+						}
 					}
 				);
 			}
