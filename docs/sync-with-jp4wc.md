@@ -10,7 +10,7 @@
 | ローカル | `~/Dev/Japanized-for-WooCommerce` | `~/Dev/paidy-wc` |
 | GitHub | artisanworkshop/Japanized-for-WooCommerce | SoftStepsEC/paidy-wc（`upstream`）/ shoheitanaka/paidy-wc（`origin`） |
 | テキストドメイン | `woocommerce-for-japan` | `paidy-wc` |
-| バージョン（2026-10-22） | 2.9.19（タグ済み。`upstream/main` は `d0cb67d`） | 2.0.0（PR #48 で bump 済み。タグは未 push） |
+| バージョン（2026-10-22） | 2.9.19（タグ済み。`upstream/main` は `d0cb67d`） | 2.0.0（2026-10-22 タグ済み） |
 
 ## ファイル対応表
 

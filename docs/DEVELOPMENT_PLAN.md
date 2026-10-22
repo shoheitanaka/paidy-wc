@@ -51,7 +51,7 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
       `test-paidy-thankyou-verification.php` `test-paidy-capture-refund.php`（新規）
 - [x] **1-4 ブロック対応の fatal 回避**（`class-wc-payments-paidy-blocks-support.php`、2.9.5。2.9.18・2.9.19 の同期（ブランチ `fix/sync-jp4wc-2.9.18`、PR #47、2026-10-22 マージ）で取り込み。同じ 2.9.5 の `paidy_redirect_to_wizard()` の
       `class_exists` ガードは #241 の同期で取り込み済み）
-- [ ] **1-5 リリース 2.0.0**: `release-bump` スキル。changelog は JP4WC の Security 行を流用。開発者向けに「`WC_Gateway_Paidy::checkout_reject_to_cancel()` と `WC_Paidy_Endpoint::$paidy` を削除」を書く（2.9.18 の同期 R1-L8）。`readme.txt` に External Services（B-6）を
+- [x] **1-5 リリース 2.0.0**（タグ `2.0.0` を 2026-10-22 に push。WordPress.org SVN `tags/2.0.0` と GitHub Release を確認）: `release-bump` スキル。changelog は JP4WC の Security 行を流用。開発者向けに「`WC_Gateway_Paidy::checkout_reject_to_cancel()` と `WC_Paidy_Endpoint::$paidy` を削除」を書く（2.9.18 の同期 R1-L8）。`readme.txt` に External Services（B-6）を
       この時点で入れる。→ 2.0.0 の release PR（ブランチ `release/2.0.0`、2026-10-22）で changelog 19 行・External Services・未リリース版 `1.6.0` の `2.0.0` への置換を実施。
       リリース前に JP4WC で直してから同期するとした 4 件（2026-10-10 に JP4WC へ起票）は、JP4WC 2.9.17 で直り、
       2026-10-12 に同期した（ブランチ `fix/sync-jp4wc-2.9.17`、PR #45、2026-10-13 マージ。B-19・B-26・B-39・B-42・B-43 が解消）:
