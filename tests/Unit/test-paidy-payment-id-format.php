@@ -13,7 +13,7 @@
  *
  * Cancellation, capture and refund put the order's transaction ID into the URL
  * of a request that carries the secret key, and that ID is not guaranteed to be
- * one Paidy issued: versions before 1.6.0 saved the thank-you URL parameter
+ * one Paidy issued: versions before 2.0.0 saved the thank-you URL parameter
  * unverified, and it can be edited on the order screen (Japanized for
  * WooCommerce issue #233). They use the same check, so the same providers
  * cover them.

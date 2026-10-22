@@ -71,7 +71,7 @@ class WC_Paidy_Upgrade_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Versions before 1.6.0 recorded no version, so an upgrade from them fires the action.
+	 * Versions before 2.0.0 recorded no version, so an upgrade from them fires the action.
 	 */
 	public function test_fires_when_no_version_is_recorded() {
 		delete_option( 'paidy_wc_version' );
@@ -121,7 +121,7 @@ class WC_Paidy_Upgrade_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The upgrade redacts the secret keys a pre-1.6.0 callback stored in plaintext.
+	 * The upgrade redacts the secret keys a pre-2.0.0 callback stored in plaintext.
 	 */
 	public function test_upgrade_redacts_plaintext_secrets() {
 		update_option(

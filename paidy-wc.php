@@ -155,13 +155,13 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 	 * Fire the upgrade action once after the plugin is installed or updated.
 	 *
 	 * Compares the version recorded in the paidy_wc_version option with
-	 * WC_PAIDY_VERSION. Versions before 1.6.0 never recorded one, so an
+	 * WC_PAIDY_VERSION. Versions before 2.0.0 never recorded one, so an
 	 * upgrade from them looks the same as a fresh install; both fire the
 	 * action, and listeners must therefore be idempotent. A downgrade only
 	 * records the version. Hooked to 'init' at priority 5 so it runs before
 	 * the receiver is set up (priority 10).
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return void
 	 */
@@ -180,7 +180,7 @@ if ( ! class_exists( 'WC_Paidy' ) ) :
 		/**
 		 * Fires once after Paidy for WooCommerce is installed or updated.
 		 *
-		 * @since 1.6.0
+		 * @since 2.0.0
 		 *
 		 * @param string|false $previous_version Version recorded before this request, or false if none was.
 		 */

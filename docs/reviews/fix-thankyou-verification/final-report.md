@@ -18,7 +18,7 @@
 | 42b1b46 | docs: record the Phase 1-3 gateway sync |
 | f2695c4 | fix: keep the Paidy description markup on save（R1-1） |
 | dfd3f65 / 678b379 / 4531e72 | docs: review-loop R1・R2 の記録 |
-| 5666d3d | docs: keep B-19 open for transaction IDs stored before 1.6.0（G1-1 の記述訂正） |
+| 5666d3d | docs: keep B-19 open for transaction IDs stored before 2.0.0（G1-1 の記述訂正） |
 | c728126 / 579fc33 | docs: record dev-cycle gate round 1 / 2 |
 
 - 設計ドキュメント・計画からの逸脱: 説明文の保存時検証 `validate_paidy_description_field()` は取り込まなかった。review-loop R1-1 でユーザーが判断した（意図的な差分 14 / B-41）。保存時検証は、ブロックチェックアウトに表示する Paidy 画像を保存のたびに消すため。
@@ -74,7 +74,7 @@ Codex は未接続のため、ゲートの対象外（CLAUDE.md）。
   これらは自動テストとミューテーションで確認済み
 
 ## 次にできること（人間の判断）
-- 1.6.0 のリリース前（1-5）に、差分外で見つかった次の High の既存バグを JP4WC で直して同期するか判断する。
+- 2.0.0 のリリース前（1-5）に、差分外で見つかった次の High の既存バグを JP4WC で直して同期するか判断する。
   - **B-42**: 通信エラーで返金・キャプチャが fatal になる。5xx の応答で返金済みと誤記録する。
   - **B-43**: 送料無料クーポンなどで Paidy Checkout が起動しない。
   - **B-19**: 旧版で保存された `transaction_id` が API の URL に入る。

@@ -61,7 +61,7 @@ T5 のために **同じ手順をもう 1 回** 行い、2 件目の成功注文
   1.5.2 の ZIP（`9d347a9`）では、ブロックチェックアウトでは出ず（B-60）、ショートコードでは 2 件重複した（B-61 = JP4WC #244）。
   JP4WC 2.9.18 を同期した版（`fix/sync-jp4wc-2.9.18` 以降）では **両方で 1 件**が期待値（ブロックは `core/notices` の `wc/checkout` に出るエラー通知）
 - 戻り先はモーダルなしで再現できる: `checkout/?add-to-cart=<id>&status=rejected&order_id=<N2>`（ブロック）とショートコードのページに
-  `?status=rejected&order_id=<N2>`。1.5.2 の実装はカートが空だとフックが動かなかったので 1 点入れ、確認後に Store API `cart/remove-item` で戻す（1.6.0 以降は `template_redirect` で動くのでカートは不要）
+  `?status=rejected&order_id=<N2>`。1.5.2 の実装はカートが空だとフックが動かなかったので 1 点入れ、確認後に Store API `cart/remove-item` で戻す（2.0.0 以降は `template_redirect` で動くのでカートは不要）
 - 注文 N2 は **支払い待ち** のまま、取引 ID なし、在庫は減っていない（在庫は `payment_complete()` 前には引かない）
 - ログに `Once the customer interrupted the payment..` は **出ない**（これは `status=closed`、購入者がモーダルを閉じたとき）
 

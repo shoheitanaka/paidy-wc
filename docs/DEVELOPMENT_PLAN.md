@@ -7,7 +7,7 @@
 
 - JP4WC（Japanized for WooCommerce 2.9.17）が Paidy モジュールの最新。**独自実装より JP4WC からの取り込みを優先**する
   （[sync-with-jp4wc.md](sync-with-jp4wc.md)）
-- セキュリティ修正（Phase 1）を他のすべてに優先し、1.6.0 としてリリースする
+- セキュリティ修正（Phase 1）を他のすべてに優先し、2.0.0 としてリリースする
 - 1 PR = 1 フェーズの 1 ステップ。品質ツール（`composer check`）が緑であることを PR の前提にする
 
 ## Phase 0 — 開発基盤（PR #38、2026-10-09 マージ）
@@ -21,7 +21,7 @@
 - [x] `.gitignore` / `.distignore` / `.gitattributes` に開発ファイルを追加
 - [x] `CLAUDE.md` / `AGENTS.md` / `docs/` / `.claude/skills/{sync-from-jp4wc,update-i18n}`
 
-## Phase 1 — セキュリティ同期（1.6.0）
+## Phase 1 — セキュリティ同期（2.0.0）
 
 JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、依存順）:
 
@@ -51,7 +51,7 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
       `test-paidy-thankyou-verification.php` `test-paidy-capture-refund.php`（新規）
 - [x] **1-4 ブロック対応の fatal 回避**（`class-wc-payments-paidy-blocks-support.php`、2.9.5。2.9.18・2.9.19 の同期（ブランチ `fix/sync-jp4wc-2.9.18`、PR #47、2026-10-22 マージ）で取り込み。同じ 2.9.5 の `paidy_redirect_to_wizard()` の
       `class_exists` ガードは #241 の同期で取り込み済み）
-- [ ] **1-5 リリース 1.6.0**: `release-bump` スキル。changelog は JP4WC の Security 行を流用。開発者向けに「`WC_Gateway_Paidy::checkout_reject_to_cancel()` と `WC_Paidy_Endpoint::$paidy` を削除」を書く（2.9.18 の同期 R1-L8）。`readme.txt` に External Services（B-6）を
+- [ ] **1-5 リリース 2.0.0**: `release-bump` スキル。changelog は JP4WC の Security 行を流用。開発者向けに「`WC_Gateway_Paidy::checkout_reject_to_cancel()` と `WC_Paidy_Endpoint::$paidy` を削除」を書く（2.9.18 の同期 R1-L8）。`readme.txt` に External Services（B-6）を
       この時点で入れてもよい。
       リリース前に JP4WC で直してから同期するとした 4 件（2026-10-10 に JP4WC へ起票）は、JP4WC 2.9.17 で直り、
       2026-10-12 に同期した（ブランチ `fix/sync-jp4wc-2.9.17`、PR #45、2026-10-13 マージ。B-19・B-26・B-39・B-42・B-43 が解消）:
@@ -59,7 +59,7 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
       B-19 → #233（旧版で保存された未検証の `transaction_id` が API の URL に入る）、B-26 → #234（再申込時に `site_hash` が未定義）。
       JP4WC 2.9.17 の残り 2 件（#241: 注文状態のコールバック（キャプチャ・close・返金）を静的ハンドラで 1 回だけ登録、#243: 2 回目以降の返金と
       取消時の残額返金）は 2026-10-13 に同期した（ブランチ `fix/sync-jp4wc-order-status-hooks`、PR #46、2026-10-14 マージ。B-12・B-18・B-36・B-40 と B-53 の返金部分が解消）。
-      changelog には JP4WC 2.9.17 の Paidy の 7 行を流用する（#223 の行の修正は 1-1 で取り込み済みで、1.6.0 が最初のリリース）。
+      changelog には JP4WC 2.9.17 の Paidy の 7 行を流用する（#223 の行の修正は 1-1 で取り込み済みで、2.0.0 が最初のリリース）。
       仲介サーバー（paidy.artws.info）が paidy-wc のサイトへ署名付き（`x-paidy-receiver-signature`）でコールバックを送ることを確かめる
       （1.5.2 から出した審査中の申込は state token を持たず、署名経路でしか通らない）
 

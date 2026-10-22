@@ -12,7 +12,7 @@
 |---|---|
 | dd482bf | fix(security): authenticate the Paidy onboarding receiver |
 | 6da05a8 | fix(security): send a state token and record the application ID from the wizard |
-| 0e562ef | fix: redact secret keys stored before 1.6.0 once after an upgrade |
+| 0e562ef | fix: redact secret keys stored before 2.0.0 once after an upgrade |
 | 5703740 | fix: delete the receiver's option rows on uninstall |
 | e0aa8d9 | chore(i18n): regenerate the POT for the receiver messages |
 | df6d2cc | docs: record the Phase 1-2 receiver authentication sync |
@@ -58,6 +58,6 @@ Codex は未接続（CLAUDE.md）。
 ## 次にできること（人間の判断）
 - **マージ前の確認**: 仲介サーバー（paidy.artws.info）が paidy-wc のサイトにも `state` を返し、`x-paidy-receiver-signature` /
   `-timestamp` を付けてコールバックを送っていること（G3 の Copilot 本文も同じ確認を求めている）
-- **B-26（High、差分外）**: 再申込で `site_hash` が送られない。main・JP4WC とも同じ。JP4WC で直してから同期（1.6.0 のリリース前に検討）
+- **B-26（High、差分外）**: 再申込で `site_hash` が送られない。main・JP4WC とも同じ。JP4WC で直してから同期（2.0.0 のリリース前に検討）
 - 保留分（B-31〜B-34）は JP4WC へ PR してから同期。個別に直す場合は `/dev-cycle fix G1-1` など
 - マージ（GitHub 上で人間が行う）→ マージ後は `/post-merge`
