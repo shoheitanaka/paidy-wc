@@ -113,7 +113,7 @@ composer check       # 上の 3 つをまとめて実行
   → `init` で `WC_Paidy_Apply_Receiver`・textdomain → `woocommerce_blocks_loaded` でブロック決済を登録
 - REST ルート: `paidy/v1/order`（Paidy Webhook）、`paidy/v1/check`（paidy.artws.info からの Webhook 登録確認）、
   `paidy-receiver/v1/receive`（申込仲介サーバーからの API キー配信）
-- 外部サービス: `api.paidy.com`（決済 API・Basic 認証 = 秘密鍵）、`apps.paidy.com`（チェックアウト JS）、
+- 外部サービス: `api.paidy.com`（決済 API。`Authorization: Bearer <秘密鍵>`）、`apps.paidy.com`（チェックアウト JS）、
   `paidy.artws.info`（Artisan Workshop の加盟店申込仲介）。3 つとも `readme.txt` の `== External Services ==` に開示済み（2.0.0）
 - オプション: ゲートウェイ設定 `woocommerce_paidy_settings`、オンボーディング `woocommerce_paidy_on_boarding_settings`、
   `paidy_site_hash`、`paidy_received_data`（秘密鍵は伏せ字）、`paidy_application_id`、`paidy_wc_version`（`paidy_wc_check_version()` が記録）、
