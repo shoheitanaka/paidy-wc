@@ -39,6 +39,14 @@ Regardless of the customer's payment status, we guarantee payment to member stor
 2. Webhook method.
 3. Cooperation between Paidy and WooCommerce.
 
+= External Services =
+
+This plugin connects to the following third-party services:
+
+* **Paidy payment API** (api.paidy.com) — used by the Paidy payment gateway to verify a payment after checkout and to capture, cancel and refund it when the order status changes. The Paidy payment ID, the order amount and the merchant's Paidy secret key are sent. Only active for orders paid with Paidy while the gateway is enabled. See [Paidy's terms of service](https://terms.paidy.com/) and privacy policy on Paidy's own site.
+* **Paidy Checkout** (apps.paidy.com) — the Paidy Checkout script is loaded in the customer's browser on the order-pay page whenever this plugin is active. Order data is passed to it only when the customer pays with Paidy and the gateway is enabled: the order items and amount, the customer's name, e-mail address, phone number and shipping address, a summary of the customer's order history in this store (number of orders, total spent, amount and date of the last order), and the merchant's Paidy public key are sent to Paidy to start the payment.
+* **Artisan Workshop Paidy onboarding intermediary** (paidy.artws.info) — used only while applying for a Paidy merchant account through this plugin's setup wizard (available before the gateway is enabled, since onboarding is how it becomes eligible to be enabled). Submitting the application form sends the store's site name and URL, the merchant's contact details (e-mail, phone), the representative's name and date of birth, the submitted screening survey answers, a site-specific verification hash and the plugin version to this Artisan Workshop-operated intermediary, which relays the application to Paidy and later delivers the issued API credentials back to the site. The intermediary also calls the site once to confirm that the Paidy webhook URL is reachable.
+
 == Installation ==
 
 Implement postpaid payment in WooCommerce with Paidy.

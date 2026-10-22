@@ -52,7 +52,7 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
 - [x] **1-4 ブロック対応の fatal 回避**（`class-wc-payments-paidy-blocks-support.php`、2.9.5。2.9.18・2.9.19 の同期（ブランチ `fix/sync-jp4wc-2.9.18`、PR #47、2026-10-22 マージ）で取り込み。同じ 2.9.5 の `paidy_redirect_to_wizard()` の
       `class_exists` ガードは #241 の同期で取り込み済み）
 - [ ] **1-5 リリース 2.0.0**: `release-bump` スキル。changelog は JP4WC の Security 行を流用。開発者向けに「`WC_Gateway_Paidy::checkout_reject_to_cancel()` と `WC_Paidy_Endpoint::$paidy` を削除」を書く（2.9.18 の同期 R1-L8）。`readme.txt` に External Services（B-6）を
-      この時点で入れてもよい。
+      この時点で入れる。→ 2.0.0 の release PR（ブランチ `release/2.0.0`、2026-10-22）で changelog 19 行・External Services・未リリース版 `1.6.0` の `2.0.0` への置換を実施。
       リリース前に JP4WC で直してから同期するとした 4 件（2026-10-10 に JP4WC へ起票）は、JP4WC 2.9.17 で直り、
       2026-10-12 に同期した（ブランチ `fix/sync-jp4wc-2.9.17`、PR #45、2026-10-13 マージ。B-19・B-26・B-39・B-42・B-43 が解消）:
       B-42 → JP4WC #231（通信エラーで返金・キャプチャが fatal、5xx で返金済みと誤記録）、B-43 → #232（送料無料クーポン等で Paidy Checkout が起動しない）、
@@ -74,7 +74,7 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
 
 ## Phase 3 — 配布・i18n・CI 整備
 
-- [ ] 3-1 `readme.txt`: External Services、Minimum Requirements、ヘッダーの `Requires at least` / `WC requires at least`（B-6, B-10, B-11）
+- [ ] 3-1 `readme.txt`: External Services、Minimum Requirements、ヘッダーの `Requires at least` / `WC requires at least`（B-10, B-11。External Services（B-6）は 2.0.0 の release PR で記載済み）
 - [ ] 3-2 i18n: `bin/build_i18n.sh` / `i18n:json` の `languages/` 参照修正、不要 JSON の整理、POT 再生成（B-5）
 - [ ] 3-3 `npm run format:js` を単独 PR で適用し、CI に `lint:js` を追加（B-4）
 - [ ] 3-4 デプロイワークフローのゲート化（`ci.yml` に `workflow_call` を追加し、タグ push でフルマトリクスを通す）、action の版更新（B-7）
