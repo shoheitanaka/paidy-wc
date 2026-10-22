@@ -52,6 +52,13 @@
 - `composer.json` の `platform.php` を 8.1.0 に固定していること（ヘッダーの `Requires PHP: 8.1` と CI の最小 PHP に合わせる）
 - `tests/bootstrap.php` が `WP_TESTS_PHPUNIT_POLYFILLS_PATH` / `WC_REMOVE_ALL_DATA` を定義すること（テストライブラリ / WooCommerce の定数）
 
+## レビュー Bot の指摘で誤検知と判定済みのもの（WordPress core のソースで確認。再調査しない）
+
+- `$_GET` の値を `sanitize_key()` に渡すと配列で TypeError になる（PR #47 Copilot）— `sanitize_key()` は `is_scalar()` のときだけ `strtolower()` を呼び、配列には空文字を返す。
+  `absint()` も配列を `(int)` でキャストするだけ。回帰テストは `test-paidy-checkout-return-notice.php` の配列ケース
+- `wp_register_script( $handle, false, $deps )` で登録したハンドルの `wp_add_inline_script()` は出力されない（PR #47 Codex）— WordPress 5.0 の changeset 43565
+  以降、`WP_Scripts::do_item()` は `src` の無いハンドルでも inline script を出力する。回帰テストは同ファイルの `test_block_checkout_notice_script_is_printed`
+
 ## ドキュメント・言語
 
 - ドキュメント・PR 本文・レビューコメントが日本語、コード・コメント・コミットメッセージが英語であること

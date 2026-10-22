@@ -49,7 +49,7 @@ JP4WC 2.9.0〜2.9.16 の Paidy 修正を取り込む。推奨順（各 1 PR、�
       （1.5.2 以前に検証なしで保存された値が close / capture / refund の URL に入る経路は残った。PR #42 Copilot G1-1。2.9.17 の同期で解消）。
       テスト: `test-paidy-description-balance.php` `test-paidy-guest-order-history.php` を移植、
       `test-paidy-thankyou-verification.php` `test-paidy-capture-refund.php`（新規）
-- [x] **1-4 ブロック対応の fatal 回避**（`class-wc-payments-paidy-blocks-support.php`、2.9.5。2.9.18・2.9.19 の同期 `fix/sync-jp4wc-2.9.18` で取り込み（2026-10-22）。同じ 2.9.5 の `paidy_redirect_to_wizard()` の
+- [x] **1-4 ブロック対応の fatal 回避**（`class-wc-payments-paidy-blocks-support.php`、2.9.5。2.9.18・2.9.19 の同期（ブランチ `fix/sync-jp4wc-2.9.18`、PR #47、2026-10-22 マージ）で取り込み。同じ 2.9.5 の `paidy_redirect_to_wizard()` の
       `class_exists` ガードは #241 の同期で取り込み済み）
 - [ ] **1-5 リリース 1.6.0**: `release-bump` スキル。changelog は JP4WC の Security 行を流用。開発者向けに「`WC_Gateway_Paidy::checkout_reject_to_cancel()` と `WC_Paidy_Endpoint::$paidy` を削除」を書く（2.9.18 の同期 R1-L8）。`readme.txt` に External Services（B-6）を
       この時点で入れてもよい。

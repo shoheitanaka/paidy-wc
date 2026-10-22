@@ -124,7 +124,7 @@ git -C "$J" log --oneline -- includes/gateways/paidy tests/Unit/test-paidy-*.php
 
 2026-10-09 時点の一覧から、Phase 1-1（ブランチ `fix/webhook-auth`）・1-2（`fix/receiver-auth`）・1-3（`fix/thankyou-verification`）と
 2.9.17 の同期（`fix/sync-jp4wc-2.9.17`、PR #45、JP4WC `829d580..fe717d0`）と #241・#243 の同期（`fix/sync-jp4wc-order-status-hooks`、PR #46、
-JP4WC `fe717d0..1bf0bd0`。`1bf0bd0` は 2.9.17 タグ後の `upstream/main`）と 2.9.18・2.9.19 の同期（`fix/sync-jp4wc-2.9.18`、JP4WC `1bf0bd0..d0cb67d`。`d0cb67d` は 2.9.19）で取り込んだ分を除いたもの。次回は `d0cb67d` 以降を見る
+JP4WC `fe717d0..1bf0bd0`。`1bf0bd0` は 2.9.17 タグ後の `upstream/main`）と 2.9.18・2.9.19 の同期（`fix/sync-jp4wc-2.9.18`、PR #47、2026-10-22 マージ。JP4WC `1bf0bd0..d0cb67d`。`d0cb67d` は 2.9.19）で取り込んだ分を除いたもの。次回は `d0cb67d` 以降を見る
 （glob は `$J` 側で解決させるため引用符で囲む）:
 `git -C "$J" log --oneline d0cb67d..upstream/main -- includes/gateways/paidy includes/jp4wc-framework 'tests/Unit/test-paidy-*.php' src/js/paidy class-wc-paidy.php uninstall.php woocommerce-for-japan.php`。
 `uninstall.php` と `woocommerce-for-japan.php` は Paidy 以外の変更も拾うので、中身を見て Paidy 関係だけを取り込む。
