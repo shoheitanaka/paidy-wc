@@ -7,7 +7,7 @@
  * @package paidy-wc
  */
 
-defined( 'WC_PAIDY_VERSION' ) || define( 'WC_PAIDY_VERSION', '1.5.2' );
+defined( 'WC_PAIDY_VERSION' ) || define( 'WC_PAIDY_VERSION', '2.0.0' );
 defined( 'JP4WC_PAIDY_FRAMEWORK_VERSION' ) || define( 'JP4WC_PAIDY_FRAMEWORK_VERSION', '2.0.14' );
 defined( 'WC_PAIDY_PLUGIN_URL' ) || define( 'WC_PAIDY_PLUGIN_URL', 'https://example.com/wp-content/plugins/paidy-wc/' );
 defined( 'WC_PAIDY_ASSETS_URL' ) || define( 'WC_PAIDY_ASSETS_URL', WC_PAIDY_PLUGIN_URL . 'assets/' );

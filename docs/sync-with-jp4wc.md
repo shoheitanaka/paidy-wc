@@ -43,31 +43,31 @@
 8. **WPCS 由来の書き換え**（ロジックは不変）: endpoint の `$order->get_payment_method() !== 'paidy'` を Yoda 条件に、
    新規メソッドの DocBlock に `@since`。ゲートウェイの `$jp4wc_framework` の `@var` を `stdClass` から `Framework\JP4WC_Framework` に
    （PHPStan baseline の削減）。テスト `test-paidy-payment-id-format.php` の「issue #223」は「Japanized for WooCommerce issue #223」。
-   receiver / wizard の `@since 2.9.16` は `@since 1.6.0` に、`@since` の無い state token 系メソッドには `@since 1.6.0` を足す。
-   コメント中の「before 2.9.16」「2.9.13–2.9.14 の 2 日 transient」のような JP4WC の版の話は paidy-wc の版（1.6.0 より前は state token
+   receiver / wizard の `@since 2.9.16` は `@since 2.0.0` に、`@since` の無い state token 系メソッドには `@since 2.0.0` を足す。
+   コメント中の「before 2.9.16」「2.9.13–2.9.14 の 2 日 transient」のような JP4WC の版の話は paidy-wc の版（2.0.0 より前は state token
    なし）に（receiver の `SIGNATURE_HEADER` の DocBlock と署名経路のコメント、wizard の `plugin_version` のコメント）。
    ただし `verify_state_token()` / `consume_state_token()` の legacy transient のフォールバックとそのコメントは verbatim のまま残す
    （paidy-wc 自身は transient の token を発行したことが無いが、JP4WC 2.9.13〜2.9.14 で申込んでから paidy-wc に移ったサイトの token を受けるため）。移植テストの「issue #210」も同様に書き換え、
    `test-paidy-receiver-signature.php` の tearDown の LIKE 削除は `$wpdb->prepare()` + `esc_like()` に（PHPCS エラー）。
    移植テストの「PR #211」「PR #213」も「Japanized for WooCommerce PR #211」のように書き換える。
    ゲートウェイ（1-3）: クラスの `@version` は paidy-wc の版（1.5.2）のまま、`paidy_description_allowed_html()` の
-   `@since 2.9.15` は `@since 1.6.0` に、`paidy_verify_payment_for_order()` に `@since 1.6.0`。
+   `@since 2.9.15` は `@since 2.0.0` に、`paidy_verify_payment_for_order()` に `@since 2.0.0`。
    `jp4wc_order_paidy_status_completed()` の `paidy_capture_id` ガードの `return;` は `return true;` に（PHPStan `return.empty`。
    `woocommerce_order_status_completed` のコールバックなので戻り値は使われない）。移植テスト `test-paidy-description-balance.php` の
    DocBlock の書き出し「payment_fields() must …」は「The payment_fields() method must …」に（PHPCS `ShortNotCapital`）。
    2.9.17 の同期: ゲートウェイの `paidy_payment_api_url()` / `paidy_is_closed_response()` / `paidy_invalid_payment_id_message()` と
-   wizard の `get_or_create_site_hash()` の `@since 2.9.17` は `@since 1.6.0` に、`paidy_payment_api_url()` の DocBlock と
+   wizard の `get_or_create_site_hash()` の `@since 2.9.17` は `@since 2.0.0` に、`paidy_payment_api_url()` の DocBlock と
    `test-paidy-payment-id-format.php` のファイル DocBlock の「versions before 2.9.14 saved the thank-you URL parameter unverified」は
-   「versions before 1.6.0」に（paidy-wc で検証なしに保存していたのは 1.5.2 以前）。コメント・テストの「(#232)」「issue #231」〜「issue #234」は
+   「versions before 2.0.0」に（paidy-wc で検証なしに保存していたのは 1.5.2 以前）。コメント・テストの「(#232)」「issue #231」〜「issue #234」は
    「Japanized for WooCommerce issue #…」に。
    #241・#243 の同期: ゲートウェイの `register_order_status_hooks()` / `handle_order_status_*()` / `get_gateway_for_order()` /
-   `paidy_merge_refund_ids()` の `@since 2.9.17` は `@since 1.6.0` に、`paidy_order_paidy_status_completed_to_cancelled()` の DocBlock と
-   コメントの「2.9.17」は「1.6.0」に。同コメントの「earlier versions blocked the refund on cancellation once anything had been refunded」は
-   JP4WC の返金ガードの話で、ガードの無かった paidy-wc では「versions before 1.6.0 refunded the order total on cancellation without
+   `paidy_merge_refund_ids()` の `@since 2.9.17` は `@since 2.0.0` に、`paidy_order_paidy_status_completed_to_cancelled()` の DocBlock と
+   コメントの「2.9.17」は「2.0.0」に。同コメントの「earlier versions blocked the refund on cancellation once anything had been refunded」は
+   JP4WC の返金ガードの話で、ガードの無かった paidy-wc では「versions before 2.0.0 refunded the order total on cancellation without
    recording a refund」に（判定のロジックは同じ）。`jp4wc_order_paidy_status_completed()` / `paidy_order_paidy_status_processing_to_cancelled()` /
    `notice_message()` の `@param string $order_id` は `@param int`（静的ハンドラが int を渡すので PHPStan `argument.type`。WooCommerce の
    `woocommerce_order_status_*` が渡すのも int。JP4WC は `string` のまま）。
-   2.9.18 の同期: `thankyou_completed()` の `@param string $order_id` も `@param int`（静的ハンドラ `handle_thankyou()` と `woocommerce_thankyou_*` が int を渡す。これで baseline の `wc_reduce_stock_levels` の 1 件が消えた）。新規メソッドの `@since 2.9.18` は `@since 1.6.0`（endpoint の private メソッド 3 つも）。コメントの「issue #244」「#268」は「Japanized for WooCommerce issue #…」に。移植テストの「issue #241」「issue #243」も「Japanized for WooCommerce issue #…」に
+   2.9.18 の同期: `thankyou_completed()` の `@param string $order_id` も `@param int`（静的ハンドラ `handle_thankyou()` と `woocommerce_thankyou_*` が int を渡す。これで baseline の `wc_reduce_stock_levels` の 1 件が消えた）。新規メソッドの `@since 2.9.18` は `@since 2.0.0`（endpoint の private メソッド 3 つも）。コメントの「issue #244」「#268」は「Japanized for WooCommerce issue #…」に。移植テストの「issue #241」「issue #243」も「Japanized for WooCommerce issue #…」に
 9. **アップグレード処理**（`class-wc-paidy-apply-receiver.php` 末尾、`paidy-wc.php`）: JP4WC は `JP4WC_Install` の `jp4wc_updated` で
    `redact_stored_secrets_on_upgrade()` を呼ぶが、paidy-wc にはバージョン検出が無い。paidy-wc は `paidy-wc.php` の
    `paidy_wc_check_version()`（`init` 5、option `paidy_wc_version`）が版の変化で `paidy_wc_updated` を発火し、receiver はそれにつなぐ。

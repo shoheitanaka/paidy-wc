@@ -356,7 +356,7 @@ class WC_Paidy_Admin_Wizard {
 	 * add_option() would fail on it and the application would carry a hash
 	 * the site never kept.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return string
 	 */
@@ -431,7 +431,7 @@ class WC_Paidy_Admin_Wizard {
 			'survey09'       => $value['securitySurvey09RadioControl'],
 			'state'          => $state_token,
 			// Sent for support diagnostics only: the intermediary records which
-			// plugin version submitted the application (versions before 1.6.0
+			// plugin version submitted the application (versions before 2.0.0
 			// sent no state token, see WC_Paidy_Apply_Receiver::SIGNATURE_HEADER).
 			'plugin_version' => defined( 'WC_PAIDY_VERSION' ) ? WC_PAIDY_VERSION : '',
 		);
@@ -488,7 +488,7 @@ class WC_Paidy_Admin_Wizard {
 	 * to support, and logged so the site's own WooCommerce log ties the wizard
 	 * submission to the intermediary's record.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param string $response_body Raw JSON body of the application POST response.
 	 * @return void
@@ -517,7 +517,7 @@ class WC_Paidy_Admin_Wizard {
 	 * Used both for the intermediary response and as the REST sanitize
 	 * callback of the `paidy_application_id` setting.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param mixed $value Raw value.
 	 * @return string Sanitized ID, or empty string if invalid.
@@ -641,14 +641,14 @@ class WC_Paidy_Admin_Wizard {
 	/**
 	 * Lifetime of the per-user "show manual settings" flag, in seconds.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 */
 	const MANUAL_SETTINGS_TTL = 15 * MINUTE_IN_SECONDS;
 
 	/**
 	 * Transient key of the per-user "show manual settings" flag.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return string
 	 */
@@ -659,7 +659,7 @@ class WC_Paidy_Admin_Wizard {
 	/**
 	 * Whether the current user asked for the plain gateway fields (wizard=false).
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return bool
 	 */

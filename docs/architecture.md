@@ -178,7 +178,7 @@ Paidy API は `https://api.paidy.com/`、認証は `Authorization: Bearer <secre
 `@woocommerce/dependency-extraction-webpack-plugin` で `wc-blocks-registry` / `wc-settings` を外部化。
 翻訳は `wp_set_script_translations( handle, 'paidy-wc', WC_PAIDY_ABSPATH . 'i18n/' )`。
 
-## 外部サービス（readme.txt の External Services に記載が必要 → backlog B-6）
+## 外部サービス（readme.txt の `== External Services ==` に開示済み。通信先・送るデータを変えたら両方を更新する）
 
 | ドメイン | 用途 | 送るデータ |
 |---------|------|-----------|

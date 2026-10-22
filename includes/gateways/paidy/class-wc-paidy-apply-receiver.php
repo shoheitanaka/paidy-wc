@@ -38,16 +38,16 @@ class WC_Paidy_Apply_Receiver {
 	 * The intermediary signs `<timestamp>.<raw JSON body>` with the site hash
 	 * shared at application time, so a callback can be authenticated even when
 	 * the one-time state token has expired or was never issued (applications
-	 * submitted from plugin versions before 1.6.0 sent no state at all).
+	 * submitted from plugin versions before 2.0.0 sent no state at all).
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 */
 	const SIGNATURE_HEADER = 'x-paidy-receiver-signature';
 
 	/**
 	 * Request header carrying the UNIX timestamp that was signed together with the body.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 */
 	const TIMESTAMP_HEADER = 'x-paidy-receiver-timestamp';
 
@@ -59,14 +59,14 @@ class WC_Paidy_Apply_Receiver {
 	 * the same request cannot both pass. The claim is released if processing
 	 * fails and kept (until pruned) if it succeeds.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 */
 	const SIGNATURE_USED_PREFIX = 'paidy_receiver_sig_';
 
 	/**
 	 * Transient that throttles the "signature present but invalid" warning.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 */
 	const SIGNATURE_WARNING_THROTTLE = 'paidy_receiver_sig_warned';
 
@@ -82,7 +82,7 @@ class WC_Paidy_Apply_Receiver {
 	 * action a second time just because it carries a fresh timestamp and
 	 * therefore a different signature.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 */
 	const EVENT_CLAIM_PREFIX = 'paidy_receiver_event_';
 
@@ -95,17 +95,17 @@ class WC_Paidy_Apply_Receiver {
 
 	/**
 	 * Redact secret API keys already stored in paidy_received_data from a
-	 * version prior to 1.6.0.
+	 * version prior to 2.0.0.
 	 *
 	 * This option started being written with the two secret fields
-	 * redacted in 1.6.0 (see process_receive_data()), but that only takes
+	 * redacted in 2.0.0 (see process_receive_data()), but that only takes
 	 * effect the next time an onboarding callback arrives — normally a
 	 * one-time event — so a store that completed onboarding on an earlier
 	 * version would otherwise keep the plaintext secrets in this option
 	 * indefinitely after upgrading. Runs once per upgrade via the
 	 * `paidy_wc_updated` action fired by paidy_wc_check_version().
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return void
 	 */
@@ -131,7 +131,7 @@ class WC_Paidy_Apply_Receiver {
 	/**
 	 * Get the lifetime of an onboarding state token in seconds.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return int TTL in seconds.
 	 */
@@ -152,7 +152,7 @@ class WC_Paidy_Apply_Receiver {
 	 *
 	 * Expired entries are pruned on every store so no cron cleanup is needed.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param string $token 32-char alphanumeric state token.
 	 * @return bool True if the token was persisted, false otherwise.
@@ -178,7 +178,7 @@ class WC_Paidy_Apply_Receiver {
 	 * Accepts raw request input: anything but a 32-char alphanumeric string is
 	 * rejected before any storage key is built.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param mixed $token 32-char alphanumeric state token.
 	 * @return bool True if the token is valid.
@@ -213,7 +213,7 @@ class WC_Paidy_Apply_Receiver {
 	 * Accepts raw request input: anything but a 32-char alphanumeric string is
 	 * rejected before any storage key is built.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param mixed $token 32-char alphanumeric state token.
 	 * @return void
@@ -233,7 +233,7 @@ class WC_Paidy_Apply_Receiver {
 	/**
 	 * Get the maximum allowed clock drift between the signed timestamp and now.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return int Tolerance in seconds.
 	 */
@@ -242,7 +242,7 @@ class WC_Paidy_Apply_Receiver {
 		 * Filters how far the signed callback timestamp may deviate from the
 		 * receiving site's clock before the signature is rejected.
 		 *
-		 * @since 1.6.0
+		 * @since 2.0.0
 		 *
 		 * @param int $tolerance Tolerance in seconds. Default 10 minutes.
 		 */
@@ -257,7 +257,7 @@ class WC_Paidy_Apply_Receiver {
 	 * any HMAC is computed. Signatures already claimed by an earlier delivery
 	 * are rejected as well (see claim_signature()).
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param mixed  $timestamp UNIX timestamp from the request header.
 	 * @param mixed  $signature Hex HMAC digest from the request header.
@@ -279,7 +279,7 @@ class WC_Paidy_Apply_Receiver {
 	 * check_permissions()). A malformed/incorrect signature here must not
 	 * reject a request that state-token verification already authorized.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param mixed  $timestamp UNIX timestamp from the request header.
 	 * @param mixed  $signature Hex HMAC digest from the request header.
@@ -311,7 +311,7 @@ class WC_Paidy_Apply_Receiver {
 	/**
 	 * Build the claim option name for a signature.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param string $signature Hex HMAC digest.
 	 * @return string
@@ -323,7 +323,7 @@ class WC_Paidy_Apply_Receiver {
 	/**
 	 * Whether a signature has already been claimed by another delivery.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param string $signature Hex HMAC digest.
 	 * @return bool
@@ -342,7 +342,7 @@ class WC_Paidy_Apply_Receiver {
 	 * before any credential or status update runs. Stale claims are pruned
 	 * on every call so no cron cleanup is needed.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param mixed $signature Hex HMAC digest from the request header.
 	 * @return bool True if this request now owns the claim.
@@ -361,7 +361,7 @@ class WC_Paidy_Apply_Receiver {
 	 * Release a signature claim so the intermediary can retry after a
 	 * processing failure (DB write, decryption, missing key field, ...).
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param mixed $signature Hex HMAC digest from the request header.
 	 * @return void
@@ -381,7 +381,7 @@ class WC_Paidy_Apply_Receiver {
 	 * is safe to drop. Same direct LIKE query rationale as
 	 * prune_expired_state_tokens().
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return void
 	 */
@@ -427,7 +427,7 @@ class WC_Paidy_Apply_Receiver {
 	 * the full parameter merge (query string included) exactly as before
 	 * the body-only restriction was introduced.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param WP_REST_Request $request request object.
 	 * @return array
@@ -458,7 +458,7 @@ class WC_Paidy_Apply_Receiver {
 	 * get_body_only_params()) so an unsigned query parameter cannot change
 	 * which event this request is claiming.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param WP_REST_Request $request request object.
 	 * @return string
@@ -485,7 +485,7 @@ class WC_Paidy_Apply_Receiver {
 	 * timestamp (and therefore a different signature) for the identical
 	 * decision is still recognized as a duplicate and rejected.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param WP_REST_Request $request request object.
 	 * @return bool True if this request now owns the claim.
@@ -499,7 +499,7 @@ class WC_Paidy_Apply_Receiver {
 	/**
 	 * Release a business-event claim so a failed delivery can be retried.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param WP_REST_Request $request request object.
 	 * @return void
@@ -517,7 +517,7 @@ class WC_Paidy_Apply_Receiver {
 	 * "resend" action) go through once the window has passed. Same direct
 	 * LIKE query rationale as prune_expired_state_tokens().
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return void
 	 */
@@ -551,7 +551,7 @@ class WC_Paidy_Apply_Receiver {
 	 *
 	 * Runs on every store_state_token() call so no cron cleanup is needed.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return void
 	 */
@@ -715,7 +715,7 @@ class WC_Paidy_Apply_Receiver {
 		// No usable state token. Fall back to the signed-callback path: the
 		// intermediary signs the raw body with the site hash it received at
 		// application time, so the callback can still be authenticated when the
-		// token expired, was never issued (pre-1.6.0 applications), or was
+		// token expired, was never issued (pre-2.0.0 applications), or was
 		// lost to a reinstall.
 		$signature = $request->get_header( self::SIGNATURE_HEADER );
 		$timestamp = $request->get_header( self::TIMESTAMP_HEADER );
@@ -804,7 +804,7 @@ class WC_Paidy_Apply_Receiver {
 	/**
 	 * Decrypt, validate and store the delivered onboarding result.
 	 *
-	 * @since 1.6.0 Split out of handle_receive_data().
+	 * @since 2.0.0 Split out of handle_receive_data().
 	 *
 	 * @param WP_REST_Request $request request object.
 	 * @return WP_REST_Response|WP_Error

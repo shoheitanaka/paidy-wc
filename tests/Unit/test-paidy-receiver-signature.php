@@ -5,7 +5,7 @@
  * The intermediary (paidy-app) signs `<timestamp>.<raw body>` with the site
  * hash shared at application time. The receiver accepts such a callback even
  * when the one-time state token has expired, was never issued (applications
- * submitted before 1.6.0), or was lost.
+ * submitted before 2.0.0), or was lost.
  *
  * @package paidy-wc
  */
@@ -693,7 +693,7 @@ class WC_Paidy_Receiver_Signature_Test extends WP_UnitTestCase {
 
 	/**
 	 * The redact_stored_secrets_on_upgrade() routine must redact plaintext secret keys
-	 * left over from before 1.6.0 (the redaction added on the write path
+	 * left over from before 2.0.0 (the redaction added on the write path
 	 * only takes effect the next time an onboarding callback arrives,
 	 * normally a one-time event, so stores that already completed
 	 * onboarding would otherwise keep the plaintext copy indefinitely
@@ -735,7 +735,7 @@ class WC_Paidy_Receiver_Signature_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Already-redacted data (stores onboarded on 1.6.0+) is left as is.
+	 * Already-redacted data (stores onboarded on 2.0.0+) is left as is.
 	 */
 	public function test_redact_stored_secrets_on_upgrade_is_idempotent() {
 		update_option(

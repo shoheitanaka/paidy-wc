@@ -155,7 +155,7 @@ npm run lint:js     # 現状 985 件（ほぼ prettier）。backlog B-4 で一�
 ## リリース
 
 1. `release-bump` スキルでバージョン（`paidy-wc.php` ヘッダーと `WC_PAIDY_VERSION`、`readme.txt` Stable tag + changelog、`package.json`）を上げる PR
-2. マージ後、`main` でタグを push（`git tag 1.6.0 && git push upstream 1.6.0`）→
+2. マージ後、`main` でタグを push（`git tag 2.0.0 && git push upstream 2.0.0`）→
    `.github/workflows/deploy-on-pushing-a-new-tag-and-create-release-with-attached-zip.yml` が
    `10up/action-wordpress-plugin-deploy` で WordPress.org SVN へデプロイし、`.distignore` 準拠の ZIP を GitHub Release に添付する
 3. タグ名はバージョンそのまま（`v` 無し。既存タグ `1.4.8` などに合わせる）

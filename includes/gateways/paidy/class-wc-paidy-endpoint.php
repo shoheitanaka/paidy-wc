@@ -22,7 +22,7 @@ class WC_Paidy_Endpoint {
 	 * x-paidy-signature header. Operators can extend or override this list via the
 	 * `paidy_webhook_allowed_ips` filter. Provided by Paidy.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @var string[]
 	 */
@@ -57,7 +57,7 @@ class WC_Paidy_Endpoint {
 	/**
 	 * The Paidy gateway WooCommerce has registered.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return WC_Gateway_Paidy|null Null when Paidy is not in WooCommerce's gateway list.
 	 */
@@ -71,7 +71,7 @@ class WC_Paidy_Endpoint {
 	 * The permission check runs for every request to the webhook route, including ones that
 	 * fail verification, so it must not construct WooCommerce's whole gateway list.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param string $key      Setting key.
 	 * @param string $fallback Value when the setting has not been saved.
@@ -93,7 +93,7 @@ class WC_Paidy_Endpoint {
 	 * not complete that order. The thank-you page completes orders separately, but it also
 	 * needs the gateway in WooCommerce's list.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return WP_Error
 	 */
@@ -130,7 +130,7 @@ class WC_Paidy_Endpoint {
 	 * through without verification if an operator explicitly empties the allowlist via the
 	 * paidy_webhook_allowed_ips filter.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param WP_REST_Request $request The request object.
 	 * @return bool|WP_Error True if authorized, WP_Error otherwise.
@@ -211,7 +211,7 @@ class WC_Paidy_Endpoint {
 	 * `paidy_trust_proxy_headers` filter), because the header is attacker-controlled
 	 * on most deployments and could be used to bypass the IP allowlist.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return string The remote IP address.
 	 */

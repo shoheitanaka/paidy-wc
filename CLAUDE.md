@@ -9,7 +9,7 @@ Paidy 決済モジュールを切り出したもので、**JP4WC 側が常に最
 | 項目 | 値 |
 |------|-----|
 | プラグイン名 / スラッグ / テキストドメイン | Paidy for WooCommerce / `paidy-wc` / `paidy-wc` |
-| 現行バージョン | 1.5.2（`paidy-wc.php` ヘッダー・`WC_PAIDY_VERSION`・`readme.txt` Stable tag・`package.json`） |
+| 現行バージョン | 2.0.0（`paidy-wc.php` ヘッダー・`WC_PAIDY_VERSION`・`readme.txt` Stable tag・`package.json`） |
 | 動作要件 | PHP 8.1+（ヘッダー）/ CI は WP 6.7+ / WC 10.2+ で検証（`.github/workflows/ci.yml`） |
 | メインファイル | `paidy-wc.php`（エントリ・フック登録）、`class-wc-paidy.php`（`WC_Paidy` シングルトン・定数・読み込み） |
 | 配布 | WordPress.org（タグ push → `deploy-on-pushing-a-new-tag-...yml` が SVN デプロイ + GitHub Release） |
@@ -113,8 +113,8 @@ composer check       # 上の 3 つをまとめて実行
   → `init` で `WC_Paidy_Apply_Receiver`・textdomain → `woocommerce_blocks_loaded` でブロック決済を登録
 - REST ルート: `paidy/v1/order`（Paidy Webhook）、`paidy/v1/check`（paidy.artws.info からの Webhook 登録確認）、
   `paidy-receiver/v1/receive`（申込仲介サーバーからの API キー配信）
-- 外部サービス: `api.paidy.com`（決済 API・Basic 認証 = 秘密鍵）、`apps.paidy.com`（チェックアウト JS）、
-  `paidy.artws.info`（Artisan Workshop の加盟店申込仲介。`readme.txt` の External Services 開示が未記載 → backlog B-6）
+- 外部サービス: `api.paidy.com`（決済 API。`Authorization: Bearer <秘密鍵>`）、`apps.paidy.com`（チェックアウト JS）、
+  `paidy.artws.info`（Artisan Workshop の加盟店申込仲介）。3 つとも `readme.txt` の `== External Services ==` に開示済み（2.0.0）
 - オプション: ゲートウェイ設定 `woocommerce_paidy_settings`、オンボーディング `woocommerce_paidy_on_boarding_settings`、
   `paidy_site_hash`、`paidy_received_data`（秘密鍵は伏せ字）、`paidy_application_id`、`paidy_wc_version`（`paidy_wc_check_version()` が記録）、
   state token / claim 行 `paidy_onboarding_state_*` `paidy_receiver_sig_*` `paidy_receiver_event_*`、通知制御 `wc_paidy_show_*` / `wc_paidy_apply_notice_*`。
@@ -130,7 +130,7 @@ state token + 署名、サンクスページと Webhook の Paidy API での裏�
 2.9.18 の #244（`WC_Paidy_Endpoint` が自前のゲートウェイを作らない。一覧に無ければ Webhook 503 + 警告ログ、署名の鍵は保存済み設定から）・#247（キャプチャの `Send URL` ログ）・
 #248（拒否の通知をブロックチェックアウトにも 1 回だけ）・#266（フレームワーク文字列のクラス内移動。更新中の fatal 回避）と 2.9.19 の #268（ブロック対応ファイルの早期読み込み。同じく更新中の fatal 回避）は PR #47 で取り込み済み（2026-10-22 マージ）。
 内容と取り込まなかった箇所は `docs/sync-with-jp4wc.md` の「取り込み済み」「意図的な差分」。
-Phase 1 の残りは 1-5（1.6.0 リリース）。1-4 は 2.9.18 の同期で完了。
+Phase 1 の残りは 1-5（2.0.0 リリース）。1-4 は 2.9.18 の同期で完了。
 
 これらに触る変更では JP4WC 側の実装（HMAC 署名 + IP 許可リスト、state token + 署名、`^pay_[A-Za-z0-9_-]+$/D`）をそのまま取り込むこと。
 独自実装で再発明しない。

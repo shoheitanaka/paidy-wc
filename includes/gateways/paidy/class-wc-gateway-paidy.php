@@ -35,7 +35,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	/**
 	 * Whether this request shows the "declined" notice in the Checkout block.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @var bool
 	 */
@@ -195,7 +195,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * to WooCommerce's instance alone either: a request that changes an order status, such
 	 * as a REST API call or a bulk action, does not always load the payment gateways.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 */
 	public static function register_order_status_hooks() {
 		$hooks = array(
@@ -212,7 +212,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	/**
 	 * Capture at Paidy when a Paidy order is completed.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param int $order_id Order ID.
 	 */
@@ -226,7 +226,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	/**
 	 * Close the payment at Paidy when a processing Paidy order is cancelled.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param int $order_id Order ID.
 	 */
@@ -240,7 +240,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	/**
 	 * Refund at Paidy when a completed Paidy order is cancelled.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param int $order_id Order ID.
 	 */
@@ -256,7 +256,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 *
 	 * Orders paid by other methods return null without loading the payment gateways.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param int $order_id Order ID.
 	 * @return WC_Gateway_Paidy|null
@@ -280,7 +280,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * Log that a Paidy order was left unprocessed because Paidy is not in WooCommerce's
 	 * gateway list. Logged whatever the debug setting is, since nothing else records it.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param string $what What was left undone, as the end of the sentence.
 	 */
@@ -298,7 +298,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * instance prints the order-pay script and saves the settings twice. The payment gateways
 	 * are loaded if they have not been yet.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return WC_Gateway_Paidy|null Null when Paidy is not in WooCommerce's gateway list.
 	 */
@@ -315,7 +315,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * They are registered once, not in the constructor, because this class can be created
 	 * more than once in a request and each instance would add the notice again.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 */
 	public static function register_checkout_return_hooks() {
 		add_action( 'template_redirect', array( __CLASS__, 'handle_checkout_return' ) );
@@ -330,7 +330,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * checkout's order-received page (e.g. one made by a funnel plugin) does not load the
 	 * payment gateways, so a callback left to WooCommerce's instance would not run there.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param int $order_id Order ID.
 	 */
@@ -355,7 +355,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * session until another page prints them. A block checkout therefore gets the notice
 	 * from enqueue_block_checkout_reject_notice() instead.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 */
 	public static function handle_checkout_return() {
 		// A long-lived PHP worker keeps static properties between requests; start each request clean.
@@ -390,7 +390,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * The notice goes to the block's own notice store (context `wc/checkout`), which the
 	 * Checkout block displays; the page itself is never modified.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 */
 	public static function enqueue_block_checkout_reject_notice() {
 		if ( ! self::$show_block_checkout_reject_notice ) {
@@ -418,7 +418,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	/**
 	 * Whether the checkout page uses the Checkout block.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return bool
 	 */
@@ -434,7 +434,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		/**
 		 * Filters whether the checkout page uses the Checkout block.
 		 *
-		 * @since 1.6.0
+		 * @since 2.0.0
 		 *
 		 * @param bool $is_block Whether the checkout page uses the Checkout block.
 		 */
@@ -444,7 +444,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	/**
 	 * The notice shown when Paidy declines the payment.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return string
 	 */
@@ -610,7 +610,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	/**
 	 * Allowed HTML tags for the Paidy description output.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return array Allowed HTML for wp_kses().
 	 */
@@ -1156,7 +1156,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 *
 	 * The refund goes through wc_create_refund(), so WooCommerce records it and only the
 	 * amount not refunded yet is sent. The order stays cancelled even when this refunds it
-	 * in full. Versions before 1.6.0 refunded the order total at Paidy without recording a
+	 * in full. Versions before 2.0.0 refunded the order total at Paidy without recording a
 	 * refund in WooCommerce; such an order is not refunded again.
 	 *
 	 * @param int $order_id Order ID.
@@ -1166,8 +1166,8 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 		if ( ! $order || $this->id !== $order->get_payment_method() ) {
 			return;
 		}
-		// Every Paidy refund since 1.6.0 has a WooCommerce refund sent through the gateway,
-		// while versions before 1.6.0 refunded the order total on cancellation without
+		// Every Paidy refund since 2.0.0 has a WooCommerce refund sent through the gateway,
+		// while versions before 2.0.0 refunded the order total on cancellation without
 		// recording a refund. A Paidy refund ID without such a refund is therefore an
 		// earlier version's refund on cancellation.
 		$gateway_refunds = array_filter(
@@ -1438,10 +1438,10 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * them keeps the path/query injection protection intact: "/", "?", "#", "%" and whitespace
 	 * are still rejected ("D" keeps "$" from matching before a trailing newline). Every request
 	 * that carries the secret key goes through here, because an order's transaction ID is not
-	 * guaranteed to be one Paidy issued: versions before 1.6.0 saved the thank-you URL
+	 * guaranteed to be one Paidy issued: versions before 2.0.0 saved the thank-you URL
 	 * parameter unverified, and the ID can be edited on the order screen.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param mixed  $payment_id Paidy payment ID.
 	 * @param string $action     Sub-resource to append ("close", "captures" or "refunds"), or "".
@@ -1464,7 +1464,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * Anything else means the operation did not happen: a non-2xx status, a body that is not
 	 * a JSON object (such as an HTML error page from a 5xx), or a payment in another state.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param int   $http_code HTTP status code of the response.
 	 * @param mixed $body      Decoded JSON body of the response.
@@ -1481,7 +1481,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * not document, so every refund ID in the answer that is not saved yet is added,
 	 * rather than the first one, which would be the earlier refund on a second refund.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param mixed $saved_ids Value of the order's paidy_refund_id meta.
 	 * @param array $payment   Decoded Paidy payment from the refund answer.
@@ -1506,7 +1506,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	/**
 	 * Order note for a transaction ID that is not sent to Paidy because it is malformed.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @return string
 	 */
@@ -1577,7 +1577,7 @@ class WC_Gateway_Paidy extends WC_Payment_Gateway {
 	 * strength of an attacker-supplied transaction id (thank-you page) or webhook
 	 * body alone, which would otherwise allow goods to ship without a real payment.
 	 *
-	 * @since 1.6.0
+	 * @since 2.0.0
 	 *
 	 * @param WC_Order|false $order          The order to verify against.
 	 * @param string         $transaction_id Paidy payment ID.
