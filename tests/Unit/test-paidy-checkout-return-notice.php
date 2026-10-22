@@ -240,6 +240,39 @@ class WC_Paidy_Checkout_Return_Notice_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An order_id passed as an array (?order_id[]=42) is cast by absint() and causes no error.
+	 *
+	 * The notice itself does not depend on the order ID, so it is still shown.
+	 */
+	public function test_order_id_as_an_array_does_not_fail() {
+		$this->is_block_checkout = false;
+		$this->return_from_paidy( 'rejected', array( '42' ) );
+
+		$this->assertSame( 1, wc_notice_count( 'error' ) );
+		$this->assertFalse( wp_script_is( self::HANDLE, 'enqueued' ) );
+	}
+
+	/**
+	 * The notice script is printed with the footer scripts.
+	 *
+	 * The handle has no src of its own: it only names its dependencies. WordPress prints the
+	 * inline scripts of such a handle since 5.0 (changeset 43565), so the dispatch reaches the
+	 * browser. Checked on the printed HTML rather than on the registered data.
+	 */
+	public function test_block_checkout_notice_script_is_printed() {
+		$this->is_block_checkout = true;
+		$this->return_from_paidy( 'rejected', '42' );
+
+		ob_start();
+		wp_scripts()->do_items( self::HANDLE );
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( 'id="' . self::HANDLE . '-js-after"', $html );
+		$this->assertStringContainsString( 'wp.data.dispatch( "core/notices" ).createErrorNotice(', $html );
+		$this->assertSame( 1, substr_count( $html, 'createErrorNotice(' ) );
+	}
+
+	/**
 	 * A buyer who closes Paidy Checkout is logged in debug mode, without a notice.
 	 */
 	public function test_closed_writes_debug_log_in_debug_mode() {
@@ -276,9 +309,9 @@ class WC_Paidy_Checkout_Return_Notice_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider provide_unrelated_requests
 	 *
-	 * @param string|null $status   Value of the status query parameter.
-	 * @param string|null $order_id Value of the order_id query parameter.
-	 * @param string|null $endpoint WooCommerce endpoint the request is for, or null for the checkout page.
+	 * @param string|array|null $status   Value of the status query parameter.
+	 * @param string|array|null $order_id Value of the order_id query parameter.
+	 * @param string|null       $endpoint WooCommerce endpoint the request is for, or null for the checkout page.
 	 */
 	public function test_unrelated_requests_do_nothing( $status, $order_id, $endpoint ) {
 		update_option( 'woocommerce_paidy_settings', array( 'debug' => 'yes' ) );
@@ -315,6 +348,10 @@ class WC_Paidy_Checkout_Return_Notice_Test extends WP_UnitTestCase {
 			'other status'              => array( 'authorized', '42', null ),
 			'rejected on the order-pay' => array( 'rejected', '42', 'order-pay' ),
 			'closed on the order-pay'   => array( 'closed', '42', 'order-pay' ),
+			// A crafted URL such as ?status[]=rejected: sanitize_key() returns '' for a
+			// non-scalar, so nothing matches and nothing fails.
+			'status as an array'        => array( array( 'rejected' ), '42', null ),
+			'both as arrays'            => array( array( 'rejected' ), array( '42' ), null ),
 		);
 	}
 
